@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <UserProfileProvider>
       <Hero
-        image={{ src: '~/assets/images/hero-image.jpg', alt: 'Find-a-Muso Hero Image' }}
+        image={{ src: '/assets/images/hero-image.jpg', alt: 'Find-a-Muso Hero Image' }}
         title="MusoSpot"
         subtitle={
           <span className="hidden sm:inline">

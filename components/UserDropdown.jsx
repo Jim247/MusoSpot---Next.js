@@ -1,5 +1,7 @@
+"use client"
+
 import React, { useState, useEffect, useRef } from 'react';
-import { auth, signOut, onAuthStateChanged, getUserProfile } from '~/lib/firebase';
+import { auth, signOut, onAuthStateChanged, getUserProfile } from '../lib/firebase';
 
 export default function UserDropdown() {
   const [user, setUser] = useState(null);
