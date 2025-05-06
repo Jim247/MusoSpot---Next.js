@@ -126,8 +126,8 @@ const BasicSignupForm = () => {
       await sendPasswordResetEmail(auth, email);
       setForgotPasswordSent(true);
       setSuccess('Password reset email sent! Please check your inbox.');
-    } catch (err) {
-      if (err.code === 'auth/user-not-found') {
+    } catch {
+      if (error === 'auth/user-not-found') {
         setError('Failed to send password reset email. Please try again later.');
       }
     }
@@ -197,16 +197,18 @@ const BasicSignupForm = () => {
       reset();
     } catch (err) {
       let userMessage = 'An error occurred during registration.';
-      if (err.code === 'auth/email-already-in-use') {
-        userMessage = 'This email address is already registered. Please use a different email or log in.';
-        setShowForgotPassword(true);
-        setStep(1);
-      } else if (err.code === 'auth/invalid-email') {
-        userMessage = 'The email address provided is invalid.';
-        setStep(1);
-      } else if (err.code === 'auth/weak-password') {
-        userMessage = 'Password is too weak. Please choose a stronger password.';
-        setStep(1);
+      if (err && typeof err === 'object' && 'code' in err) {
+        if (err.code === 'auth/email-already-in-use') {
+          userMessage = 'This email address is already registered. Please use a different email or log in.';
+          setShowForgotPassword(true);
+          setStep(1);
+        } else if (err.code === 'auth/invalid-email') {
+          userMessage = 'The email address provided is invalid.';
+          setStep(1);
+        } else if (err.code === 'auth/weak-password') {
+          userMessage = 'Password is too weak. Please choose a stronger password.';
+          setStep(1);
+        }
       }
       setError(userMessage);
     } finally {
@@ -418,7 +420,7 @@ const BasicSignupForm = () => {
                       className="form-input"
                       type="number"
                       id="yearsExperience"
-                      {...register('yearsExperience', { required: 'Years of experience is required', min: 0, max: 70 })}
+                      {...register('yearsExperience', { required: 'Years of experience is required', min: 0, max: 50 })}
                     />
                     {errors.yearsExperience && <span className="form-error">{errors.yearsExperience.message}</span>}
                   </div>

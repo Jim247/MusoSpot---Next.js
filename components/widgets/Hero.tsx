@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image'
 
 type HeroProps = {
   title?: React.ReactNode;
@@ -25,17 +26,17 @@ const Hero: React.FC<HeroProps> = ({
   >
     {/* Background Image */}
     {image?.src && (
-      <img
+      <Image
         src={image.src}
         alt={image.alt || 'Hero Image'}
         className="absolute inset-0 w-full h-full object-cover"
         style={{ zIndex: 0 }}
+        fill
       />
     )}
     {/* Overlay */}
     <div className="absolute inset-0 bg-black bg-opacity-30" style={{ zIndex: 1 }} />
     {/* Centered Content */}
-    <h2 className="text- text-3xl font-bold">Tailwind working?</h2>
     <div className="relative z-10 flex flex-col items-center justify-center w-full h-full text-center px-4">
       {title && (
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-tight text-white drop-shadow mb-4">
