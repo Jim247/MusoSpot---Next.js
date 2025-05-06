@@ -1,4 +1,4 @@
-import type { GeoPoint } from '../constants/event';
+import type { GeoPoint } from '../../constants/event';
 
 export const getGeoPoint = async (postcode: string): Promise<GeoPoint> => {
   const formatted = postcode.trim().toUpperCase();

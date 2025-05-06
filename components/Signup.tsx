@@ -3,10 +3,10 @@ import React, { useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { createUser, generateUsername } from '../lib/firebase';
 import { INSTRUMENTS } from '../constants/instruments';
-import { postcodeToGeoPoint } from '../lib/postcodeUtils';
+import { postcodeToGeoPoint } from '../lib/utils/postcodeUtils';
 import { postcodeValidator } from 'postcode-validator';
 import { sendPasswordResetEmail, getAuth, fetchSignInMethodsForEmail } from 'firebase/auth';
-import PostcodeAutocomplete from '../lib/ValidatePostcode';
+import PostcodeAutocomplete from '../lib/utils/ValidatePostcode';
 
 interface FormDataState {
   firstName: string;
@@ -224,73 +224,76 @@ const BasicSignupForm = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white shadow rounded-lg">
-      <h1 className="text-2xl font-bold mb-6 ml-3 text-center">
+    <div className="form-container">
+      <h1 className="form-title">
         Create Account {step < 4 ? `(Step ${step} of 4)` : ''}
       </h1>
-      {error && <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded">{error}</div>}
+      
+      {error && <div className="form-error">{error}</div>}
       {success && !emailSent && (
-        <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded">{success}</div>
+        <div className="form-success">{success}</div>
       )}
 
       {emailSent ? (
-        <div className="text-center items">
-          <p className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded">{success}</p>
+        <div className="text-center">
+          <p className="form-success">{success}</p>
           <p className="mb-4">
             A verification email has been sent to <strong>{registeredEmail}</strong>.
           </p>
           <p className="mb-4">Please check your inbox and click the verification link to activate your account.</p>
           <button
             onClick={handleResendEmail}
-            className="mt-3 py-2 px-4 bg-highlight hover:bg-hover text-white font-semibold rounded"
+            className="btn-primary"
           >
             Resend Verification Email
           </button>
           <div className="mt-2">
             <button
               onClick={() => (window.location.href = '/login')}
-              className="mt-2 py-2 px-4 bg-white *:hover:bg-hover text-black font-semibold margin-left-2 rounded border border-gray-300"
-            >
+              className="btn-secondary"
+            >å
               Login now
             </button>
           </div>
         </div>
       ) : (
-        <form ref={formRef} onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form ref={formRef} onSubmit={handleSubmit(onSubmit)} className="form-section">
           {step === 1 && (
             <>
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-semibold mb-2" htmlFor="firstName">
+                <div className="form-group">
+                  <label className="form-label" htmlFor="firstName">
                     First Name
                   </label>
                   <input
-                    className="w-full border rounded px-3 py-2"
+                    className="form-input"
                     type="text"
                     id="firstName"
                     {...register('firstName', { required: 'First name is required' })}
                   />
-                  {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName.message}</p>}
+                  {errors.firstName && <span className="form-error">{errors.firstName.message}</span>}
                 </div>
-                <div>
-                  <label className="block font-semibold mb-2" htmlFor="lastName">
+                
+                <div className="form-group">
+                  <label className="form-label" htmlFor="lastName">
                     Last Name
                   </label>
                   <input
-                    className="w-full border rounded px-3 py-2"
+                    className="form-input"
                     type="text"
                     id="lastName"
                     {...register('lastName', { required: 'Last name is required' })}
                   />
-                  {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName.message}</p>}
+                  {errors.lastName && <span className="form-error">{errors.lastName.message}</span>}
                 </div>
               </div>
-              <div>
-                <label className="block font-semibold mb-2" htmlFor="email">
+
+              <div className="form-group">
+                <label className="form-label" htmlFor="email">
                   Email
                 </label>
                 <input
-                  className="w-full border rounded px-3 py-2"
+                  className="form-input"
                   type="email"
                   id="email"
                   {...register('email', {
@@ -301,14 +304,15 @@ const BasicSignupForm = () => {
                     },
                   })}
                 />
-                {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
+                {errors.email && <span className="form-error">{errors.email.message}</span>}
               </div>
-              <div>
-                <label className="block font-semibold mb-2" htmlFor="password">
+
+              <div className="form-group">
+                <label className="form-label" htmlFor="password">
                   Password
                 </label>
                 <input
-                  className="w-full border rounded px-3 py-2"
+                  className="form-input"
                   type="password"
                   id="password"
                   {...register('password', {
@@ -324,14 +328,15 @@ const BasicSignupForm = () => {
                 <p id="passwordHelp" className="text-xs text-gray-500 mt-1">
                   Min 8 chars, incl. uppercase, lowercase, number, symbol (!@#$%^&*).
                 </p>
-                {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
+                {errors.password && <span className="form-error">{errors.password.message}</span>}
               </div>
-              <div>
-                <label className="block font-semibold mb-2" htmlFor="confirmPassword">
+
+              <div className="form-group">
+                <label className="form-label" htmlFor="confirmPassword">
                   Confirm Password
                 </label>
                 <input
-                  className="w-full border rounded px-3 py-2"
+                  className="form-input"
                   type="password"
                   id="confirmPassword"
                   {...register('confirmPassword', {
@@ -339,10 +344,9 @@ const BasicSignupForm = () => {
                     validate: (value) => value === password || 'Passwords do not match',
                   })}
                 />
-                {errors.confirmPassword && (
-                  <p className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>
-                )}
+                {errors.confirmPassword && <span className="form-error">{errors.confirmPassword.message}</span>}
               </div>
+
               {showForgotPassword && (
                 <div className="mt-2">
                   <button
@@ -361,39 +365,39 @@ const BasicSignupForm = () => {
 
           {step === 2 && (
             <>
-              <div>
-                <label className="block font-semibold mb-2" htmlFor="role">
+              <div className="form-group">
+                <label className="form-label" htmlFor="role">
                   Are you a musician or an agent?
                 </label>
-                <select className="w-full border rounded px-3 py-2" id="role" {...register('role', { required: true })}>
+                <select className="form-select" id="role" {...register('role', { required: true })}>
                   <option value="musician">Musician</option>
                   <option value="agent">Agent</option>
                 </select>
               </div>
 
               {role === 'agent' && (
-                <div>
-                  <label className="block font-semibold mb-2" htmlFor="agencyName">
+                <div className="form-group">
+                  <label className="form-label" htmlFor="agencyName">
                     Agency Name
                   </label>
                   <input
-                    className="w-full border rounded px-3 py-2"
+                    className="form-input"
                     type="text"
                     id="agencyName"
                     {...register('agencyName', { required: 'Agency name is required' })}
                   />
-                  {errors.agencyName && <p className="text-red-500 text-sm mt-1">{errors.agencyName.message}</p>}
+                  {errors.agencyName && <span className="form-error">{errors.agencyName.message}</span>}
                 </div>
               )}
 
               {role === 'musician' && (
                 <>
-                  <div>
-                    <label className="block font-semibold mb-2" htmlFor="instrument">
+                  <div className="form-group">
+                    <label className="form-label" htmlFor="instrument">
                       Primary Instrument
                     </label>
                     <select
-                      className="w-full border rounded px-3 py-2"
+                      className="form-select"
                       id="instrument"
                       {...register('instrument', { required: 'Instrument is required' })}
                     >
@@ -404,28 +408,26 @@ const BasicSignupForm = () => {
                         </option>
                       ))}
                     </select>
-                    {errors.instrument && <p className="text-red-500 text-sm mt-1">{errors.instrument.message}</p>}
+                    {errors.instrument && <span className="form-error">{errors.instrument.message}</span>}
                   </div>
-                  <div>
-                    <label className="block font-semibold mb-2" htmlFor="yearsExperience">
+                  <div className="form-group">
+                    <label className="form-label" htmlFor="yearsExperience">
                       Years Of Professional Experience
                     </label>
                     <input
-                      className="w-full border rounded px-3 py-2"
+                      className="form-input"
                       type="number"
                       id="yearsExperience"
                       {...register('yearsExperience', { required: 'Years of experience is required', min: 0, max: 70 })}
                     />
-                    {errors.yearsExperience && (
-                      <p className="text-red-500 text-sm mt-1">{errors.yearsExperience.message}</p>
-                    )}
+                    {errors.yearsExperience && <span className="form-error">{errors.yearsExperience.message}</span>}
                   </div>
-                  <div>
-                    <label className="block font-semibold mb-2" htmlFor="transport">
+                  <div className="form-group">
+                    <label className="form-label" htmlFor="transport">
                       Do you have your own transport?
                     </label>
                     <select
-                      className="w-full border rounded px-3 py-2"
+                      className="form-select"
                       id="transport"
                       {...register('transport', { required: 'Please specify transport' })}
                     >
@@ -433,14 +435,14 @@ const BasicSignupForm = () => {
                       <option value="yes">Yes</option>
                       <option value="no">No</option>
                     </select>
-                    {errors.transport && <p className="text-red-500 text-sm mt-1">{errors.transport.message}</p>}
+                    {errors.transport && <span className="form-error">{errors.transport.message}</span>}
                   </div>
-                  <div>
-                    <label className="block font-semibold mb-2" htmlFor="paSystem">
+                  <div className="form-group">
+                    <label className="form-label" htmlFor="paSystem">
                       Do you have your own PA system?
                     </label>
                     <select
-                      className="w-full border rounded px-3 py-2"
+                      className="form-select"
                       id="paSystem"
                       {...register('paSystem', { required: 'Please specify PA system' })}
                     >
@@ -448,14 +450,14 @@ const BasicSignupForm = () => {
                       <option value="yes">Yes</option>
                       <option value="no">No</option>
                     </select>
-                    {errors.paSystem && <p className="text-red-500 text-sm mt-1">{errors.paSystem.message}</p>}
+                    {errors.paSystem && <span className="form-error">{errors.paSystem.message}</span>}
                   </div>
-                  <div>
-                    <label className="block font-semibold mb-2" htmlFor="lighting">
+                  <div className="form-group">
+                    <label className="form-label" htmlFor="lighting">
                       Do you have your own lighting?
                     </label>
                     <select
-                      className="w-full border rounded px-3 py-2"
+                      className="form-select"
                       id="lighting"
                       {...register('lighting', { required: 'Please specify lighting' })}
                     >
@@ -463,7 +465,7 @@ const BasicSignupForm = () => {
                       <option value="yes">Yes</option>
                       <option value="no">No</option>
                     </select>
-                    {errors.lighting && <p className="text-red-500 text-sm mt-1">{errors.lighting.message}</p>}
+                    {errors.lighting && <span className="form-error">{errors.lighting.message}</span>}
                   </div>
                 </>
               )}
@@ -472,11 +474,10 @@ const BasicSignupForm = () => {
 
           {step === 3 && (
             <>
-              <div>
-                <label className="block font-semibold mb-2" htmlFor="postcode">
+              <div className="form-group">
+                <label className="form-label" htmlFor="postcode">
                   Postcode
                 </label>
-                {/* Use Controller for custom input component */}
                 <Controller
                   name="postcode"
                   control={control}
@@ -485,40 +486,40 @@ const BasicSignupForm = () => {
                     <PostcodeAutocomplete {...field} value={field.value} onChange={field.onChange} required />
                   )}
                 />
-                {errors.postcode && <p className="text-red-500 text-sm mt-1">{errors.postcode.message}</p>}
+                {errors.postcode && <span className="form-error">{errors.postcode.message}</span>}
               </div>
-              <div>
-                <label className="block font-semibold mb-2" htmlFor="phone">
+              <div className="form-group">
+                <label className="form-label" htmlFor="phone">
                   Mobile Phone
                 </label>
                 <input
-                  className="w-full border rounded px-3 py-2"
+                  className="form-input"
                   type="tel"
                   id="phone"
                   {...register('phone', { required: 'Phone is required' })}
                   placeholder="e.g. 07123 456789"
                 />
-                {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>}
+                {errors.phone && <span className="form-error">{errors.phone.message}</span>}
               </div>
             </>
           )}
 
           {step === 4 && (
-            <div className="flex items-start space-x-3">
+            <div className="form-group flex items-start space-x-3">
               <input
                 type="checkbox"
                 id="terms"
                 checked={agreedToTerms}
                 onChange={(e) => setAgreedToTerms(e.target.checked)}
-                className="mt-1 h-4 w-4 text-highlight border-gray-300 rounded bg-pink-700"
+                className="form-checkbox"
               />
-              <label htmlFor="terms" className="text-sm text-gray-700">
+              <label htmlFor="terms" className="form-label">
                 I agree to the{' '}
-                <a href="/terms" target="_blank" className="text-highlight hover:underline">
+                <a href="/terms" target="_blank" className="form-link">
                   Terms of Service
                 </a>{' '}
                 and{' '}
-                <a href="/privacy" target="_blank" className="text-highlight hover:underline">
+                <a href="/privacy" target="_blank" className="form-link">
                   Privacy Policy
                 </a>
                 .
@@ -526,22 +527,26 @@ const BasicSignupForm = () => {
             </div>
           )}
 
-          <div className="flex justify-center pt-4">
+          <div className="form-nav">
             {step > 1 && (
-              <button type="button" onClick={prevStep} className="btn btn-secondary w-1/2">
+              <button type="button" onClick={prevStep} className="btn-secondary">
                 Back
               </button>
             )}
             {step === 1 && <div />}
 
             {step < 4 && (
-              <button type="button" onClick={nextStep} className="btn btn-primary w-1/2 mx-6">
+              <button type="button" onClick={nextStep} className="btn-primary">
                 Next
               </button>
             )}
 
             {step === 4 && (
-              <button type="submit" className="btn btn-primary w-1/2 mx-6" disabled={isLoading || !agreedToTerms}>
+              <button 
+                type="submit" 
+                className="btn-primary"
+                disabled={isLoading || !agreedToTerms}
+              >
                 {isLoading ? 'Creating Account...' : 'Create Account'}
               </button>
             )}
