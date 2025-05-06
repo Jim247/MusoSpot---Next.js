@@ -44,34 +44,39 @@ const LoginForm = () => {
   }
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white dark:bg-gray-800 shadow rounded-lg">
-      <h1 className="text-2xl font-bold mb-6 text-center text-default">{isResetMode ? 'Reset Password' : 'Login'}</h1>
-      {error && <p className="text-red-600 dark:text-red-400 mb-4 text-center">{error}</p>}
+    <div className="form-container">
+      <h1 className="form-title">
+        {isResetMode ? 'Reset Password' : 'Login'}
+      </h1>
+      
+      {error && <div className="form-error">{error}</div>}
       {resetSent && (
-        <p className="text-green-600 dark:text-green-400 mb-4 text-center">
+        <div className="form-success">
           Password reset email sent! Check your inbox.
-        </p>
+        </div>
       )}
-      <form onSubmit={isResetMode ? handlePasswordReset : handleSubmit} className="space-y-4">
-        <div>
-          <label className="block font-semibold text-default mb-2" htmlFor="email">
+
+      <form onSubmit={isResetMode ? handlePasswordReset : handleSubmit} className="form-section">
+        <div className="form-group">
+          <label className="form-label" htmlFor="email">
             Email
           </label>
           <input
-            className="w-full border rounded px-3 py-2 dark:bg-gray-700 dark:border-gray-600 focus:ring-primary-600"
+            className="form-input"
             type="email"
             id="email"
             name="email"
             required
           />
         </div>
+
         {!isResetMode && (
-          <div>
-            <label className="block font-semibold text-default mb-2" htmlFor="password">
+          <div className="form-group">
+            <label className="form-label" htmlFor="password">
               Password
             </label>
             <input
-              className="w-full border rounded px-3 py-2 dark:bg-gray-700 dark:border-gray-600 focus:ring-primary-600"
+              className="form-input"
               type="password"
               id="password"
               name="password"
@@ -79,13 +84,15 @@ const LoginForm = () => {
             />
           </div>
         )}
+
         <button
           type="submit"
-          className="w-full bg-primary text-accent rounded py-2 px-4 hover:bg-secondary transition duration-300"
+          className="btn-primary w-full"
         >
           {isResetMode ? 'Send Reset Link' : 'Login'}
         </button>
-        <div className="text-center mt-4 space-y-2">
+
+        <div className="form-nav">
           <button
             onClick={() => {
               setIsResetMode(!isResetMode);
@@ -93,16 +100,16 @@ const LoginForm = () => {
               setResetSent(false);
             }}
             type="button"
-            className="text-primary hover:text-secondary text-sm"
+            className="form-link text-sm"
           >
             {isResetMode ? 'Back to Login' : 'Forgot password?'}
           </button>
+          
           {!isResetMode && (
-            <div>
-              <span className="text-black">Don't have an account? </span>
-              <span></span>
-              <a href="/signup" className="text-highlight text-hover:text-secondary">
-                <strong> Sign up </strong>{' '}
+            <div className="text-gray-600 dark:text-gray-400">
+              <span>Don't have an account? </span>
+              <a href="/signup" className="form-link font-semibold">
+                Sign up
               </a>
             </div>
           )}
