@@ -1,3 +1,4 @@
+"use client"
 import React, { useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { createUser, generateUsername } from '../lib/firebase';
