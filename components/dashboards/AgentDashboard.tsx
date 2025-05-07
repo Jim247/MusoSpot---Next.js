@@ -1,11 +1,12 @@
+"use client"
 import React, { useState, useEffect } from 'react';
-import type { UserDashboard } from '../constants/users';
+import type { UserDashboard } from '../../constants/users';
 import {
     fetchUserEvents,
     fetchUserNotifications,
-} from '../lib/firebase';
-import { EventsList } from './events/EventsList';
-import type { EventApplication, EventPost } from '~/constants/event';
+} from '../../lib/firebase';
+import { EventsList } from './../events/EventsList';
+import type { EventApplication, EventPost } from '../../constants/event';
 
 // Define a simpler notification type based on the error message
 interface SimpleNotification {
