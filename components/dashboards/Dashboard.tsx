@@ -2,13 +2,14 @@
 import React from 'react';
 import MusoDashboard from './MusoDashboard';
 import AgentDashboard from './AgentDashboard';
-import { useUserProfile } from '../UserProfileContext';
+import { useUserProfile } from '@components/UserProfileContext';
 
 const Dashboard = () => {
   const { profile, loading } = useUserProfile();
 
   console.log('Dashboard state:', { profile, loading }); // Debug log
 
+  // Loading Screen for Dashboard
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -20,6 +21,7 @@ const Dashboard = () => {
     );
   }
 
+  // Hypothetical display for no profile available
   if (!profile) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -33,11 +35,13 @@ const Dashboard = () => {
     );
   }
 
+  // Control switch statement for which profile is displayed based on the user.role property
+
   switch (profile.role) {
     case 'musician':
       return <MusoDashboard />;
     case 'agent':
-      return <AgentDashboard profile={profile} />;
+      return <AgentDashboard />;
     default:
       return (
         <div className="flex items-center justify-center min-h-screen">

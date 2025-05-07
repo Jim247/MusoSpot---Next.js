@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import CoverageMap from './CoverageMap';
+import CoverageMap from '@components/maps/CoverageMap'
 
 interface SearchRadiusControlProps {
   initialRadius: number;

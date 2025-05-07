@@ -3,7 +3,7 @@ import React, { useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { createUser, generateUsername } from '../lib/firebase';
 import { INSTRUMENTS } from '../constants/instruments';
-import { postcodeToGeoPoint } from '../lib/utils/postcodeUtils';
+import { postcodeToGeoPoint } from '../lib/utils/PostcodeUtils';
 import { postcodeValidator } from 'postcode-validator';
 import { sendPasswordResetEmail, getAuth, fetchSignInMethodsForEmail } from 'firebase/auth';
 import PostcodeAutocomplete from '../lib/utils/ValidatePostcode';

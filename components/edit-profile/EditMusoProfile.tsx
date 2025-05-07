@@ -1,65 +1,50 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useForm, type SubmitHandler } from 'react-hook-form';
-import type { Review, Agent, UserDashboard } from '@constants/users';
-import {
-  useAuth,
-  updateUserAttributes,
-  uploadProfileImage,
-  fetchUserReviews,
-} from '@lib/firebase';
+import React, { useState, useRef } from 'react';
+import { useForm } from 'react-hook-form';
+import { useUserProfile } from '@components/UserProfileContext';
+import { useAuth, updateUserAttributes, uploadProfileImage, fetchUserReviews } from '@lib/firebase';
+import { EditProfileHeader } from '@components/Profile/EditProfileHeader';
 import { PromoVideo } from '@components/PromoVideo';
 import { SearchRadiusControl } from '@components/SearchRadiusControl';
-import { EditProfileHeader } from '@components/Profile/EditProfileHeader';
-import { AgentProfileInfo } from '@components/Profile/AgentProfileInfo';
-import { useUserProfile } from '@components/UserProfileContext';
-import ReviewSection from '@components/ReviewSection';
+import { formatReviewDate } from '../../utils/formatReviewDate'
+import type { Muso, Review } from '@constants/users';
+import { EditMusoProfileInfo } from '@components/profile/EditMusoProfileInfo';
 
-interface FormData {
-  bio?: string;
-  video?: string;
-  searchRadius?: number;
-}
 
-export default function AgentEditProfile() {
-  const { user: authUser } = useAuth() as { user: Agent | null };
-  const { profile, loading } = useUserProfile();
+export default function MusoEditProfile() {
+  const { profile, loading, refresh } = useUserProfile();
+  const { user: authUser } = useAuth() as { user: Muso | null };
   const [message, setMessage] = useState('');
   const [bioMessage, setBioMessage] = useState('');
   const [isEditingBio, setIsEditingBio] = useState(false);
+  const [isEditingEquipment, setIsEditingEquipment] = useState(false);
   const [isEditingRadius, setIsEditingRadius] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [photoMessage, setPhotoMessage] = useState('');
   const [isEditingVideo, setIsEditingVideo] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [photoMessage, setPhotoMessage] = useState('');
   const [reviews, setReviews] = useState<Review[]>([]);
   const [reviewLoading, setReviewLoading] = useState(true);
   const [reviewError, setReviewError] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const {
-    register,
-    handleSubmit: handleFormSubmit,
-    reset,
-    formState: { errors },
-    setValue,
-  } = useForm<FormData>({
-    defaultValues: {
-      bio: profile?.bio || '',
-      video: profile?.video || '',
-      searchRadius: profile?.searchRadius || 100,
-    },
+  const form = useForm<{ bio?: string }>({
+    defaultValues: { bio: profile?.bio || '' },
   });
 
-  useEffect(() => {
-    if (profile) {
-      reset({
-        bio: profile.bio || '',
-        video: profile.video || '',
-        searchRadius: profile.searchRadius || 100,
-      });
+  const onBioSubmit = async (data: { bio?: string }) => {
+    if (!authUser?.uid) return;
+    try {
+      await updateUserAttributes(authUser.uid, { bio: data.bio });
+      await refresh();
+      setBioMessage('Bio updated successfully');
+      setIsEditingBio(false);
+      setTimeout(() => setBioMessage(''), 3000);
+    } catch (err) {
+      setBioMessage('Failed to update bio');
+      console.error(err);
     }
-  }, [profile, reset]);
+  };
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!profile?.uid) return;
     setReviewLoading(true);
     fetchUserReviews(profile.uid)
@@ -68,55 +53,18 @@ export default function AgentEditProfile() {
       .finally(() => setReviewLoading(false));
   }, [profile?.uid]);
 
-  // Use SubmitHandler for type safety
-  const onSubmit: SubmitHandler<FormData> = async (data) => {
+  const handleEquipmentUpdate = async (equipment: { transport: boolean; paSystem: boolean; lighting: boolean }) => {
     if (!authUser?.uid) return;
-
     try {
-      const updateData: Partial<UserDashboard> = {
-        bio: data.bio,
-        video: data.video,
-        searchRadius: data.searchRadius,
-      };
-
-      // Perform bio validation here if needed, or rely on RHF validation
-      const bioText = data.bio || '';
-      const wordCount = bioText.trim().split(/\s+/).filter(Boolean).length;
-      const MIN_WORDS = 20;
-      const MAX_WORDS = 200;
-
-      // Check RHF errors first
-      if (errors.bio) {
-        // RHF already handles displaying the error message
-        return;
-      }
-      // Additional custom validation if necessary (though RHF should handle min/max length)
-      if (wordCount < MIN_WORDS) {
-        setBioMessage(`Bio must be at least ${MIN_WORDS} words.`); // Keep custom message state if needed
-        return;
-      }
-      if (wordCount > MAX_WORDS) {
-        setBioMessage(`Bio must not exceed ${MAX_WORDS} words.`); // Keep custom message state if needed
-        return;
-      }
-
-      await updateUserAttributes(authUser.uid, updateData);
-      setMessage('Profile updated successfully.');
-
-      // Update the profile state reliably
-      const updatedProfile = { ...profile, ...updateData } as UserDashboard;
-
-      setBioMessage(''); // Clear custom message
-      setIsEditingBio(false);
-      setIsEditingVideo(false);
-      setIsEditingRadius(false); // Also ensure radius editing closes if save is triggered elsewhere
-
-      // Reset the form with the fully updated profile data, ensuring correct types
-      reset(updatedProfile);
-    } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'An error occurred.';
-      setMessage(`Update failed: ${errorMessage}`); // Show error in general message area
-      setBioMessage(errorMessage); // Also set bio message if relevant
+      await updateUserAttributes(authUser.uid, equipment);
+      await refresh();
+      setMessage('Equipment updated successfully');
+      setIsEditingEquipment(false);
+      setTimeout(() => setMessage(''), 3000);
+    } catch (err) {
+      setMessage('Failed to update equipment');
+      setIsEditingEquipment(false);
+      console.error(err);
     }
   };
 
@@ -134,18 +82,15 @@ export default function AgentEditProfile() {
         setPhotoMessage('Image must be less than 5MB.');
         return;
       }
-      const imageUrl = await uploadProfileImage(authUser.uid, file);
-      setProfile((prev) => (prev ? { ...prev, avatar: imageUrl } : null));
+      await uploadProfileImage(authUser.uid, file);
+      await refresh();
       setPhotoMessage('Profile image updated successfully!');
       setTimeout(() => setPhotoMessage(''), 3000);
-    } catch (error) {
-      console.error('Upload error:', error);
+    } catch {
       setPhotoMessage('Error uploading image. Please try again.');
     } finally {
       setIsUploading(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -156,12 +101,7 @@ export default function AgentEditProfile() {
     <div className="bg-contrast dark=bg">
       {message && (
         <div className="fixed top-4 right-4 z-50 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded shadow-lg">
-          <p className="flex items-center">
-            <span>{message}</span>
-            <button onClick={() => setMessage('')} className="ml-4 text-green-700 hover:text-green-900">
-              ×
-            </button>
-          </p>
+          <span>{message}</span>
         </div>
       )}
       <div className="max-w-7xl mx-auto p-6">
@@ -174,28 +114,66 @@ export default function AgentEditProfile() {
         />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="space-y-6">
-            {/* Reviews Section */}
-            <ReviewSection profileUid={profile.uid} currentUser={authUser} />
+            <EditMusoProfileInfo
+              profile={profile}
+              isEditingBio={isEditingBio}
+              bioMessage={bioMessage}
+              setIsEditingBio={setIsEditingBio}
+              setBioMessage={setBioMessage}
+              form={form}
+              onBioSubmit={onBioSubmit}
+              isEditingEquipment={isEditingEquipment}
+              setIsEditingEquipment={setIsEditingEquipment}
+              onUpdateEquipment={handleEquipmentUpdate}
+            />
+            <div className="bg-white rounded-lg p-6">
+              <h2 className="text-xl font-semibold mb-2">User Reviews</h2>
+              {reviewLoading ? (
+                <div>Loading reviews...</div>
+              ) : reviews.length === 0 ? (
+                <div className="text-gray-500">No reviews yet.</div>
+              ) : (
+                <ul className="space-y-4">
+                  {reviews.slice(0, 3).map((review) => (
+                    <li key={review.id} className="border rounded-lg p-4 bg-blue-50">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-bold text-gray-700">Rating:</span>
+                        <span className="text-yellow-500 text-lg">
+                          {'★'.repeat(review.rating)}
+                          {'☆'.repeat(5 - review.rating)}
+                        </span>
+                      </div>
+                      {review.comment && <div className="mt-1 text-gray-800 italic">"{review.comment}"</div>}
+                      <div className="flex items-center gap-2 text-xs text-gray-500 mt-2">
+                        <span>{formatReviewDate(review.timestamp)}</span>
+                        {review.reviewerName && (
+                          <span>
+                            · reviewed by <span className="font-semibold text-gray-700">{review.reviewerName}</span>
+                          </span>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {reviewError && <div className="text-red-500 mt-2">{reviewError}</div>}
+            </div>
           </div>
-
           <div className="space-y-6">
-            {/* Search Radius Section - Needs adjustment to use RHF */}
             {profile.role !== 'agent' && (
               <div className="bg-white rounded-lg p-6">
                 <div className="group">
                   <div className="flex justify-between items-center">
                     <h3 className="text-gray-700 font-semibold w-1/3">Search Distance</h3>
                   </div>
-                  <div className="">
+                  <div>
                     {profile.geoPoint ? (
                       <SearchRadiusControl
-                        // Use RHF state if possible, or keep local state for editing toggle
                         initialRadius={profile.searchRadius || 100}
                         center={profile.geoPoint}
-                        // Modify onSave to trigger the main form submission
                         onSave={async (radius) => {
-                          setValue('searchRadius', radius, { shouldValidate: true });
-                          await handleFormSubmit(onSubmit)();
+                          await updateUserAttributes(authUser!.uid, { searchRadius: radius });
+                          await refresh();
                         }}
                         isEditing={isEditingRadius}
                         onEditToggle={setIsEditingRadius}
@@ -209,8 +187,6 @@ export default function AgentEditProfile() {
                 </div>
               </div>
             )}
-
-            {/* Promo Video Section - Needs adjustment to use RHF */}
             <div className="bg-white rounded-lg p-6">
               <div className="py-4 group">
                 <div className="flex justify-between items-center mb-4">
@@ -252,10 +228,10 @@ export default function AgentEditProfile() {
                 ) : (
                   <PromoVideo
                     initialUrl={profile.video || ''}
-                    // Modify onSave to trigger the main form submission
                     onSave={async (videoUrl) => {
-                      setValue('video', videoUrl, { shouldValidate: true });
-                      await handleFormSubmit(onSubmit)(); // Trigger main form submit
+                      await updateUserAttributes(authUser!.uid, { video: videoUrl });
+                      await refresh();
+                      setIsEditingVideo(false);
                     }}
                     isEditing={isEditingVideo}
                     onEditToggle={setIsEditingVideo}

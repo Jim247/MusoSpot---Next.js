@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import type { UserDashboard } from '../../constants/users';
+import Image from 'next/image'
 
 interface EditProfileHeaderProps {
   profile: UserDashboard;
@@ -27,7 +28,7 @@ export const EditProfileHeader: React.FC<EditProfileHeaderProps> = ({
       <div className="text-center">
         <div className="relative inline-block cursor-pointer group">
           <label className="cursor-pointer">
-            <img
+            <Image
               src={profile.avatar ? profile.avatar : '/images/User-avatar.svg'}
               alt="Profile"
               className="w-48 h-48 md:w-64 md:h-64 object-cover rounded-md border mx-auto"

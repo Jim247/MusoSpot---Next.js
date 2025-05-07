@@ -1,12 +1,12 @@
 "use client"
-import React, { useState, useEffect } from 'react';
-import type { UserDashboard } from '../../constants/users';
+import { useState, useEffect } from 'react';
 import {
     fetchUserEvents,
     fetchUserNotifications,
-} from '../../lib/firebase';
-import { EventsList } from './../events/EventsList';
-import type { EventApplication, EventPost } from '../../constants/event';
+} from '@lib/firebase';
+import { EventsList } from '@components/events/EventsList';
+import type { EventApplication, EventPost } from '@constants/event';
+import { useUserProfile } from '@components/UserProfileContext';
 
 // Define a simpler notification type based on the error message
 interface SimpleNotification {
@@ -17,31 +17,28 @@ interface SimpleNotification {
     createdAt: string;
 }
 
-interface AgentDashboardProps {
-  profile: UserDashboard;
-}
-
-export default function AgentDashboard({ profile }: AgentDashboardProps) {
-    const [loading, setLoading] = useState(true);
+export default function AgentDashboard() {
+    const { profile, loading: profileLoading } = useUserProfile();
     const [events, setEvents] = useState<EventPost[]>([]);
     const [notifications, setNotifications] = useState<SimpleNotification[]>([]); 
     const [applications, setApplications] = useState<{ [key: string]: EventApplication[] }>({});
-    
+    const [loading, setLoading] = useState(true);
+
     useEffect(() => {
         async function fetchData() {
+            // Events need to be fetched 
             if (!profile?.uid) {
                 setLoading(false);
                 return;
             }
             try {
-                setLoading(true); // Set loading true at the start of fetch
-                // Fetch data in parallel
+                setLoading(true);
                 const [userEvents, userNotifications] = await Promise.all([
-                    fetchUserEvents(profile.uid), // EventPost[]
-                    fetchUserNotifications(profile.uid), // Returns SimpleNotification[]
+                    fetchUserEvents(profile.uid),
+                    fetchUserNotifications(profile.uid),
                 ]);
                 setEvents(userEvents);
-                setNotifications(userNotifications as SimpleNotification[]); 
+                setNotifications(userNotifications as SimpleNotification[]);
             } catch (error) {
                 console.error('Error loading data:', error);
             } finally {
@@ -51,7 +48,7 @@ export default function AgentDashboard({ profile }: AgentDashboardProps) {
         fetchData();
     }, [profile?.uid]);
 
-    if (loading) return <div>Loading dashboard data...</div>;
+    if (profileLoading || loading) return <div>Loading dashboard data...</div>;
     if (!profile) return <div>Could not load profile data. Please try again later.</div>;
 
     return (

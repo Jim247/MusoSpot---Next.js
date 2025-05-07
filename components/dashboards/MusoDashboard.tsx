@@ -26,6 +26,7 @@ export default function MusoDashboard() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        // Events need to be fetched 
         async function fetchData() {
             if (!profile?.uid) {
                 setLoading(false);

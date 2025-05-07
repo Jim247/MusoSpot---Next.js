@@ -1,9 +1,10 @@
+"use client"
 import EditMusoProfile from './EditMusoProfile';
 import EditAgentProfile from './EditAgentProfile';
-import { useUserProfile } from './UserProfileContext';
+import { useUserProfile } from '@components/UserProfileContext';
 
 
-const EditProfile = () => {
+export const EditProfile = () => {
 const { profile, loading } = useUserProfile();
   
   if (loading) return <div>Loading...</div>;
