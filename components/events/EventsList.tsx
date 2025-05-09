@@ -16,7 +16,7 @@ export const EventsList: React.FC<EventsListProps> = ({ events, applications }) 
       <div>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold">My Events</h2>
-          <a href="/addevent" className="text-highlight hover:text-secondary text-sm">
+          <a href="/add-event" className="text-highlight hover:text-secondary text-sm">
             + Post New Event
           </a>
         </div>
