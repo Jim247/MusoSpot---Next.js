@@ -1,6 +1,6 @@
 "use client"
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '../lib/firebase';
+import { applyToEvent, hasUserAppliedToEvent, useAuth } from '../lib/firebase';
 import type { User } from 'firebase/auth';
 import type { EventNotification } from '../constants/event';
 

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import './globals.css';
+import 'leaflet/dist/leaflet.css';
 import Header from "../../components/layout/Header";
 import { UserProfileProvider } from "../../components/UserProfileContext";
 

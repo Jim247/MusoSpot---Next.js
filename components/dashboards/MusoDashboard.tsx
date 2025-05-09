@@ -6,7 +6,7 @@ import { EventsList } from '@components/events/EventsList';
 
 export default function MusoDashboard() {
     const { profile, events, notifications, loading, error } = useDashboardData();
-
+    console.log('MusoDashboard data:', { profile, events, notifications, loading, error });
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-screen">
@@ -47,8 +47,10 @@ export default function MusoDashboard() {
                         Welcome, {profile.firstName || 'Musician'}!
                     </h1>
                 </div>
+                {/* Ensure notifications are of type EventNotification[] */}
                 <NotificationList notifications={notifications} />
-                <EventsList events={events} />
+                {/* Pass applications prop to EventsList */}
+                <EventsList events={events} applications={{}} />
             </div>
         </div>
     );
