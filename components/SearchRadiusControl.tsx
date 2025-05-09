@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import CoverageMap from '@components/maps/CoverageMap'
+import CoverageMap from '@components/maps/CoverageMap';
 
 interface SearchRadiusControlProps {
   initialRadius: number;
-  center: { lat: number; lng: number };
+  center?: { lat: number; lng: number } | null;
   onSave: (radius: number) => Promise<void>;
   isEditing: boolean;
   onEditToggle: (editing: boolean) => void;
@@ -19,10 +19,20 @@ export const SearchRadiusControl = React.memo(
       onEditToggle(false);
     };
 
+    if (!center) {
+      return (
+        <div className="bg-white rounded-lg p-6">
+          <h3 className="text-gray-700 font-semibold mb-2">Search Distance</h3>
+          <div className="w-full h-64 rounded-lg mt-2 bg-gray-100 flex items-center justify-center">
+            <p className="text-gray-500">Location not available</p>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="space-y-4">
         <CoverageMap center={center} radiusMiles={radiusValue} />
-
         {isEditing ? (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="flex items-center gap-4">

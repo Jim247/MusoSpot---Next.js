@@ -4,7 +4,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 First, run the development server:
 
-run 'npm run seed-emulator' - to set emulator up with dummy users
+run 'npm run seed-users' - to set emulator up with dummy users
 
 run 'depcheck' for unused dependencies
 'npx unimported' for unused files and imports

@@ -23,8 +23,9 @@
       "@/*": ["./src/*"],
       "@components/*": ["./components/*"],
       "@lib/*": ["./lib/*"],
-      "@utils/*": ["./utils/*"],
-      "@constants/*": ["./constants/*"]
+      "@utils/*": ["./lib/utils/*"],
+      "@constants/*": ["./constants/*"],
+      "@hooks/*": ["./hooks/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

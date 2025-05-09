@@ -19,7 +19,7 @@ const LoginForm = () => {
       // redirect to dashboard after successful login
       window.location.href = '/dashboard';
     } catch {
-      setError('Login failed. Please ensure you have signed up email is verified and try again.');
+      setError('Login failed. Please ensure you have signed up, and that your email is verified and try again.');
     }
   }
 

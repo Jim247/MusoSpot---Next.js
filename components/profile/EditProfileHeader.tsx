@@ -32,6 +32,8 @@ export const EditProfileHeader: React.FC<EditProfileHeaderProps> = ({
               src={profile.avatar ? profile.avatar : '/images/User-avatar.svg'}
               alt="Profile"
               className="w-48 h-48 md:w-64 md:h-64 object-cover rounded-md border mx-auto"
+              width={256}
+              height={256}
             />
             <div className="absolute inset-0 bg-black bg-opacity-40 rounded-md opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
               <span className="text-white text-sm">{profile.avatar ? 'Change Photo' : 'Add a Photo'}</span>

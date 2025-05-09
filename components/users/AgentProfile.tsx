@@ -97,7 +97,7 @@ export default function AgentProfile() {
         </div>
       )}
       {/* User Reviews Section*/}
-      <ReviewSection profileUid={profile.uid} currentUser={null} />
+      <ReviewSection />
     </div>
   );
 }

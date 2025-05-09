@@ -5,12 +5,12 @@ import { getAuth, connectAuthEmulator, createUserWithEmailAndPassword, updatePro
 
 // Build config from process.env for Node.js
 const firebaseConfig = {
-  apiKey: process.env.PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.PUBLIC_FIREBASE_APP_ID,
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
 const app = initializeApp(firebaseConfig);
@@ -28,7 +28,7 @@ const dummyUsers = [
     uid: 'user1',
     firstName: 'James',
     lastName: 'Burgess',
-    userName: 'jburgess',
+    username: 'jburgess',
     email: 'jay249@hotmail.co.uk',
     phone: '07700900000',
     postcode: 'BS20 0LH',
@@ -55,7 +55,7 @@ const dummyUsers = [
     uid: 'agent1',
     firstName: 'Alex',
     lastName: 'Agent',
-    userName: 'agent',
+    username: 'agent',
     email: 'agent@agency.com',
     phone: '07700900001',
     postcode: 'BS1 4DJ',
