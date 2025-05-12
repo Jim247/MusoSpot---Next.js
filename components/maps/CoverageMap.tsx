@@ -40,11 +40,9 @@ export default function CoverageMap({ center, radiusMiles }: CoverageMapProps) {
 
       // Clear existing layers except tile layers
       mapRef.current!.eachLayer((layer: L.Layer) => {
-        // Only remove Circle or Marker layers
         if (
-          (layer as any).constructor &&
-          ((layer as any).constructor.name === 'Circle' ||
-            (layer as any).constructor.name === 'Marker')
+          layer instanceof L.Circle ||
+          layer instanceof L.Marker
         ) {
           mapRef.current!.removeLayer(layer);
         }

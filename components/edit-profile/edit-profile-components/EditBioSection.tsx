@@ -1,9 +1,9 @@
 import React from 'react';
 import { UseFormReturn } from 'react-hook-form';
-import type { Muso } from '@constants/users';
+import type { UserDashboard } from '@constants/users';
 
 interface BioSectionEditableProps {
-  profile: Muso;
+  profile: UserDashboard;
   bioMessage: string;
   setBioMessage: (msg: string) => void;
   form: UseFormReturn<{ bio?: string }>;
@@ -15,11 +15,16 @@ const BioSectionEditable: React.FC<BioSectionEditableProps> = ({ profile, bioMes
 
   React.useEffect(() => {
     form.reset({ bio: profile.bio || '' });
-  }, [profile.bio]);
+  }, [form, profile.bio]);
 
   return (
-    <div className="bg-white rounded-lg p-6">
-      <div className="border-b border-gray-200 py-4 group">
+    <div className="bg-white rounded-lg p-6 relative">
+      {!isEditing && (
+        <button className="btn-primary absolute bottom-3 right-3" onClick={() => setIsEditing(true)}>
+          Edit
+        </button>
+      )}
+      <div className="py-4 group">
         <div>
           <h3 className="text-gray-700 font-semibold w-1/3">About Me</h3>
         </div>
@@ -43,10 +48,7 @@ const BioSectionEditable: React.FC<BioSectionEditableProps> = ({ profile, bioMes
             </form>
           ) : (
             <div className="space-y-4">
-              <p className="text-m text-gray-500">{profile.bio || 'Add a bio to tell people about yourself'}</p>
-              <button className="btn-primary mt-2" onClick={() => setIsEditing(true)}>
-                Edit
-              </button>
+              <p className="text-m text-gray-500">{profile.bio || 'Add a short bio to tell people about yourself'}</p>
             </div>
           )}
           {bioMessage && <p className="text-red-500 text-sm mt-1">{bioMessage}</p>}

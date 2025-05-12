@@ -65,9 +65,11 @@ export const SearchRadiusControl = React.memo(
         ) : (
           <div className="flex items-center justify-between">
             <p className="text-m text-gray-500">Your search radius is set to {radiusValue} miles</p>
+            <div className="position-absolute bottom-">
             <button type="button" onClick={() => onEditToggle(true)} className="btn-primary">
               Edit
             </button>
+            </div>
           </div>
         )}
       </div>

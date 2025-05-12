@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import type { Muso } from '@constants/users';
+import type { UserDashboard } from '@constants/users';
 
 interface EquipmentSectionEditableProps {
-  profile: Muso;
+  profile: UserDashboard;
   onUpdateEquipment: (equipment: { transport: boolean; paSystem: boolean; lighting: boolean }) => void | Promise<void>;
 }
 
@@ -45,18 +45,19 @@ const EquipmentSectionEditable: React.FC<EquipmentSectionEditableProps> = ({ pro
   };
 
   return (
-    <div className="bg-white rounded-lg p-6">
-      <div className="mb-6 flex flex-col relative">
-      <div className="mb-2 relative">
-  <h3 className="text-gray-700 font-semibold">Equipment</h3>
-  {!isEditing && (
+    <div className="bg-white rounded-lg p-6 relative" >
+        {!isEditing && (
     <button
-      className="btn-primary absolute bottom-0 right-0"
+      className="btn-primary absolute bottom-3 right-3"
       onClick={() => setIsEditing(true)}
     >
       Edit
     </button>
   )}
+      <div className="mb-6 flex flex-col relative">
+      <div className="mb-2 relative">
+        
+  <h3 className="text-gray-700 font-semibold">Equipment</h3>
         </div>
         {isEditing ? (
           <div className="flex flex-col gap-2">
