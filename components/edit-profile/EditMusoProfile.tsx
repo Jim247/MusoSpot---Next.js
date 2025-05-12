@@ -1,10 +1,10 @@
 import React, { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { useUserProfile } from '@components/UserProfileContext';
-import { useAuth, updateUserAttributes, uploadProfileImage, fetchUserReviews } from '@lib/firebase';
+import { useAuth, updateUserAttributes, uploadProfileImage } from '@lib/firebase';
 import { EditProfileHeader } from '@components/profile/EditProfileHeader';
 import { SearchRadiusControl } from '@components/SearchRadiusControl';
-import type { Muso, Review } from '@constants/users';
+import type { Muso } from '@constants/users';
 import BioSectionEditable from './edit-profile-components/EditBioSection';
 import EquipmentSectionEditable from './edit-profile-components/EditEquipment';
 import ReviewSection from '@components/ReviewSection';
@@ -15,14 +15,10 @@ export default function MusoEditProfile() {
   const { user: authUser } = useAuth() as { user: Muso | null };
   const [message, setMessage] = useState('');
   const [bioMessage, setBioMessage] = useState('');
-  const [isEditingEquipment, setIsEditingEquipment] = useState(false);
   const [isEditingRadius, setIsEditingRadius] = useState(false);
   const [isEditingVideo, setIsEditingVideo] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [photoMessage, setPhotoMessage] = useState('');
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [reviewLoading, setReviewLoading] = useState(true);
-  const [reviewError, setReviewError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<{ bio?: string }>({
@@ -38,30 +34,6 @@ export default function MusoEditProfile() {
       setTimeout(() => setBioMessage(''), 3000);
     } catch (err) {
       setBioMessage('Failed to update bio');
-      console.error(err);
-    }
-  };
-
-  React.useEffect(() => {
-    if (!profile?.uid) return;
-    setReviewLoading(true);
-    fetchUserReviews(profile.uid)
-      .then(setReviews)
-      .catch(() => setReviewError('Error loading reviews'))
-      .finally(() => setReviewLoading(false));
-  }, [profile?.uid]);
-
-  const handleEquipmentUpdate = async (equipment: { transport: boolean; paSystem: boolean; lighting: boolean }) => {
-    if (!authUser?.uid) return;
-    try {
-      await updateUserAttributes(authUser.uid, equipment);
-      await refresh();
-      setMessage('Equipment updated successfully');
-      setIsEditingEquipment(false);
-      setTimeout(() => setMessage(''), 3000);
-    } catch (err) {
-      setMessage('Failed to update equipment');
-      setIsEditingEquipment(false);
       console.error(err);
     }
   };
@@ -121,11 +93,22 @@ export default function MusoEditProfile() {
             />
             <EquipmentSectionEditable
               profile={profile}
-              onUpdateEquipment={handleEquipmentUpdate}
+              onUpdateEquipment={async (equipment) => {
+                if (!authUser?.uid) return;
+                try {
+                  await updateUserAttributes(authUser.uid, equipment);
+                  await refresh();
+                  setMessage('Equipment updated successfully');
+                  setTimeout(() => setMessage(''), 3000);
+                } catch (err) {
+                  setMessage('Failed to update equipment');
+                  console.error(err);
+                }
+              }}
             />
-                        <div className="bg-white rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <h2 className="text-xl font-semibold mb-2">User Reviews</h2>
-              <ReviewSection profile={profile} />
+              <ReviewSection profileUid={profile.uid} currentUser={authUser} />
             </div>
           </div>
           <div className="space-y-6">
