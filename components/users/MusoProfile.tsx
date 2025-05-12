@@ -1,12 +1,12 @@
-import { useUserProfile } from '~/components/UserProfileContext';
+import { useUserProfile } from '@components/UserProfileContext';
 import React from 'react';
-import MiniMap from '~/components/MiniMap';
-import ExperienceBadge from '~/components/Profile/ExperienceBadge';
-import { getExperienceLevel, getTransport } from '~/utils/badgeRules';
-import TransportBadge from '~/components/Profile/TransportBadge';
-import PASystemBadge from '~/components/Profile/PaSystemBadge';
-import LightingBadge from '~/components/Profile/LightingBadge';
-import ReviewSection from '~/components/ReviewSection';
+import MiniMap from '@components/maps/MiniMap';
+import ExperienceBadge from '@components/Profile/ExperienceBadge';
+import { getExperienceLevel, getTransport } from '@utils/BadgeRules'
+import TransportBadge from '@components/Profile/TransportBadge';
+import PASystemBadge from '@components/Profile/PaSystemBadge';
+import LightingBadge from '@components/Profile/LightingBadge';
+import ReviewSection from '@components/ReviewSection';
 
 export default function MusoProfile() {
   const { profile, loading } = useUserProfile();

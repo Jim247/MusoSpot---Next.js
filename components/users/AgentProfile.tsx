@@ -1,9 +1,9 @@
 'use client';
 import React from 'react';
-import { useUserProfile } from '~/components/UserProfileContext';
-import { getExperienceLevel } from '~/utils/badgeRules';
-import ReviewSection from '~/components/ReviewSection';
-import ExperienceBadge from '~/components/Profile/ExperienceBadge';
+import { useUserProfile } from '@components/UserProfileContext';
+import { getExperienceLevel } from '@utils/BadgeRules';
+import ReviewSection from '@components/ReviewSection';
+import ExperienceBadge from '@components/Profile/ExperienceBadge';
 
 export default function AgentProfile() {
   const { profile, loading } = useUserProfile();
