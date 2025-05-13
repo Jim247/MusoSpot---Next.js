@@ -1,3 +1,4 @@
+"use client"
 import { useEffect, useState } from 'react';
 import MusoProfile from './MusoProfile';
 import AgentProfile from './AgentProfile';

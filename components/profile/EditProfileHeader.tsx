@@ -58,7 +58,7 @@ export const EditProfileHeader: React.FC<EditProfileHeaderProps> = ({
 
       <div className="mt-4 text-center">
         {profile?.slug && (
-          <a href={`${profile.slug}`} className="text-highlight hover:text-secondary text-sm">
+          <a href={`users/${profile.slug}`} className="text-highlight hover:text-secondary text-sm">
             See My Profile
           </a>
         )}

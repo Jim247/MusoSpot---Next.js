@@ -1,10 +1,10 @@
-import Badge from '../badges/Badge';
-import { getExperienceLevel } from '~/utils/badgeRules';
-import { experienceBadges } from '../badges/badges';
+import Badge from './Badge';
+import { getExperienceLevel } from '@utils/BadgeRules';
+import { badgeData } from './badges';
 
-export default function ExperienceBadge({ yearsExperience, size }) {
+export function ExperienceBadge({ yearsExperience, size }) {
   const level = getExperienceLevel(yearsExperience);
-  const badge = level && experienceBadges[level.label.toLowerCase()];
+  const badge = level && badgeData.experience[level.label];
   if (!level || !badge) return null;
 
   return (

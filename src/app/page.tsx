@@ -1,6 +1,6 @@
-import { UserProfileProvider } from '../../components/UserProfileContext';
-import Hero from '../../components/widgets/Hero';
-import AuthHeroActions from '../../components/AuthHeroActions';
+import { UserProfileProvider } from '@components/UserProfileContext';
+import Hero from '@components/widgets/Hero';
+import AuthHeroActions from '@components/AuthHeroActions';
 
 export default function Home() {
   return (

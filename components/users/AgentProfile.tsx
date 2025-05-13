@@ -3,7 +3,7 @@ import React from 'react';
 import { useUserProfile } from '@components/UserProfileContext';
 import { getExperienceLevel } from '@utils/BadgeRules';
 import ReviewSection from '@components/ReviewSection';
-import ExperienceBadge from '@components/Profile/ExperienceBadge';
+import { ExperienceBadge } from '@components/Profile/badges/ExperienceBadge';
 
 export default function AgentProfile() {
   const { profile, loading } = useUserProfile();

@@ -1,11 +1,9 @@
 import { useUserProfile } from '@components/UserProfileContext';
 import React from 'react';
 import MiniMap from '@components/maps/MiniMap';
-import ExperienceBadge from '@components/Profile/ExperienceBadge';
+import { ExperienceBadge } from '@components/Profile/badges/ExperienceBadge';
 import { getExperienceLevel, getTransport } from '@utils/BadgeRules'
-import TransportBadge from '@components/Profile/TransportBadge';
-import PASystemBadge from '@components/Profile/PaSystemBadge';
-import LightingBadge from '@components/Profile/LightingBadge';
+import { LightingBadge, PaSystemBadge, TransportBadge } from '../profile/badges/BadgeRender'
 import ReviewSection from '@components/ReviewSection';
 
 export default function MusoProfile() {
@@ -94,7 +92,7 @@ export default function MusoProfile() {
                   className="flex items-center justify-center transition-transform hover:scale-110 hover:shadow-xl rounded-md bg-gray-50 px-2 py-2"
                   title="PA System Owner"
                 >
-                  <PASystemBadge boolean={profile.paSystem} size="xxl" />
+                  <PaSystemBadge boolean={profile.paSystem} size="xxl" />
                 </div>
               )}
               {profile.lighting && (
