@@ -349,19 +349,6 @@ const BasicSignupForm = () => {
                 {errors.confirmPassword && <span className="form-error">{errors.confirmPassword.message}</span>}
               </div>
 
-              {showForgotPassword && (
-                <div className="mt-2">
-                  <button
-                    type="button"
-                    className="text-blue-600 underline text-sm"
-                    onClick={handleForgotPassword}
-                    disabled={forgotPasswordSent}
-                  >
-                    Forgot Password?
-                  </button>
-                  {forgotPasswordSent && <div className="text-green-600 text-xs mt-1">Password reset email sent!</div>}
-                </div>
-              )}
             </>
           )}
 
@@ -529,19 +516,32 @@ const BasicSignupForm = () => {
             </div>
           )}
 
-          <div className="form-nav">
-            {step > 1 && (
-              <button type="button" onClick={prevStep} className="btn-secondary">
-                Back
-              </button>
-            )}
-            {step === 1 && <div />}
 
-            {step < 4 && (
+
+            {/* Step 1 only next button centered in div */}
+            <div className="flex items-center justify-center pt-3">
+            {step === 1 && (
               <button type="button" onClick={nextStep} className="btn-primary">
                 Next
               </button>
             )}
+            </div>
+            
+            {/* Step 2 to 4 both boxes spaced  */}
+            <div className="flex justify-evenly">
+            {step >= 2 && (
+              <button type="button" onClick={prevStep} className="btn-secondary">
+                Back
+              </button>
+            )}
+            
+            <div className=''>
+            {step >= 2 && step < 4 && (
+              <button type="button" onClick={nextStep} className="btn-primary">
+                Next
+              </button>
+            )}
+            </div>
 
             {step === 4 && (
               <button 

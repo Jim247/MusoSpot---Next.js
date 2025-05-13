@@ -85,32 +85,37 @@ const LoginForm = () => {
           </div>
         )}
 
+        <div className='mb-4'>
         <button
           type="submit"
           className="btn-primary w-full"
         >
           {isResetMode ? 'Send Reset Link' : 'Login'}
         </button>
+        </div>
 
-        <div className="form-nav">
-          <button
-            onClick={() => {
-              setIsResetMode(!isResetMode);
-              setError('');
-              setResetSent(false);
-            }}
-            type="button"
-            className="form-link text-sm"
-          >
-            {isResetMode ? 'Back to Login' : 'Forgot password?'}
-          </button>
-          
+        <div className="form-nav flex flex-col">
+          <div>
+            <button
+              onClick={() => {
+                setIsResetMode(!isResetMode);
+                setError('');
+                setResetSent(false);
+              }}
+              type="button"
+              className="form-link text-sm"
+            >
+              {isResetMode ? 'Back to Login' : 'Forgot password?'}
+            </button>
+          </div>
           {!isResetMode && (
-            <div className="text-gray-600 dark:text-gray-400">
-              <span>Don't have an account? </span>
+            <div className="text-gray-600 mt-2">
+              <span>Don&apos;t have an account? </span>
+              <div className='flex flex-col items-center'>
               <a href="/signup" className="form-link font-semibold">
                 Sign up
               </a>
+              </div>
             </div>
           )}
         </div>
