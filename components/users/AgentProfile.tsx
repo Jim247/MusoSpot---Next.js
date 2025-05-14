@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import { useUserProfile } from '@components/UserProfileContext';
-import { getExperienceLevel } from '@utils/BadgeRules';
+import { getExperienceLevel } from '@lib/utils/BadgeRules';
 import ReviewSection from '@components/ReviewSection';
 import { ExperienceBadge } from '@components/Profile/badges/ExperienceBadge';
 

@@ -1,5 +1,5 @@
 import Badge from './Badge';
-import { getExperienceLevel } from '@utils/BadgeRules';
+import { getExperienceLevel } from '@lib/utils/BadgeRules';
 import { badgeData } from './badges';
 
 export function ExperienceBadge({ yearsExperience, size }) {

@@ -2,7 +2,7 @@ import { useUserProfile } from '@components/UserProfileContext';
 import React from 'react';
 import MiniMap from '@components/maps/MiniMap';
 import { ExperienceBadge } from '@components/Profile/badges/ExperienceBadge';
-import { getExperienceLevel, getTransport } from '@utils/BadgeRules'
+import { getExperienceLevel, getTransport } from '@lib/utils/BadgeRules'
 import { LightingBadge, PaSystemBadge, TransportBadge } from '../profile/badges/BadgeRender'
 import ReviewSection from '@components/ReviewSection';
 
