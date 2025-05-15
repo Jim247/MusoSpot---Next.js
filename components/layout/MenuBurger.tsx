@@ -2,14 +2,25 @@ export interface Props {
   label?: string;
   className?: string;
   children?: React.ReactNode;
+  onClick?: () => void;
+  expanded?: boolean;
 }
 
-const ToggleMenu: React.FC<Props> = ({
+const MenuBurger: React.FC<Props> = ({
   label = 'Toggle Menu',
   className = 'flex flex-col h-12 w-12 rounded justify-center items-center cursor-pointer group',
-  children
+  children,
+  onClick,
+  expanded = false,
 }) => (
-  <button type="button" className={className} aria-label={label} data-aw-toggle-menu>
+  <button
+    type="button"
+    className={`${className} ${expanded ? 'expanded' : ''}`}
+    aria-label={label}
+    data-aw-toggle-menu
+    onClick={onClick}
+    aria-expanded={expanded}
+  >
     <span className="sr-only">{label}</span>
     {children || (
       <>
@@ -30,4 +41,4 @@ const ToggleMenu: React.FC<Props> = ({
   </button>
 );
 
-export default ToggleMenu;
+export default MenuBurger;

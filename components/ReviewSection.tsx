@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import type { Review, Muso } from '@constants/users';
 import { addUserReview, fetchUserReviews } from '@lib/firebase';
-import { formatReviewDate } from '@utils/formatReviewDate';
+import { FormatReviewDate } from '@utils/FormatReviewDate';
 
 interface ReviewSectionProps {
   profileUid: string;

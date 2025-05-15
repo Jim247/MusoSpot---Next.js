@@ -1,25 +1,14 @@
 "use client"
-
 import React, { useState, useEffect, useRef } from 'react';
-import { auth, signOut, onAuthStateChanged, getUserProfile } from '../lib/firebase';
+import { auth, signOut, onAuthStateChanged } from '@lib/firebase'
 
 export default function UserDropdown() {
   const [user, setUser] = useState(null);
-  const [profile, setProfile] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (u) => {
-      setUser(u);
-      if (u) {
-        // Fetch user profile from Firestore to get slug
-        const userProfile = await getUserProfile(u.uid);
-        setProfile(userProfile);
-      } else {
-        setProfile(null);
-      }
-    });
+    const unsubscribe = onAuthStateChanged(auth, (u) => setUser(u));
     return unsubscribe;
   }, []);
 
