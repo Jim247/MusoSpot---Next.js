@@ -16,7 +16,7 @@ export default function Header({ links = [] }: HeaderProps) {
     <header className="top-0 z-50 flex-none mx-auto w-full border-b border-gray-50/0 transition-[opacity] ease-in-out">
       <div className="relative text-default py-3 px-3 md:px-6 mx-auto w-full max-w-7xl flex justify-between items-center">
         <Link className="flex items-center" href="/">
-          <Logo />
+          <Logo /><span className='pl-4 text-xl font-bold'>MusoSpot</span> 
         </Link>
         <nav className="flex-1 flex justify-center">
           <ul className="flex flex-row gap-6 text-base font-medium">
