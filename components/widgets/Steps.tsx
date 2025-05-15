@@ -12,23 +12,26 @@ export interface Props {
   image?: React.ReactNode; // for the right column
 }
 
-const baseColor = 'var(--color-primary, #f50057)';
-
 const Steps = ({ title, items = [], image }: Props) => {
   if (!items.length) return null;
 
   return (
     <div className="container mx-auto px-4 py-8">
-      {title && (
-        <div className="mb-8 text-left">
-          <h2 className="text-4xl font-bold">{title}</h2>
-        </div>
-      )}
-      {/* Grid Columns */}
-      <div className="grid grid-cols-2 gap-8 items-center">
-        <div className="relative flex flex-col gap-12">
-          {/* Vertical line connecting all icons */}
-          <div className="absolute left-[31px] top-[31px] bottom-[31px] w-px bg-gray-300 z-0" style={{height: 'calc(100% - 62px)'}} />
+      {/* Title above columns on large screens, inside left column on mobile */}
+      <div className="block md:hidden mb-8 text-left">
+        {/* Mobile title */}
+        {title && (
+          <h2 className="text-3xl font-bold">{title}</h2>
+        )}
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-x-16 items-start">
+        <div className="relative flex flex-col gap-6 align-middle">
+          {/* Large screen title */}
+          <div className="hidden md:block mb-2 text-left">
+            {title && (
+              <h2 className="text-3xl font-bold">{title}</h2>
+            )}
+          </div>
           {items.map(({ title, description, icon: Icon }, index) => (
             <div
               key={index}
@@ -39,16 +42,16 @@ const Steps = ({ title, items = [], image }: Props) => {
                   style={{
                     width: 62,
                     height: 62,
-                    border: `2px solid ${baseColor}`,
+                    border: '2px solid var(--aw-color-primary)',
                     borderRadius: 10,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: baseColor,
+                    color: 'var(--aw-color-primary)',
                     background: '#fff',
                   }}
                 >
-                  {Icon ? <Icon size={36} /> : index + 1}
+                  {Icon ? <Icon size={36} color="var(--aw-color-primary)" /> : index + 1}
                 </div>
               </div>
               <div className="flex-1 flex flex-col justify-center">
