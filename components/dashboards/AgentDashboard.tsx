@@ -39,15 +39,15 @@ export default function AgentDashboard() {
     }
 
     return (
-        <div className="bg-contrast dark:bg-gray-800 min-h-screen">
+        <div className="bg-contrast min-h-screen">
             <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
-                <div className="mb-6 p-4 bg-white dark:bg-gray-700 rounded-lg shadow">
-                    <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
+                <div className="mb-6 p-4 bg-white rounded-lg shadow">
+                    <h1 className="text-2xl font-semibold text-gray-900">
                         Welcome, {profile.firstName || 'Agent'}!
                     </h1>
                 </div>
                 <div>
-                    <h2 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">
+                    <h2 className="text-xl font-semibold mb-3 text-gray-900">
                         Your Posted Gigs & Applicants
                     </h2>
                     <EventsList events={events} applications={applications} />
