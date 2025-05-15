@@ -2,9 +2,9 @@
 import { useUserProfile } from './UserProfileContext';
 
 export default function AuthHeroActions() {
-  const { user } = useUserProfile();
+  const { profile } = useUserProfile();
 
-  if (user) {
+  if (profile) {
     return (
       <div className="flex justify-center gap-4">
         <a href="/dashboard" className="btn-primary">

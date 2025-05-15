@@ -24,7 +24,6 @@ export default function Home() {
           }
           actions={<AuthHeroActions />}
         />
-      </UserProfileProvider>
       <WidgetWrapper>
         <Steps
           title="Get your own profile page, for free, it's easy!"
@@ -108,6 +107,7 @@ export default function Home() {
           ]}
         />
       </WidgetWrapper>
+            </UserProfileProvider>
     </>
   );
 }
