@@ -13,7 +13,7 @@ export default function MusoProfile() {
   if (!profile) return <div>Profile not found</div>;
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white shadow rounded-lg">
+    <div className="max-w-3xl mx-auto p-6 bg-white">
       {/* Updated header: Pic on top, name then instruments */}
       <div className="flex flex-col items-center space-y-4">
         <img
