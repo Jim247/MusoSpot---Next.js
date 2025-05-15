@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 
 export interface Item {
   title?: string;
@@ -25,22 +24,21 @@ const Steps = ({ title, items = [], image }: Props) => {
           <h2 className="text-4xl font-bold">{title}</h2>
         </div>
       )}
-      <div className="grid grid-cols-2 gap-8 items-start">
-        <div className="relative">
+      {/* Grid Columns */}
+      <div className="grid grid-cols-2 gap-8 items-center">
+        <div className="relative flex flex-col gap-12">
+          {/* Vertical line connecting all icons */}
+          <div className="absolute left-[31px] top-[31px] bottom-[31px] w-px bg-gray-300 z-0" style={{height: 'calc(100% - 62px)'}} />
           {items.map(({ title, description, icon: Icon }, index) => (
-            <motion.div
+            <div
               key={index}
-              initial={{ opacity: 0, x: -40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.15 }}
-              viewport={{ once: true, amount: 0.6 }}
-              className="flex items-start mb-12 last:mb-0"
+              className="flex flex-row items-center gap-6 relative z-10"
             >
-              <div className="relative flex flex-col items-center mr-6">
+              <div className="flex-shrink-0 flex flex-col items-center pt-0">
                 <div
                   style={{
-                    width: 44,
-                    height: 44,
+                    width: 62,
+                    height: 62,
                     border: `2px solid ${baseColor}`,
                     borderRadius: 10,
                     display: 'flex',
@@ -50,32 +48,24 @@ const Steps = ({ title, items = [], image }: Props) => {
                     background: '#fff',
                   }}
                 >
-                  {Icon ? <Icon size={28} /> : index + 1}
+                  {Icon ? <Icon size={36} /> : index + 1}
                 </div>
-                {index !== items.length - 1 && (
-                  <div
-                    style={{
-                      width: 2,
-                      flex: 1,
-                      background: '#eee',
-                      marginTop: 2,
-                    }}
-                  />
-                )}
               </div>
-              <div>
-                {title && (
-                  <div style={{ fontWeight: 700, fontSize: 22, marginBottom: 6 }}>
-                    {title}
-                  </div>
-                )}
-                {description && (
-                  <div style={{ color: '#666', fontSize: 17, lineHeight: 1.5 }}>
-                    {description}
-                  </div>
-                )}
+              <div className="flex-1 flex flex-col justify-center">
+                <div className="space-y-1">
+                  {title && (
+                    <div style={{ fontWeight: 700, fontSize: 22, marginBottom: 6 }}>
+                      {title}
+                    </div>
+                  )}
+                  {description && (
+                    <div style={{ color: '#666', fontSize: 17, lineHeight: 1.5 }}>
+                      {description}
+                    </div>
+                  )}
+                </div>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
         <div>
