@@ -1,37 +1,33 @@
 import React, { ReactNode } from 'react';
-import { twMerge } from 'tailwind-merge';
 import type { CallToAction as Props } from '~/types';
 
 type ButtonProps = Props & {
   children?: ReactNode;
   className?: string;
-  icon?: string;
   type?: 'button' | 'submit' | 'reset';
 };
 
-const variants: Record<string, string> = {
+const variants = {
   primary: 'btn-primary',
-  secondary: 'btn-secondary',
-  tertiary: 'btn btn-tertiary',
-  link: 'cursor-pointer hover:text-primary',
+  secondary: 'inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-gray-700 bg-gray-100 hover:bg-gray-200',
+  tertiary: 'inline-flex items-center justify-center px-6 py-3 border border-gray-300 rounded-md shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50',
+  link: 'text-primary-600 hover:text-primary-700 font-medium',
 };
 
 export const Button: React.FC<ButtonProps> = ({
   variant = 'secondary',
   target,
   children,
-  icon = '',
   className = '',
   type,
   ...rest
 }) => {
-  const classes = twMerge(variants[variant] || '', className);
+  const classes = `${variants[variant as keyof typeof variants] || variants.secondary} ${className}`;
 
   if (type === 'button' || type === 'submit' || type === 'reset') {
     return (
       <button type={type} className={classes} {...rest}>
         {children}
-        {icon && <Icon name={icon} className="w-5 h-4 ml-1 -mr-1.5 rtl:mr-1 rtl:-ml-1.5 inline-block" />}
       </button>
     );
   }
@@ -44,7 +40,6 @@ export const Button: React.FC<ButtonProps> = ({
       {...rest}
     >
       {children}
-      {icon && <Icon name={icon} className="w-5 h-5 ml-1 -mr-1.5 rtl:mr-1 rtl:-ml-1.5 inline-block" />}
     </a>
   );
 };

@@ -31,6 +31,7 @@ const Hero: React.FC<HeroProps> = ({
         alt={image.alt || 'Hero Image'}
         className="absolute inset-0 w-full h-full object-cover"
         style={{ zIndex: 0 }}
+        priority
         fill
       />
     )}
