@@ -1,5 +1,3 @@
-import type { Timestamp } from 'firebase-admin/firestore';
-
 export type GeoPoint = {
   lat: number;
   lng: number;
@@ -14,7 +12,7 @@ export type EventPost = {
   eventType: string;
   postcode: string;
   geoPoint?: GeoPoint;
-  date: Timestamp;
+  date: Date;
   instrumentsNeeded: string[];
   budget: number;
   extraInfo: string;

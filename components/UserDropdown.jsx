@@ -1,16 +1,11 @@
 "use client"
 import React, { useState, useEffect, useRef } from 'react';
-import { auth, signOut, onAuthStateChanged } from '@lib/firebase'
+import { useAuth, signOut } from '@supabase/auth';
 
 export default function UserDropdown() {
-  const [user, setUser] = useState(null);
+  const { user, loading } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (u) => setUser(u));
-    return unsubscribe;
-  }, []);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -33,6 +28,8 @@ export default function UserDropdown() {
       alert('Failed to sign out, please try again.');
     }
   };
+
+  if (loading) return null;
 
   if (!user) {
     return (

@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.2.5",
+    "@supabase/supabase-js": "^2.49.4",
     "@tabler/icons-react": "^3.31.0",
     "@tailwindcss/typography": "^0.5.16",
     "admin": "^1.4.1",

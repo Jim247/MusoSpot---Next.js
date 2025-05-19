@@ -5,7 +5,6 @@ import { IconUserPlus, IconId, IconSearch, IconCheck } from '@tabler/icons-react
 import Steps from '@components/widgets/Steps';
 import WidgetWrapper from '@components/widgets/WidgetWrapper';
 import FAQs from '@components/widgets/FAQs';
-import CallToAction from '@components/widgets/CallToAction';
 
 export default function Home() {
   return (
@@ -109,15 +108,7 @@ export default function Home() {
         />
       </WidgetWrapper>
             </UserProfileProvider>
-      <WidgetWrapper>
-          <CallToAction
-            title='Sign Up Today!'
-            text="Get template"
-            href="https://github.com/onwidget/astrowind"
-            icon="IconUserPlus"
-          />
-      </WidgetWrapper>
-    </>
+                </>
   
   );
 }

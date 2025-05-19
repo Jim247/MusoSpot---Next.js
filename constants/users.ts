@@ -42,10 +42,7 @@ export interface Agent {
   yearsExperience?: number;
   agencyName?: string;
   city?: string;
-  geoPoint?: {
-    lat: number;
-    lng: number;
-  };
+  geoPoint?: string
   ward?: string;
   region?: string;
   country?: string;

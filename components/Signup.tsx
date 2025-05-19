@@ -1,12 +1,11 @@
 "use client"
 import React, { useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { createUser, generateUsername } from '../lib/firebase';
+import { signUpUser, generateUsername, sendPasswordReset} from '@supabase/auth'
 import { INSTRUMENTS } from '../constants/instruments';
-import { postcodeToGeoPoint } from '../lib/utils/PostcodeUtils';
 import { postcodeValidator } from 'postcode-validator';
-import { sendPasswordResetEmail, getAuth, fetchSignInMethodsForEmail } from 'firebase/auth';
 import PostcodeAutocomplete from '../lib/utils/ValidatePostcode';
+import { postcodeToGeoJSONPoint } from '@lib/utils/GeoPoints';
 
 interface FormDataState {
   firstName: string;
@@ -117,113 +116,96 @@ const BasicSignupForm = () => {
     setStep((prev) => Math.max(prev - 1, 1));
   };
 
-  const handleForgotPassword = async () => {
-    setError('');
-    setSuccess('');
-    setForgotPasswordSent(false);
-    try {
-      const auth = getAuth();
-      await sendPasswordResetEmail(auth, email);
-      setForgotPasswordSent(true);
-      setSuccess('Password reset email sent! Please check your inbox.');
-    } catch {
-      if (error === 'auth/user-not-found') {
-        setError('Failed to send password reset email. Please try again later.');
-      }
-    }
-  };
+
+const handleForgotPassword = async () => {
+  setError('');
+  setSuccess('');
+  setForgotPasswordSent(false);
+  try {
+    await sendPasswordReset(email);
+    setForgotPasswordSent(true);
+    setSuccess('Password reset email sent! Please check your inbox.');
+  } catch (err) {
+    setError('Failed to send password reset email. Please try again later.');
+  }
+};
 
   const onSubmit = async (data: FormDataState) => {
-    if (!agreedToTerms) {
-      setError('Please agree to the terms.');
-      setStep(4);
+  if (!agreedToTerms) {
+    setError('Please agree to the terms.');
+    setStep(4);
+    return;
+  }
+  setIsLoading(true);
+  setEmailSent(false);
+  setSuccess('');
+  setError('');
+
+  try {
+    // Check if email already exists in users table
+    const { data: existingUser, error: userCheckError } = await supabase
+      .from('users')
+      .select('email')
+      .eq('email', data.email)
+      .single();
+
+    if (existingUser) {
+      setError('This email address is already registered. Please use a different email or log in.');
+      setShowForgotPassword(true);
+      setStep(1);
+      setIsLoading(false);
       return;
     }
-    setIsLoading(true);
-    setEmailSent(false);
-    setSuccess('');
-    setError('');
 
-    try {
-      // Check if email already exists
-      const auth = getAuth();
-      const signInMethods = await fetchSignInMethodsForEmail(auth, data.email);
-      if (signInMethods && signInMethods.length > 0) {
-        setError('This email address is already registered. Please use a different email or log in.');
-        setShowForgotPassword(true);
-        setStep(1);
-        setIsLoading(false);
-        return;
-      }
+    const rawPostcode = data.postcode.toUpperCase();
+    const cleaned = rawPostcode.replace(/\s+/g, '');
+    const formattedPostcode = cleaned.replace(/^(.+?)(\d[A-Z]{2})$/, '$1 $2');
 
-      const rawPostcode = data.postcode.toUpperCase();
-      const cleaned = rawPostcode.replace(/\s+/g, '');
-      const formattedPostcode = cleaned.replace(/^(.+?)(\d[A-Z]{2})$/, '$1 $2');
-
-      const geoPoint = await postcodeToGeoPoint(formattedPostcode);
-      if (!geoPoint) {
-        setError('Could not validate postcode location. Please check your postcode.');
-        setIsLoading(false);
-        setStep(3);
-        return;
-      }
-
-      const username = await generateUsername(data.firstName, data.lastName);
-
-      const userData = {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email,
-        phone: data.phone,
-        username,
-        role: data.role,
-        instrument: data.role === 'musician' ? data.instrument : undefined,
-        agencyName: data.role === 'agent' ? data.agencyName : undefined,
-        yearsExperience: data.role === 'musician' ? data.yearsExperience : undefined,
-        postcode: formattedPostcode,
-        geoPoint,
-        slug: username,
-        transport: data.role === 'musician' ? data.transport === 'yes' : undefined,
-        paSystem: data.role === 'musician' ? data.paSystem === 'yes' : undefined,
-        lighting: data.role === 'musician' ? data.lighting === 'yes' : undefined,
-      };
-
-      await createUser(data.email, data.password, userData);
-
-      setRegisteredEmail(data.email);
-      setEmailSent(true);
-      setSuccess('Account created! Please check your email to verify your account before logging in.');
-      setShowForgotPassword(false);
-      reset();
-    } catch (err) {
-      let userMessage = 'An error occurred during registration.';
-      if (err && typeof err === 'object' && 'code' in err) {
-        if (err.code === 'auth/email-already-in-use') {
-          userMessage = 'This email address is already registered. Please use a different email or log in.';
-          setShowForgotPassword(true);
-          setStep(1);
-        } else if (err.code === 'auth/invalid-email') {
-          userMessage = 'The email address provided is invalid.';
-          setStep(1);
-        } else if (err.code === 'auth/weak-password') {
-          userMessage = 'Password is too weak. Please choose a stronger password.';
-          setStep(1);
-        }
-      }
-      setError(userMessage);
-    } finally {
+    const geoPoint = await postcodeToGeoJSONPoint(formattedPostcode);
+    if (!geoPoint) {
+      setError('Could not validate postcode location. Please check your postcode.');
       setIsLoading(false);
+      setStep(3);
+      return;
     }
-  };
 
-  const handleResendEmail = async () => {
-    try {
-      await resendVerificationEmail();
-      setSuccess('Verification email has been resent!');
-    } catch {
-      setError('Failed to resend verification email. Please try again later.');
+    const username = await generateUsername(data.firstName, data.lastName);
+
+    const userData = {
+      firstName: data.firstName,
+      lastName: data.lastName,
+      email: data.email,
+      phone: data.phone,
+      username,
+      role: data.role,
+      instrument: data.role === 'musician' ? data.instrument : undefined,
+      agencyName: data.role === 'agent' ? data.agencyName : undefined,
+      yearsExperience: data.role === 'musician' ? data.yearsExperience : undefined,
+      postcode: formattedPostcode,
+      geoPoint,
+      slug: username,
+      transport: data.role === 'musician' ? data.transport === 'yes' : undefined,
+      paSystem: data.role === 'musician' ? data.paSystem === 'yes' : undefined,
+      lighting: data.role === 'musician' ? data.lighting === 'yes' : undefined,
+    };
+
+    await signUpUser(data.email, data.password, userData);
+
+    setRegisteredEmail(data.email);
+    setEmailSent(true);
+    setSuccess('Account created! Please check your email to verify your account before logging in.');
+    setShowForgotPassword(false);
+    reset();
+  } catch (err) {
+    let userMessage = 'An error occurred during registration.';
+    if (err && typeof err === 'object' && 'message' in err) {
+      userMessage = err.message as string;
     }
-  };
+    setError(userMessage);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="form-container">

@@ -1,6 +1,6 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import { useAuth, getUserProfile } from '../lib/firebase'
+import { useAuth, getCurrentUser } from '../supabase/auth'
 import type { Muso, Agent, UserDashboard } from '../constants/users'
 
 interface UserProfileContextType {
@@ -31,14 +31,14 @@ export const UserProfileProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
     setLoading(true);
-    const userProfile = await getUserProfile(authUser.uid);
+    const userProfile = await getCurrentUser();
     setProfile(userProfile);
     setLoading(false);
   };
 
   useEffect(() => {
     fetchProfile();
-  }, [authUser?.uid]);
+  }, [authUser?.uid, fetchProfile]);
 
   return (
     <UserProfileContext.Provider value={{ profile, loading, refresh: fetchProfile }}>
