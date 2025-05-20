@@ -5,7 +5,7 @@ import Image from 'next/image'
 interface EditProfileHeaderProps {
   profile: UserDashboard;
   isUploading: boolean;
-  userName: string;
+  username: string;
   photoMessage: string;
   handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
@@ -22,7 +22,7 @@ export const EditProfileHeader: React.FC<EditProfileHeaderProps> = ({
     <div className="bg-white rounded-lg p-6 mb-8">
      {profile.role == 'agent' && (
         <div className="mb-6">
-          <h3 className="text-gray-700 font-semibold mb-2">Welcome, {profile.firstName}!</h3>
+          <h3 className="text-gray-700 font-semibold mb-2">Welcome, {profile.first_name}!</h3>
         </div>
       )}
       <div className="text-center">

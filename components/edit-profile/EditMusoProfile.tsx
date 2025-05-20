@@ -1,7 +1,6 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useUserProfile } from '@components/UserProfileContext';
-import { useAuth, updateUserAttributes, uploadProfileImage } from '@lib/firebase';
 import { EditProfileHeader } from '@components/profile/EditProfileHeader';
 import { SearchRadiusControl } from '@components/SearchRadiusControl';
 import type { Muso } from '@constants/users';
@@ -9,6 +8,9 @@ import BioSectionEditable from './edit-profile-components/EditBioSection';
 import EquipmentSectionEditable from './edit-profile-components/EditEquipment';
 import ReviewSection from '@components/ReviewSection';
 import EditPromoVideo from './edit-profile-components/EditPromoVideo'
+import { supabase } from '../../supabaseClient'; // Adjust path as needed
+import type { Review } from '@constants/users';
+import { useAuth } from '@supabase/auth';
 
 export default function MusoEditProfile() {
   const { profile, loading, refresh } = useUserProfile();
@@ -19,6 +21,9 @@ export default function MusoEditProfile() {
   const [isEditingVideo, setIsEditingVideo] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [photoMessage, setPhotoMessage] = useState('');
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviewLoading, setReviewLoading] = useState(true);
+  const [reviewError, setReviewError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<{ bio?: string }>({
@@ -26,9 +31,9 @@ export default function MusoEditProfile() {
   });
 
   const onBioSubmit = async (data: { bio?: string }) => {
-    if (!authUser?.uid) return;
+    if (!authUser?.id) return;
     try {
-      await updateUserAttributes(authUser.uid, { bio: data.bio });
+      await updateUserAttributes(authUser.id, { bio: data.bio });
       await refresh();
       setBioMessage('Bio updated successfully');
       setTimeout(() => setBioMessage(''), 3000);
@@ -40,7 +45,7 @@ export default function MusoEditProfile() {
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !authUser?.uid) return;
+    if (!file || !authUser?.id) return;
     try {
       setIsUploading(true);
       setPhotoMessage('');
@@ -52,7 +57,7 @@ export default function MusoEditProfile() {
         setPhotoMessage('Image must be less than 5MB.');
         return;
       }
-      await uploadProfileImage(authUser.uid, file);
+      await uploadProfileImage(authUser.id, file);
       await refresh();
       setPhotoMessage('Profile image updated successfully!');
       setTimeout(() => setPhotoMessage(''), 3000);
@@ -63,6 +68,27 @@ export default function MusoEditProfile() {
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
+
+  useEffect(() => {
+    if (!profile?.id) return;
+    setReviewLoading(true);
+    supabase
+      .from('reviews')
+      .select('*')
+      .eq('user_id', profile.id)
+      .order('created_at', { ascending: false })
+      .then(({ data, error }) => {
+        if (error) {
+          setReviewError('Error loading reviews');
+          setReviews([]);
+        } else {
+          setReviews(data as Review[]);
+          setReviewError('');
+        }
+      })
+      .catch(() => setReviewError('Error loading reviews'))
+      .finally(() => setReviewLoading(false));
+  }, [profile?.id]);
 
   if (loading) return <div>Loading...</div>;
   if (!profile) return <div>No profile found.</div>;
@@ -76,7 +102,7 @@ export default function MusoEditProfile() {
       )}
       <div className="max-w-7xl mx-auto p-6">
         <EditProfileHeader
-          userName={profile.firstName}
+          username={profile.first_name}
           profile={profile}
           isUploading={isUploading}
           photoMessage={photoMessage}
@@ -94,9 +120,9 @@ export default function MusoEditProfile() {
             <EquipmentSectionEditable
               profile={profile}
               onUpdateEquipment={async (equipment) => {
-                if (!authUser?.uid) return;
+                if (!authUser?.id) return;
                 try {
-                  await updateUserAttributes(authUser.uid, equipment);
+                  await updateUserAttributes(authUser.id, equipment);
                   await refresh();
                   setMessage('Equipment updated successfully');
                   setTimeout(() => setMessage(''), 3000);
@@ -108,7 +134,13 @@ export default function MusoEditProfile() {
             />
             <div className="bg-white rounded-lg p-6">
               <h2 className="text-xl font-semibold mb-2">User Reviews</h2>
-              <ReviewSection profileUid={profile.uid} currentUser={authUser} />
+              <ReviewSection
+                profileid={profile.id}
+                currentUser={authUser}
+                reviews={reviews}
+                loading={reviewLoading}
+                error={reviewError}
+              />
             </div>
           </div>
           <div className="space-y-6">
@@ -124,7 +156,7 @@ export default function MusoEditProfile() {
                         initialRadius={profile.searchRadius || 100}
                         center={profile.geoPoint}
                         onSave={async (radius) => {
-                          await updateUserAttributes(authUser!.uid, { searchRadius: radius });
+                          await updateUserAttributes(authUser!.id, { searchRadius: radius });
                           await refresh();
                         }}
                         isEditing={isEditingRadius}
@@ -145,7 +177,7 @@ export default function MusoEditProfile() {
                 isEditing={isEditingVideo}
                 setIsEditing={setIsEditingVideo}
                 onSave={async (videoUrl) => {
-                  await updateUserAttributes(authUser!.uid, { video: videoUrl });
+                  await updateUserAttributes(authUser!.id, { video: videoUrl });
                   await refresh();
                   setIsEditingVideo(false);
                 }}

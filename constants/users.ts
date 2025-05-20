@@ -1,16 +1,16 @@
 import type { Timestamp } from 'firebase/firestore';
 
 export interface Muso {
-  uid: string;
-  firstName: string;
-  lastName: string;
-  userName: string;
+  id: string;
+  first_name: string;
+  last_name: string;
+  username: string;
   email: string;
   phone: string;
   postcode?: string;
-  searchRadius?: number;
-  yearsExperience?: number;
-  agencyName?: string;
+  search_radius?: number;
+  years_experience?: number;
+  agency_name?: string;
   city?: string;
   geoPoint?: {
     lat: number;
@@ -27,20 +27,20 @@ export interface Muso {
   slug: string;
   reviews?: Review[];
   transport?: boolean;
-  paSystem?: boolean;
+  pa_system?: boolean;
   lighting?: boolean;
 }
 
 export interface Agent {
-  uid: string;
-  firstName: string;
-  lastName: string;
-  userName: string;
+  id: string;
+  first_name: string;
+  last_name: string;
+  username: string;
   email: string;
   phone: string;
   postcode?: string;
-  yearsExperience?: number;
-  agencyName?: string;
+  years_experience?: number;
+  agency_name?: string;
   city?: string;
   geoPoint?: string
   ward?: string;
@@ -66,18 +66,18 @@ export interface Review {
 
 export interface UserDashboard {
   lighting: boolean;
-  paSystem: boolean;
+  pa_system: boolean;
   transport: boolean;
-  uid: string;
-  firstName: string;
-  lastName: string;
-  userName?: string;
+  id: string;
+  first_name: string;
+  last_name: string;
+  username?: string;
   email: string;
   phone?: string;
   postcode?: string;
   searchRadius?: number;
-  yearsExperience?: number;
-  agencyName?: string;
+  years_experience?: number;
+  agency_name?: string;
   city?: string;
   geoPoint?: {
     lat: number;

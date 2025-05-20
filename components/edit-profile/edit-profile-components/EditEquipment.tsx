@@ -3,14 +3,14 @@ import type { UserDashboard } from '@constants/users';
 
 interface EquipmentSectionEditableProps {
   profile: UserDashboard;
-  onUpdateEquipment: (equipment: { transport: boolean; paSystem: boolean; lighting: boolean }) => void | Promise<void>;
+  onUpdateEquipment: (equipment: { transport: boolean; pa_system: boolean; lighting: boolean }) => void | Promise<void>;
 }
 
 const EquipmentSectionEditable: React.FC<EquipmentSectionEditableProps> = ({ profile, onUpdateEquipment }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [equipment, setEquipment] = useState({
     transport: !!profile.transport,
-    paSystem: !!profile.paSystem,
+    pa_system: !!profile.pa_system,
     lighting: !!profile.lighting,
   });
   const [message, setMessage] = useState('');
@@ -18,10 +18,10 @@ const EquipmentSectionEditable: React.FC<EquipmentSectionEditableProps> = ({ pro
   React.useEffect(() => {
     setEquipment({
       transport: !!profile.transport,
-      paSystem: !!profile.paSystem,
+      pa_system: !!profile.pa_system,
       lighting: !!profile.lighting,
     });
-  }, [profile.transport, profile.paSystem, profile.lighting]);
+  }, [profile.transport, profile.pa_system, profile.lighting]);
 
   const handleChange = (field: keyof typeof equipment, value: boolean) => {
     setEquipment((prev) => ({ ...prev, [field]: value }));
@@ -37,7 +37,7 @@ const EquipmentSectionEditable: React.FC<EquipmentSectionEditableProps> = ({ pro
   const handleCancel = () => {
     setEquipment({
       transport: !!profile.transport,
-      paSystem: !!profile.paSystem,
+      pa_system: !!profile.pa_system,
       lighting: !!profile.lighting,
     });
     setIsEditing(false);
@@ -75,8 +75,8 @@ const EquipmentSectionEditable: React.FC<EquipmentSectionEditableProps> = ({ pro
             <label className="flex items-center gap-2">
               <span>Own PA System?</span>
               <select
-                value={equipment.paSystem ? 'true' : 'false'}
-                onChange={e => handleChange('paSystem', e.target.value === 'true')}
+                value={equipment.pa_system ? 'true' : 'false'}
+                onChange={e => handleChange('pa_system', e.target.value === 'true')}
                 className="border rounded px-2 py-1"
               >
                 <option value="true">Yes</option>
@@ -105,7 +105,7 @@ const EquipmentSectionEditable: React.FC<EquipmentSectionEditableProps> = ({ pro
               Own Transport: <span className="font-semibold">{profile.transport ? 'Yes' : 'No'}</span>
             </li>
             <li>
-              Own PA System: <span className="font-semibold">{profile.paSystem ? 'Yes' : 'No'}</span>
+              Own PA System: <span className="font-semibold">{profile.pa_system ? 'Yes' : 'No'}</span>
             </li>
             <li>
               Own Lighting: <span className="font-semibold">{profile.lighting ? 'Yes' : 'No'}</span>

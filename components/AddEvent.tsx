@@ -90,8 +90,8 @@ export default function AddEvent() {
         budget: Number(data.budget),
         extraInfo: data.text,
         eventType: data.eventType,
-        agentId: user.uid,
-        eventID: '',
+        agentId: user.id,
+        event_id: '',
         status: 'pending',
       };
 
@@ -109,7 +109,7 @@ export default function AddEvent() {
     }
     setSubmitError('');
     try {
-      await createEventWithNotifications(eventDataToConfirm, user.uid);
+      await createEventWithNotifications(eventDataToConfirm, user.id);
       window.location.href = '/dashboard';
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : 'Error creating event');

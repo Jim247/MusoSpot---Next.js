@@ -55,9 +55,9 @@ export const EventsList: React.FC<EventsListProps> = ({ events, applications }) 
                 </div>
                 <div className="mt-4">
                   <h3 className="font-semibold mb-2">Applications</h3>
-                  {applications[event.eventID]?.length ? (
+                  {applications[event.event_id]?.length ? (
                     <ul className="list-disc ml-6">
-                      {applications[event.eventID].map((app) => (
+                      {applications[event.event_id].map((app) => (
                         <li key={app.id}>
                           <a href={`/users/${app.slug}`} className="text-highlight hover:text-secondary">
                             {app.slug}

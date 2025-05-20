@@ -21,12 +21,12 @@ export function TransportBadge({ boolean, size }) {
   );
 }
 
-export function PaSystemBadge({ boolean, size }) {
+export function pa_systemBadge({ boolean, size }) {
   if (!boolean) return null;
-  const paSystem = badgeData.equipment.paSystem;
+  const pa_system = badgeData.equipment.pa_system;
   return (
     <div className="flex justify-left">
-      <Badge label="PA System" svg={paSystem.svg} size={size} />
+      <Badge label="PA System" svg={pa_system.svg} size={size} />
     </div>
   );
 }

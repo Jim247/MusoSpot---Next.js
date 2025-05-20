@@ -8,11 +8,11 @@ export async function createEvent(eventData) {
 }
 
 // Update an event
-export async function updateEvent(eventId, updates) {
+export async function updateEvent(event_id, updates) {
   const { data, error } = await supabase
     .from('events')
     .update(updates)
-    .eq('id', eventId)
+    .eq('id', event_id)
     .select();
   if (error) throw error;
   return data[0];
@@ -26,11 +26,11 @@ export async function fetchAllEvents() {
 }
 
 // Get a single event
-export async function getEvent(eventId) {
+export async function getEvent(event_id) {
   const { data, error } = await supabase
     .from('events')
     .select('*')
-    .eq('id', eventId)
+    .eq('id', event_id)
     .single();
   if (error) throw error;
   return data;

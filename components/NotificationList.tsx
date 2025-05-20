@@ -1,43 +1,61 @@
 "use client"
 import React, { useEffect, useState } from 'react';
-import { applyToEvent, hasUserAppliedToEvent, useAuth } from '../lib/firebase';
-import type { User } from 'firebase/auth';
+import { useAuth } from '@supabase/auth';
+import { supabase } from '../supabaseClient.js';
 import type { EventNotification } from '../constants/event';
 
-// Fix: Define correct props interface
 interface NotificationListProps {
   notifications: EventNotification[];
-  onApplicationSuccess?: (eventID: string) => void;
+  onApplicationSuccess?: (event_id: string) => void;
 }
 
 export const NotificationList: React.FC<NotificationListProps> = ({ notifications, onApplicationSuccess }) => {
-  const { user } = useAuth() as { user: User | null };
+  const { user } = useAuth();
   const [appliedEvents, setAppliedEvents] = useState<{ [key: string]: boolean }>({});
+
+  // Check if user has applied to event
+  const hasUserAppliedToEvent = async (event_id: string, userID: string) => {
+    const { data, error } = await supabase
+      .from('event_applications')
+      .select('id')
+      .eq('event_id', event_id)
+      .eq('user_id', userID)
+      .maybeSingle();
+    return !!data;
+  };
+
+  // Apply to event
+  const applyToEvent = async (event_id: string, userID: string) => {
+    const { error } = await supabase
+      .from('event_applications')
+      .insert([{ event_id: event_id, user_id: userID }]);
+    if (error) throw error;
+  };
 
   useEffect(() => {
     if (!user) return;
     (async () => {
       const tracking: { [key: string]: boolean } = {};
       for (const notif of notifications) {
-        if (!notif.eventID) {
-          console.error('Missing eventID in notification:', notif);
+        if (!notif.event_id) {
+          console.error('Missing event_id in notification:', notif);
           continue;
         }
-        const alreadyApplied = await hasUserAppliedToEvent(notif.eventID, user.uid);
-        tracking[notif.eventID] = alreadyApplied;
+        const alreadyApplied = await hasUserAppliedToEvent(notif.event_id, user.id);
+        tracking[notif.event_id] = alreadyApplied;
       }
       setAppliedEvents(tracking);
     })();
   }, [notifications, user]);
 
-  const handleApply = async (eventID: string) => {
+  const handleApply = async (event_id: string) => {
     if (!user) return;
     try {
-      await applyToEvent(eventID, user.uid);
+      await applyToEvent(event_id, user.id);
       alert('Applied successfully!');
-      setAppliedEvents((prev) => ({ ...prev, [eventID]: true }));
+      setAppliedEvents((prev) => ({ ...prev, [event_id]: true }));
       if (onApplicationSuccess) {
-        onApplicationSuccess(eventID);
+        onApplicationSuccess(event_id);
       }
     } catch (error) {
       alert('Failed to apply. Check console for details.');
@@ -66,8 +84,8 @@ export const NotificationList: React.FC<NotificationListProps> = ({ notification
                 </div>
               </div>
               <div className="mt-4">
-                {user && !appliedEvents[notification.eventID] ? (
-                  <button onClick={() => handleApply(notification.eventID)} className="btn btn-primary">
+                {user && !appliedEvents[notification.event_id] ? (
+                  <button onClick={() => handleApply(notification.event_id)} className="btn btn-primary">
                     Apply
                   </button>
                 ) : (

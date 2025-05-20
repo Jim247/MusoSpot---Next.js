@@ -1,11 +1,11 @@
 import { supabase } from './supabaseClient';
 
 // Update user attributes
-export async function updateUserAttributes(uid, attributes) {
+export async function updateUserAttributes(id, attributes) {
   const { error } = await supabase
     .from('users')
     .update(attributes)
-    .eq('id', uid);
+    .eq('id', id);
   if (error) throw error;
 }
 
@@ -17,19 +17,19 @@ export async function fetchAllUsers() {
 }
 
 // Get a single user profile
-export async function getUserProfile(uid) {
+export async function getUserProfile(id) {
   const { data, error } = await supabase
     .from('users')
     .select('*')
-    .eq('id', uid)
+    .eq('id', id)
     .single();
   if (error) throw error;
   return data;
 }
 
 // Upload profile image
-export async function uploadProfileImage(uid, file) {
-  const filePath = `profile-images/${uid}/${Date.now()}_${file.name}`;
+export async function uploadProfileImage(id, file) {
+  const filePath = `profile-images/${id}/${Date.now()}_${file.name}`;
   const { error: uploadError } = await supabase.storage
     .from('avatars')
     .upload(filePath, file, { upsert: true });
@@ -37,9 +37,9 @@ export async function uploadProfileImage(uid, file) {
 
   const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
 
-  await updateUserAttributes(uid, {
+  await updateUserAttributes(id, {
     avatar: urlData.publicUrl,
-    avatarUpdatedAt: new Date().toISOString()
+    avatarupdated_at: new Date().toISOString()
   });
 
   return urlData.publicUrl;

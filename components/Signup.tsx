@@ -1,29 +1,15 @@
 "use client"
 import React, { useRef, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
-import { signUpUser, generateUsername, sendPasswordReset} from '@supabase/auth'
-import { INSTRUMENTS } from '../constants/instruments';
-import { postcodeValidator } from 'postcode-validator';
-import PostcodeAutocomplete from '../lib/utils/ValidatePostcode';
-import { postcodeToGeoJSONPoint } from '@lib/utils/GeoPoints';
+import { useForm } from 'react-hook-form';
+import { sendPasswordReset } from '@supabase/auth'
+import { supabase } from '../supabaseClient';
 
 interface FormDataState {
-  firstName: string;
-  lastName: string;
   email: string;
   password: string;
-  confirmPassword: string;
-  role: string;
-  agencyName?: string;
-  instrument?: string;
-  yearsExperience?: string;
-  postcode: string;
-  phone: string;
-  transport: string;
-  paSystem: string;
-  lighting: string;
 }
 
+// BasicSignupForm: only collects email and password for Supabase Auth
 const BasicSignupForm = () => {
   const formRef = useRef<HTMLFormElement>(null);
   const [error, setError] = useState('');
@@ -31,7 +17,6 @@ const BasicSignupForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState('');
-  const [step, setStep] = useState(1);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [forgotPasswordSent, setForgotPasswordSent] = useState(false);
@@ -39,185 +24,103 @@ const BasicSignupForm = () => {
   const {
     register,
     handleSubmit,
-    watch,
-    trigger,
     formState: { errors },
     reset,
-    control,
   } = useForm<FormDataState>({
     defaultValues: {
-      firstName: '',
-      lastName: '',
       email: '',
       password: '',
-      confirmPassword: '',
-      role: 'musician',
-      agencyName: '',
-      instrument: '',
-      yearsExperience: '',
-      postcode: '',
-      phone: '',
-      transport: '',
-      paSystem: '',
-      lighting: '',
     },
     mode: 'onBlur',
   });
 
-  const role = watch('role');
-  const postcode = watch('postcode');
-  const phone = watch('phone');
-  const password = watch('password');
-  const confirmPassword = watch('confirmPassword');
-  const email = watch('email');
-
-  const validateStep = async (currentStep: number): Promise<boolean> => {
+  // --- Forgot Password Handler ---
+  const handleForgotPassword = async (email: string) => {
     setError('');
-    if (currentStep === 1) {
-      const valid = await trigger(['firstName', 'lastName', 'email', 'password', 'confirmPassword']);
-      if (!valid) return false;
-      if (password !== confirmPassword) {
-        setError('Passwords do not match.');
-        return false;
-      }
-    } else if (currentStep === 2) {
-      if (role === 'musician') {
-        const valid = await trigger(['instrument', 'yearsExperience', 'transport', 'paSystem', 'lighting']);
-        if (!valid) return false;
-      } else if (role === 'agent') {
-        const valid = await trigger(['agencyName']);
-        if (!valid) return false;
-      }
-    } else if (currentStep === 3) {
-      const valid = await trigger(['postcode', 'phone']);
-      if (!valid) return false;
-      const rawPostcode = postcode?.toUpperCase();
-      if (!postcodeValidator(rawPostcode, 'GB')) {
-        setError('Please enter a valid UK postcode.');
-        return false;
-      }
-      const phonePattern = /^(\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3}$/;
-      if (!phonePattern.test(phone || '')) {
-        setError('Please enter a valid UK mobile number.');
-        return false;
-      }
-    }
-    return true;
-  };
-
-  const nextStep = async () => {
-    if (await validateStep(step)) {
-      setStep((prev) => Math.min(prev + 1, 4));
+    setSuccess('');
+    setForgotPasswordSent(false);
+    try {
+      await sendPasswordReset(email);
+      setForgotPasswordSent(true);
+      setSuccess('Password reset email sent! Please check your inbox.');
+    } catch {
+      setError('Failed to send password reset email. Please try again later.');
     }
   };
-
-  const prevStep = () => {
-    setError('');
-    setStep((prev) => Math.max(prev - 1, 1));
-  };
-
-
-const handleForgotPassword = async () => {
-  setError('');
-  setSuccess('');
-  setForgotPasswordSent(false);
-  try {
-    await sendPasswordReset(email);
-    setForgotPasswordSent(true);
-    setSuccess('Password reset email sent! Please check your inbox.');
-  } catch (err) {
-    setError('Failed to send password reset email. Please try again later.');
-  }
-};
 
   const onSubmit = async (data: FormDataState) => {
-  if (!agreedToTerms) {
-    setError('Please agree to the terms.');
-    setStep(4);
-    return;
-  }
-  setIsLoading(true);
-  setEmailSent(false);
-  setSuccess('');
-  setError('');
-
-  try {
-    // Check if email already exists in users table
-    const { data: existingUser, error: userCheckError } = await supabase
-      .from('users')
-      .select('email')
-      .eq('email', data.email)
-      .single();
-
-    if (existingUser) {
-      setError('This email address is already registered. Please use a different email or log in.');
-      setShowForgotPassword(true);
-      setStep(1);
-      setIsLoading(false);
+    if (!agreedToTerms) {
+      setError('Please agree to the terms.');
       return;
     }
+    setIsLoading(true);
+    setEmailSent(false);
+    setSuccess('');
+    setError('');
 
-    const rawPostcode = data.postcode.toUpperCase();
-    const cleaned = rawPostcode.replace(/\s+/g, '');
-    const formattedPostcode = cleaned.replace(/^(.+?)(\d[A-Z]{2})$/, '$1 $2');
+    try {
+      // Only create auth user with email and password
+      const { data: signUpResult, error: signUpError } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+      });
+      if (signUpError) {
+        // If error is about email already registered, show a friendly message
+        if (signUpError.message && signUpError.message.toLowerCase().includes('email')) {
+          setError('This email address is already registered. Please log in or use a different email.');
+        } else {
+          setError(signUpError.message || 'An error occurred during registration.');
+        }
+        setIsLoading(false);
+        return;
+      }
+      const authUser = signUpResult.user;
+      if (!authUser) throw new Error('Signup failed: no user returned');
 
-    const geoPoint = await postcodeToGeoJSONPoint(formattedPostcode);
-    if (!geoPoint) {
-      setError('Could not validate postcode location. Please check your postcode.');
+      setRegisteredEmail(data.email);
+      setEmailSent(true);
+      setSuccess('Account created! Please check your email to verify your account before logging in.');
+      setShowForgotPassword(false);
+      reset();
+    } catch {
+      const userMessage = 'An error occurred during registration.';
+      setError(userMessage);
+    } finally {
       setIsLoading(false);
-      setStep(3);
-      return;
     }
+  };
 
-    const username = await generateUsername(data.firstName, data.lastName);
+  const handleResendEmail = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    event.preventDefault();
+    setIsLoading(true);
+    setError('');
+    setSuccess('');
 
-    const userData = {
-      firstName: data.firstName,
-      lastName: data.lastName,
-      email: data.email,
-      phone: data.phone,
-      username,
-      role: data.role,
-      instrument: data.role === 'musician' ? data.instrument : undefined,
-      agencyName: data.role === 'agent' ? data.agencyName : undefined,
-      yearsExperience: data.role === 'musician' ? data.yearsExperience : undefined,
-      postcode: formattedPostcode,
-      geoPoint,
-      slug: username,
-      transport: data.role === 'musician' ? data.transport === 'yes' : undefined,
-      paSystem: data.role === 'musician' ? data.paSystem === 'yes' : undefined,
-      lighting: data.role === 'musician' ? data.lighting === 'yes' : undefined,
-    };
+    try {
+      // Attempt to resend verification email
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: registeredEmail,
+      });
 
-    await signUpUser(data.email, data.password, userData);
+      if (error) throw error;
 
-    setRegisteredEmail(data.email);
-    setEmailSent(true);
-    setSuccess('Account created! Please check your email to verify your account before logging in.');
-    setShowForgotPassword(false);
-    reset();
-  } catch (err) {
-    let userMessage = 'An error occurred during registration.';
-    if (err && typeof err === 'object' && 'message' in err) {
-      userMessage = err.message as string;
+      setSuccess('Verification email has been resent. Please check your inbox.');
+    } catch {
+      setError('Failed to resend verification email. Please try again later.');
+    } finally {
+      setIsLoading(false);
     }
-    setError(userMessage);
-  } finally {
-    setIsLoading(false);
-  }
-};
+  };
 
+  // Only render email and password fields for signup
   return (
     <div className="form-container">
-      <h1 className="form-title">
-        Create Account {step < 4 ? `(Step ${step} of 4)` : ''}
-      </h1>
-      
+      <h1 className="form-title">Create Account</h1>
       {error && <div className="form-error">{error}</div>}
       {success && !emailSent && (
         <div className="form-success">{success}</div>
       )}
-
       {emailSent ? (
         <div className="text-center">
           <p className="form-success">{success}</p>
@@ -235,307 +138,105 @@ const handleForgotPassword = async () => {
             <button
               onClick={() => (window.location.href = '/login')}
               className="btn-secondary"
-            >å
+            >
               Login now
             </button>
           </div>
         </div>
       ) : (
         <form ref={formRef} onSubmit={handleSubmit(onSubmit)} className="form-section">
-          {step === 1 && (
-            <>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="form-group">
-                  <label className="form-label" htmlFor="firstName">
-                    First Name
-                  </label>
-                  <input
-                    className="form-input"
-                    type="text"
-                    id="firstName"
-                    {...register('firstName', { required: 'First name is required' })}
-                  />
-                  {errors.firstName && <span className="form-error">{errors.firstName.message}</span>}
-                </div>
-                
-                <div className="form-group">
-                  <label className="form-label" htmlFor="lastName">
-                    Last Name
-                  </label>
-                  <input
-                    className="form-input"
-                    type="text"
-                    id="lastName"
-                    {...register('lastName', { required: 'Last name is required' })}
-                  />
-                  {errors.lastName && <span className="form-error">{errors.lastName.message}</span>}
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label" htmlFor="email">
-                  Email
-                </label>
-                <input
-                  className="form-input"
-                  type="email"
-                  id="email"
-                  {...register('email', {
-                    required: 'Email is required',
-                    pattern: {
-                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                      message: 'Please enter a valid email address',
-                    },
-                  })}
-                />
-                {errors.email && <span className="form-error">{errors.email.message}</span>}
-              </div>
-
-              <div className="form-group">
-                <label className="form-label" htmlFor="password">
-                  Password
-                </label>
-                <input
-                  className="form-input"
-                  type="password"
-                  id="password"
-                  {...register('password', {
-                    required: 'Password is required',
-                    minLength: { value: 8, message: 'Min 8 characters' },
-                    pattern: {
-                      value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])/,
-                      message: 'Must include uppercase, lowercase, number, and symbol',
-                    },
-                  })}
-                  aria-describedby="passwordHelp"
-                />
-                <p id="passwordHelp" className="text-xs text-gray-500 mt-1">
-                  Min 8 chars, incl. uppercase, lowercase, number, symbol (!@#$%^&*).
-                </p>
-                {errors.password && <span className="form-error">{errors.password.message}</span>}
-              </div>
-
-              <div className="form-group">
-                <label className="form-label" htmlFor="confirmPassword">
-                  Confirm Password
-                </label>
-                <input
-                  className="form-input"
-                  type="password"
-                  id="confirmPassword"
-                  {...register('confirmPassword', {
-                    required: 'Please confirm your password',
-                    validate: (value) => value === password || 'Passwords do not match',
-                  })}
-                />
-                {errors.confirmPassword && <span className="form-error">{errors.confirmPassword.message}</span>}
-              </div>
-
-            </>
-          )}
-
-          {step === 2 && (
-            <>
-              <div className="form-group">
-                <label className="form-label" htmlFor="role">
-                  Are you a musician or an agent?
-                </label>
-                <select className="form-select" id="role" {...register('role', { required: true })}>
-                  <option value="musician">Musician</option>
-                  <option value="agent">Agent</option>
-                </select>
-              </div>
-
-              {role === 'agent' && (
-                <div className="form-group">
-                  <label className="form-label" htmlFor="agencyName">
-                    Agency Name
-                  </label>
-                  <input
-                    className="form-input"
-                    type="text"
-                    id="agencyName"
-                    {...register('agencyName', { required: 'Agency name is required' })}
-                  />
-                  {errors.agencyName && <span className="form-error">{errors.agencyName.message}</span>}
-                </div>
-              )}
-
-              {role === 'musician' && (
-                <>
-                  <div className="form-group">
-                    <label className="form-label" htmlFor="instrument">
-                      Primary Instrument
-                    </label>
-                    <select
-                      className="form-select"
-                      id="instrument"
-                      {...register('instrument', { required: 'Instrument is required' })}
-                    >
-                      <option value="">Select your instrument</option>
-                      {INSTRUMENTS.map((inst) => (
-                        <option key={inst} value={inst}>
-                          {inst}
-                        </option>
-                      ))}
-                    </select>
-                    {errors.instrument && <span className="form-error">{errors.instrument.message}</span>}
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label" htmlFor="yearsExperience">
-                      Years Of Professional Experience
-                    </label>
-                    <input
-                      className="form-input"
-                      type="number"
-                      id="yearsExperience"
-                      {...register('yearsExperience', { required: 'Years of experience is required', min: 0, max: 50 })}
-                    />
-                    {errors.yearsExperience && <span className="form-error">{errors.yearsExperience.message}</span>}
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label" htmlFor="transport">
-                      Do you have your own transport?
-                    </label>
-                    <select
-                      className="form-select"
-                      id="transport"
-                      {...register('transport', { required: 'Please specify transport' })}
-                    >
-                      <option value="">Select an option</option>
-                      <option value="yes">Yes</option>
-                      <option value="no">No</option>
-                    </select>
-                    {errors.transport && <span className="form-error">{errors.transport.message}</span>}
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label" htmlFor="paSystem">
-                      Do you have your own PA system?
-                    </label>
-                    <select
-                      className="form-select"
-                      id="paSystem"
-                      {...register('paSystem', { required: 'Please specify PA system' })}
-                    >
-                      <option value="">Select an option</option>
-                      <option value="yes">Yes</option>
-                      <option value="no">No</option>
-                    </select>
-                    {errors.paSystem && <span className="form-error">{errors.paSystem.message}</span>}
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label" htmlFor="lighting">
-                      Do you have your own lighting?
-                    </label>
-                    <select
-                      className="form-select"
-                      id="lighting"
-                      {...register('lighting', { required: 'Please specify lighting' })}
-                    >
-                      <option value="">Select an option</option>
-                      <option value="yes">Yes</option>
-                      <option value="no">No</option>
-                    </select>
-                    {errors.lighting && <span className="form-error">{errors.lighting.message}</span>}
-                  </div>
-                </>
-              )}
-            </>
-          )}
-
-          {step === 3 && (
-            <>
-              <div className="form-group">
-                <label className="form-label" htmlFor="postcode">
-                  Postcode
-                </label>
-                <Controller
-                  name="postcode"
-                  control={control}
-                  rules={{ required: 'Postcode is required' }}
-                  render={({ field }) => (
-                    <PostcodeAutocomplete {...field} value={field.value} onChange={field.onChange} required />
-                  )}
-                />
-                {errors.postcode && <span className="form-error">{errors.postcode.message}</span>}
-              </div>
-              <div className="form-group">
-                <label className="form-label" htmlFor="phone">
-                  Mobile Phone
-                </label>
-                <input
-                  className="form-input"
-                  type="tel"
-                  id="phone"
-                  {...register('phone', { required: 'Phone is required' })}
-                  placeholder="e.g. 07123 456789"
-                />
-                {errors.phone && <span className="form-error">{errors.phone.message}</span>}
-              </div>
-            </>
-          )}
-
-          {step === 4 && (
-            <div className="form-group flex items-start space-x-3">
-              <input
-                type="checkbox"
-                id="terms"
-                checked={agreedToTerms}
-                onChange={(e) => setAgreedToTerms(e.target.checked)}
-                className="form-checkbox"
-              />
-              <label htmlFor="terms" className="form-label">
-                I agree to the{' '}
-                <a href="/terms" target="_blank" className="form-link">
-                  Terms of Service
-                </a>{' '}
-                and{' '}
-                <a href="/privacy" target="_blank" className="form-link">
-                  Privacy Policy
-                </a>
-                .
-              </label>
-            </div>
-          )}
-
-
-
-            {/* Step 1 only next button centered in div */}
-            <div className="flex items-center justify-center pt-3">
-            {step === 1 && (
-              <button type="button" onClick={nextStep} className="btn-primary">
-                Next
-              </button>
-            )}
-            </div>
-            
-            {/* Step 2 to 4 both boxes spaced  */}
-            <div className="flex justify-evenly">
-            {step >= 2 && (
-              <button type="button" onClick={prevStep} className="btn-secondary">
-                Back
-              </button>
-            )}
-            
-            <div className=''>
-            {step >= 2 && step < 4 && (
-              <button type="button" onClick={nextStep} className="btn-primary">
-                Next
-              </button>
-            )}
-            </div>
-
-            {step === 4 && (
-              <button 
-                type="submit" 
-                className="btn-primary"
-                disabled={isLoading || !agreedToTerms}
-              >
-                {isLoading ? 'Creating Account...' : 'Create Account'}
-              </button>
-            )}
+          <div className="form-group">
+            <label className="form-label" htmlFor="email">
+              Email
+            </label>
+            <input
+              className="form-input"
+              type="email"
+              id="email"
+              {...register('email', {
+                required: 'Email is required',
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: 'Please enter a valid email address',
+                },
+              })}
+            />
+            {errors.email && <span className="form-error">{errors.email.message}</span>}
+          </div>
+          <div className="form-group">
+            <label className="form-label" htmlFor="password">
+              Password
+            </label>
+            <input
+              className="form-input"
+              type="password"
+              id="password"
+              {...register('password', {
+                required: 'Password is required',
+                minLength: { value: 8, message: 'Min 8 characters' },
+                pattern: {
+                  value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])/, // at least one upper, lower, number, symbol
+                  message: 'Must include uppercase, lowercase, number, and symbol',
+                },
+              })}
+              aria-describedby="passwordHelp"
+            />
+            <p id="passwordHelp" className="text-xs text-gray-500 mt-1">
+              Min 8 chars, incl. uppercase, lowercase, number, symbol (!@#$%^&*).
+            </p>
+            {errors.password && <span className="form-error">{errors.password.message}</span>}
+          </div>
+          <div className="form-group flex items-start space-x-3">
+            <input
+              type="checkbox"
+              id="terms"
+              checked={agreedToTerms}
+              onChange={(e) => setAgreedToTerms(e.target.checked)}
+              className="form-checkbox"
+            />
+            <label htmlFor="terms" className="form-label">
+              I agree to the{' '}
+              <a href="/terms" target="_blank" className="form-link">
+                Terms of Service
+              </a>{' '}
+              and{' '}
+              <a href="/privacy" target="_blank" className="form-link">
+                Privacy Policy
+              </a>
+              .
+            </label>
+          </div>
+          <div className="flex items-center justify-center pt-3">
+            <button type="submit" className="btn-primary" disabled={isLoading || !agreedToTerms}>
+              {isLoading ? 'Creating Account...' : 'Create Account'}
+            </button>
           </div>
         </form>
+      )}
+      {/* Password reset UI (optional, can be toggled with showForgotPassword if needed) */}
+      {showForgotPassword && (
+        <div className="form-section mt-4">
+          <h2 className="form-title">Reset Password</h2>
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              const email = (formRef.current?.elements.namedItem('email') as HTMLInputElement)?.value;
+              if (email) await handleForgotPassword(email);
+            }}
+          >
+            <input
+              className="form-input"
+              type="email"
+              name="resetEmail"
+              placeholder="Enter your email"
+              required
+            />
+            <button type="submit" className="btn-primary mt-2">
+              Send Reset Email
+            </button>
+          </form>
+          {forgotPasswordSent && <div className="form-success mt-2">Password reset email sent!</div>}
+        </div>
       )}
     </div>
   );

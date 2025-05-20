@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useUserProfile } from "@components/UserProfileContext";
-import { fetchUserEvents, fetchUserNotifications } from "@lib/firebase";
+import { supabase } from "../supabaseClient.js";
 import type { EventApplication, EventNotification, EventPost } from "@constants/event";
 
 export function useDashboardData() {
@@ -14,35 +14,45 @@ export function useDashboardData() {
 
   useEffect(() => {
     async function fetchData() {
-      if (!profile?.uid) {
+      if (!profile?.id) { // Supabase uses 'id' not 'id'
         setLoading(false);
         return;
       }
       try {
         setLoading(true);
-        const [userEvents, userNotifications] = await Promise.all([
-          fetchUserEvents(profile.uid),
-          fetchUserNotifications(profile.uid),
-        ]);
-        console.log('Fetched userEvents:', userEvents);
-        console.log('Fetched userNotifications:', userNotifications);
-        setEvents(userEvents);
+
+        // Fetch events for the user
+        const { data: userEvents, error: eventsError } = await supabase
+          .from('events')
+          .select('*')
+          .eq('user_id', profile.id);
+
+        // Fetch notifications for the user
+        const { data: userNotifications, error: notifError } = await supabase
+          .from('notifications')
+          .select('*')
+          .eq('user_id', profile.id);
+
+        if (eventsError || notifError) {
+          throw eventsError || notifError;
+        }
+
+        setEvents(userEvents || []);
         const mappedNotifications = (userNotifications as EventNotification[]).map((notif) => ({
           ...notif,
           id: notif.id || '',
-          agentId: notif.agentId || '',
-          eventID: notif.eventID || notif.eventID || '',
-          eventType: notif.eventType || '',
+          agentId: notif.agent_id || '',
+          event_id: notif.event_id || notif.event_id || '',
+          eventType: notif.event_type || '',
           postcode: notif.postcode || '',
           budget: notif.budget || 0,
-          instrumentsNeeded: notif.instrumentsNeeded || [],
+          instrumentsNeeded: notif.instruments_needed || [],
           distance: notif.distance || 0,
           date: notif.date || null,
-          geoPoint: notif.geoPoint,
-          extraInfo: notif.extraInfo || '',
+          geoPoint: notif.geopoint,
+          extraInfo: notif.extra_info || '',
           status: notif.status || '',
         }));
-        console.log('Mapped notifications:', mappedNotifications);
         setNotifications(mappedNotifications);
         setError(null);
       } catch (err) {
@@ -53,7 +63,7 @@ export function useDashboardData() {
       }
     }
     fetchData();
-  }, [profile?.uid]);
+  }, [profile?.id]);
 
   return {
     profile,

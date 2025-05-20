@@ -1,7 +1,8 @@
 "use client";
-import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import { useAuth, getCurrentUser } from '../supabase/auth'
-import type { Muso, Agent, UserDashboard } from '../constants/users'
+import type { UserDashboard } from '../constants/users'
+import type { User as SupabaseUser } from '@supabase/supabase-js';
 
 interface UserProfileContextType {
   profile: UserDashboard | null;
@@ -20,25 +21,30 @@ export const useUserProfile = () => {
 };
 
 export const UserProfileProvider = ({ children }: { children: ReactNode }) => {
-  const { user: authUser } = useAuth() as { user: Muso | Agent | null };
+  const { user: authUser } = useAuth() as { user: SupabaseUser | null };
   const [profile, setProfile] = useState<UserDashboard | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchProfile = async () => {
-    if (!authUser?.uid) {
+  const fetchProfile = useCallback(async () => {
+    if (!authUser?.id) {
       setProfile(null);
       setLoading(false);
       return;
     }
     setLoading(true);
-    const userProfile = await getCurrentUser();
-    setProfile(userProfile);
-    setLoading(false);
-  };
+    try {
+      const userProfile = await getCurrentUser();
+      setProfile(userProfile);
+    } catch {
+      setProfile(null);
+    } finally {
+      setLoading(false);
+    }
+  }, [authUser?.id]);
 
-  useEffect(() => {
+  useEffect(() => { 
     fetchProfile();
-  }, [authUser?.uid, fetchProfile]);
+  }, [authUser?.id, fetchProfile]);
 
   return (
     <UserProfileContext.Provider value={{ profile, loading, refresh: fetchProfile }}>

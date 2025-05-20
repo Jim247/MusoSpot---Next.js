@@ -2,11 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import type { Review, Muso } from '@constants/users';
-import { addUserReview, fetchUserReviews } from '@lib/firebase';
-import { FormatReviewDate } from '@utils/FormatReviewDate';
+import { supabase } from '../supabaseClient.js';
 
 interface ReviewSectionProps {
-  profileUid: string;
+  profileid: string;
   currentUser: Muso | null;
 }
 
@@ -15,11 +14,50 @@ interface ReviewFormData {
   comment: string;
 }
 
-export default function ReviewSection({ profileUid, currentUser }: ReviewSectionProps) {
+// Helper to format timestamp (assumes ISO string or Date)
+function formatReviewDate(timestamp: string | number | Date) {
+  const date = new Date(timestamp);
+  return date.toLocaleDateString();
+}
+
+// Fetch reviews for a user from Supabase
+async function fetchUserReviews(profileid: string): Promise<Review[]> {
+  const { data, error } = await supabase
+    .from('reviews')
+    .select('*')
+    .eq('profile_id', profileid)
+    .order('timestamp', { ascending: false });
+  if (error) throw error;
+  return data || [];
+}
+
+// Add a review for a user in Supabase
+async function addUserReview(
+  profileid: string,
+  rating: number,
+  comment: string,
+  reviewer?: Muso | null
+) {
+  const { error } = await supabase.from('reviews').insert([
+    {
+      profile_id: profileid,
+      rating,
+      comment,
+      reviewer_id: reviewer?.id || reviewer?.id || null,
+      reviewer_name: reviewer?.first_name
+        ? `${reviewer.first_name} ${reviewer.last_name || ''}`.trim()
+        : null,
+      timestamp: new Date().toISOString(),
+    },
+  ]);
+  if (error) throw error;
+}
+
+export default function ReviewSection({ profileid, currentUser }: ReviewSectionProps) {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [reviewLoading, setReviewLoading] = useState(true);
   const [reviewError, setReviewError] = useState('');
-  const [submitting, setSubmitting] = useState(false); // Keep submitting state for button feedback
+  const [submitting, setSubmitting] = useState(false);
 
   const { register, handleSubmit, reset } = useForm<ReviewFormData>({
     defaultValues: {
@@ -30,11 +68,11 @@ export default function ReviewSection({ profileUid, currentUser }: ReviewSection
 
   useEffect(() => {
     async function loadReviews() {
-      if (!profileUid) return;
+      if (!profileid) return;
       setReviewLoading(true);
       setReviewError('');
       try {
-        const fetchedReviews = await fetchUserReviews(profileUid);
+        const fetchedReviews = await fetchUserReviews(profileid);
         setReviews(fetchedReviews);
       } catch (err) {
         console.error('Error loading reviews:', err);
@@ -43,23 +81,22 @@ export default function ReviewSection({ profileUid, currentUser }: ReviewSection
       setReviewLoading(false);
     }
     loadReviews();
-  }, [profileUid]);
+  }, [profileid]);
 
   const onReviewSubmit = async (data: ReviewFormData) => {
-    if (!profileUid) {
+    if (!profileid) {
       setReviewError('Profile not found');
       return;
     }
     setSubmitting(true);
     setReviewError('');
     try {
-      await addUserReview(profileUid, data.rating, data.comment);
-      reset({ rating: 5, comment: '' }); // Reset form using react-hook-form's reset
+      await addUserReview(profileid, data.rating, data.comment, currentUser);
+      reset({ rating: 5, comment: '' });
       // Refresh reviews
-      const updatedReviews = await fetchUserReviews(profileUid);
+      const updatedReviews = await fetchUserReviews(profileid);
       setReviews(updatedReviews);
     } catch (err: unknown) {
-      // Safely extract error message
       let message = 'Failed to submit review';
       if (err instanceof Error) {
         message = err.message;
@@ -70,7 +107,9 @@ export default function ReviewSection({ profileUid, currentUser }: ReviewSection
   };
 
   const canLeaveReview =
-    currentUser && currentUser.uid !== profileUid && !reviews.some((r) => r.reviewerId === currentUser?.uid);
+    currentUser &&
+    (currentUser.id || currentUser.id) !== profileid &&
+    !reviews.some((r) => r.reviewer_id === (currentUser.id || currentUser.id));
 
   return (
     <div className="mt-8">
@@ -92,12 +131,11 @@ export default function ReviewSection({ profileUid, currentUser }: ReviewSection
               </div>
               {review.comment && <div className="mt-1 text-gray-800 italic">"{review.comment}"</div>}
               <div className="flex items-center gap-2 text-xs text-gray-500 mt-2">
-                {/* Add check for timestamp before formatting */}
                 {review.timestamp && <span>{formatReviewDate(review.timestamp)}</span>}
-                {review.reviewerName && (
+                {review.reviewer_name && (
                   <span>
-                    {review.timestamp ? ' · ' : ''} {/* Add separator only if date exists */}
-                    reviewed by <span className="font-semibold text-gray-700">{review.reviewerName}</span>
+                    {review.timestamp ? ' · ' : ''}
+                    reviewed by <span className="font-semibold text-gray-700">{review.reviewer_name}</span>
                   </span>
                 )}
               </div>
@@ -116,7 +154,7 @@ export default function ReviewSection({ profileUid, currentUser }: ReviewSection
             <select
               {...register('rating', { valueAsNumber: true })}
               className="ml-2 border rounded px-2 py-1"
-              defaultValue={5} // Keep default value for initial render
+              defaultValue={5}
             >
               {[5, 4, 3, 2, 1].map((val) => (
                 <option key={val} value={val}>

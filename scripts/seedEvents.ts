@@ -25,7 +25,7 @@ const dummyPosts = [
     },
     date: new Date('2024-02-01'),
     instrumentsNeeded: ['Violin'],
-    createdAt: serverTimestamp(),
+    created_att: serverTimestamp(),
     status: 'open',
   },
 ];

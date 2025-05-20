@@ -24,7 +24,7 @@ interface AgentProfileInfoProps {
   form: UseFormReturn<FormData>;
   isEditingEquipment: boolean;
   setIsEditingEquipment: (value: boolean) => void;
-  onUpdateEquipment: (equipment: { transport: boolean; paSystem: boolean; lighting: boolean }) => void;
+  onUpdateEquipment: (equipment: { transport: boolean; pa_system: boolean; lighting: boolean }) => void;
   onBioSubmit: (data: FormData) => void | Promise<void>;
 }
 
@@ -48,7 +48,7 @@ export const AgentProfileInfo: React.FC<AgentProfileInfoProps> = ({
  * @param {UseFormReturn} props.form - React Hook Form instance for managing the bio form.
  * @param {boolean} props.isEditingEquipment - Whether the equipment section is in editing mode.
  * @param {(isEditing: boolean) => void} props.setIsEditingEquipment - Function to toggle equipment editing mode.
- * @param {(equipment: { transport: boolean; paSystem: boolean; lighting: boolean }) => void} props.onUpdateEquipment - Callback when equipment is updated.
+ * @param {(equipment: { transport: boolean; pa_system: boolean; lighting: boolean }) => void} props.onUpdateEquipment - Callback when equipment is updated.
  * @param {(data: any) => void} props.onBioSubmit - Callback when the bio form is submitted.
  *
  * @returns {JSX.Element} The rendered EditMusoProfileInfo component.
@@ -81,7 +81,7 @@ export const AgentProfileInfo: React.FC<AgentProfileInfoProps> = ({
   // Local state for equipment
   const [equipment, setEquipment] = React.useState({
     transport: !!profile.transport,
-    paSystem: !!profile.paSystem,
+    pa_system: !!profile.pa_system,
     lighting: !!profile.lighting,
   });
 
@@ -89,7 +89,7 @@ export const AgentProfileInfo: React.FC<AgentProfileInfoProps> = ({
     if (isEditingEquipment) {
       setEquipment({
         transport: !!profile.transport,
-        paSystem: !!profile.paSystem,
+        pa_system: !!profile.pa_system,
         lighting: !!profile.lighting,
       });
     }
@@ -129,7 +129,7 @@ export const AgentProfileInfo: React.FC<AgentProfileInfoProps> = ({
       <div className="mb-6">
         <h3 className="text-gray-700 font-semibold mb-2">Name</h3>
         <p className="text-gray-600">
-          {profile.firstName} {profile.lastName}
+          {profile.first_name} {profile.last_name}
         </p>
       </div>
       <div className="mb-6">
@@ -172,8 +172,8 @@ export const AgentProfileInfo: React.FC<AgentProfileInfoProps> = ({
             <label className="flex items-center gap-2">
               <span>Own PA System?</span>
               <select
-                value={equipment.paSystem ? 'true' : 'false'}
-                onChange={e => setEquipment(eq => ({ ...eq, paSystem: e.target.value === 'true' }))}
+                value={equipment.pa_system ? 'true' : 'false'}
+                onChange={e => setEquipment(eq => ({ ...eq, pa_system: e.target.value === 'true' }))}
                 className="border rounded px-2 py-1"
               >
                 <option value="true">Yes</option>
@@ -211,7 +211,7 @@ export const AgentProfileInfo: React.FC<AgentProfileInfoProps> = ({
                 Own Transport: <span className="font-semibold">{profile.transport ? 'Yes' : 'No'}</span>
               </li>
               <li>
-                Own PA System: <span className="font-semibold">{profile.paSystem ? 'Yes' : 'No'}</span>
+                Own PA System: <span className="font-semibold">{profile.pa_system ? 'Yes' : 'No'}</span>
               </li>
               <li>
                 Own Lighting: <span className="font-semibold">{profile.lighting ? 'Yes' : 'No'}</span>

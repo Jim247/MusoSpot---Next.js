@@ -1,4 +1,4 @@
-import { supabase } from '../supabaseClient'
+import { supabase } from '../supabaseClient.js'
 
 // Sign up a new user
 export async function signUpUser(email, password, userData) {
@@ -18,11 +18,19 @@ export async function loginUser(email, password) {
   return data.user;
 }
 
-// Get current user
+// Get current user profile from users table
 export async function getCurrentUser() {
-  const { data, error } = await supabase.auth.getUser();
-  if (error) throw error;
-  return data.user;
+  const { data: authData, error: authError } = await supabase.auth.getUser();
+  if (authError) throw authError;
+  const authUser = authData.user;
+  if (!authUser) return null;
+  const { data: profile, error: profileError } = await supabase
+    .from('users')
+    .select('*')
+    .eq('id', authUser.id)
+    .maybeSingle();
+  if (profileError) throw profileError;
+  return profile;
 }
 
 // Sign out
@@ -59,8 +67,8 @@ export function useAuth() {
  * Generates a unique username by checking Supabase.
  * Tries up to 5 times with a new random number if needed.
  */
-export async function generateUsername(firstName, lastName) {
-  const base = `${firstName}${lastName}`.replace(/\s+/g, '').toLowerCase();
+export async function generateusername(first_name, last_name) {
+  const base = `${first_name}${last_name}`.replace(/\s+/g, '').toLowerCase();
 
   for (let i = 0; i < 5; i++) {
     const random = Math.floor(1000 + Math.random() * 9000);

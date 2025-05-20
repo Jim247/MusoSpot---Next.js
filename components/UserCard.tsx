@@ -13,7 +13,7 @@ export default function UserCard({ user }: UserCardProps) {
         <div className="w-16 h-16 rounded-md bg-gray-200 overflow-hidden">
           <img
             src={user.avatar || '/src/assets/images/avatar-placeholder.png'}
-            alt={`${user.firstName} ${user.lastName}`}
+            alt={`${user.first_name} ${user.last_name}`}
             className="w-full h-full object-cover"
             onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
               e.currentTarget.onerror = null;
@@ -23,7 +23,7 @@ export default function UserCard({ user }: UserCardProps) {
         </div>
         <div>
           <h3 className="text-lg font-semibold">
-            {user.firstName} {user.lastName}{' '}
+            {user.first_name} {user.last_name}{' '}
           </h3>
           <p className="text-gray-600">{user.location}</p>
         </div>

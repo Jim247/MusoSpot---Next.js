@@ -12,10 +12,10 @@ if (process.env.NODE_ENV === 'development') {
 
 const dummyApplications = [
   {
-    eventId: 'post1', // match this with an existing event ID
+    event_id: 'post1', // match this with an existing event ID
     applicantId: 'musician1', // the ID of the applying musician
     status: 'pending',
-    createdAt: serverTimestamp(),
+    created_att: serverTimestamp(),
     instrument: 'Violin',
   },
 ];
@@ -23,7 +23,7 @@ const dummyApplications = [
 async function seedApplications() {
   for (const application of dummyApplications) {
     const docRef = await addDoc(collection(db, 'applications'), application);
-    console.log(`Created application: ${docRef.id} for event ${application.eventId}`);
+    console.log(`Created application: ${docRef.id} for event ${application.event_id}`);
   }
 }
 

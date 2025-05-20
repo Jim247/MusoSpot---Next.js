@@ -43,7 +43,7 @@ export default function AgentDashboard() {
             <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
                 <div className="mb-6 p-4 bg-white rounded-lg shadow">
                     <h1 className="text-2xl font-semibold text-gray-900">
-                        Welcome, {profile.firstName || 'Agent'}!
+                        Welcome, {profile.first_name || 'Agent'}!
                     </h1>
                 </div>
                 <div>

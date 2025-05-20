@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { loginUser } from '../lib/firebase';
-import { getAuth, sendPasswordResetEmail } from 'firebase/auth';
+import { loginUser, sendPasswordReset } from '@supabase/auth';
+import { supabase } from '../supabaseClient';
+import PostValidationSignup from './PostValidationSignup';
 
 const LoginForm = () => {
   const [error, setError] = useState('');
   const [resetSent, setResetSent] = useState(false);
   const [isResetMode, setIsResetMode] = useState(false);
+  const [showValidatedSignup, setShowValidatedSignup] = useState(false);
+  const [pendingProfile, setPendingProfile] = useState(null);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -16,7 +19,42 @@ const LoginForm = () => {
 
     try {
       await loginUser(email, password);
-      // redirect to dashboard after successful login
+      // After login, check if user row exists in users table
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: userRow, error: userRowError } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+        // Check for required fields (customize as needed)
+        const requiredFields = ['first_name', 'last_name', 'role', 'postcode', 'phone'];
+        let missingFields = [];
+        if (!userRow || !userRowError) {
+          // No user row: check for pending profile in localStorage
+          const pending = typeof window !== 'undefined' ? localStorage.getItem('pendingProfile') : null;
+          if (pending) {
+            setPendingProfile(JSON.parse(pending));
+            setShowValidatedSignup(true);
+            return;
+          } else {
+            // No pending profile, create minimal row and prompt to complete profile
+            await supabase.from('users').insert([
+              { id: user.id, email: user.email }
+            ]);
+            setShowValidatedSignup(true);
+            return;
+          }
+        } else {
+          // User row exists, check for missing required fields
+          missingFields = requiredFields.filter(f => !userRow[f]);
+          if (missingFields.length > 0) {
+            setPendingProfile(userRow);
+            setShowValidatedSignup(true);
+            return;
+          }
+        }
+      }
       window.location.href = '/dashboard';
     } catch {
       setError('Login failed. Please ensure you have signed up, and that your email is verified and try again.');
@@ -34,13 +72,16 @@ const LoginForm = () => {
     }
 
     try {
-      const auth = getAuth();
-      await sendPasswordResetEmail(auth, email);
+      await sendPasswordReset(email);
       setResetSent(true);
       setError('');
     } catch {
       setError('Failed to send password reset email. Please check your email address and try again.');
     }
+  }
+
+  if (showValidatedSignup) {
+    return <PostValidationSignup initialProfile={pendingProfile || {}} />;
   }
 
   return (

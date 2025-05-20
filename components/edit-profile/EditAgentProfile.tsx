@@ -1,17 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import type { Review, Agent, UserDashboard } from '@constants/users';
-import {
-  useAuth,
-  updateUserAttributes,
-  uploadProfileImage,
-  fetchUserReviews,
-} from '@lib/firebase';
 import { SearchRadiusControl } from '@components/SearchRadiusControl';
 import { EditProfileHeader } from '@components/profile/EditProfileHeader';
 import { useUserProfile } from '@components/UserProfileContext';
 import ReviewSection from '@components/ReviewSection';
 import EditPromoVideo from './edit-profile-components/EditPromoVideo'
+import { supabase } from '../../supabaseClient';
 
 interface FormData {
   bio?: string;
@@ -58,20 +53,33 @@ export default function AgentEditProfile() {
   }, [profile, reset]);
 
   useEffect(() => {
-    if (!profile?.uid) return;
+    if (!profile?.id) return;
     setReviewLoading(true);
-    fetchUserReviews(profile.uid)
-      .then(setReviews)
+    // --- Replace Firebase fetchUserReviews with Supabase query ---
+    supabase
+      .from('reviews')
+      .select('*')
+      .eq('user_id', profile.id)
+      .order('created_at', { ascending: false })
+      .then(({ data, error }) => {
+        if (error) {
+          setReviewError('Error loading reviews');
+          setReviews([]);
+        } else {
+          setReviews(data as Review[]);
+          setReviewError('');
+        }
+      })
       .catch(() => setReviewError('Error loading reviews'))
       .finally(() => setReviewLoading(false));
-  }, [profile?.uid]);
+  }, [profile?.id]);
 
   // Use SubmitHandler for type safety
   const onSubmit: SubmitHandler<FormData> = async (data) => {
-    if (!authUser?.uid) return;
+    if (!authUser?.id) return;
 
     try {
-      const updateData: Partial<UserDashboard> = {
+      const updated_ata: Partial<UserDashboard> = {
         bio: data.bio,
         video: data.video,
         searchRadius: data.searchRadius,
@@ -98,11 +106,11 @@ export default function AgentEditProfile() {
         return;
       }
 
-      await updateUserAttributes(authUser.uid, updateData);
+      await updateUserAttributes(authUser.id, updated_ata);
       setMessage('Profile updated successfully.');
 
       // Update the profile state reliably
-      const updatedProfile = { ...profile, ...updateData } as UserDashboard;
+      const updatedProfile = { ...profile, ...updated_ata } as UserDashboard;
 
       setBioMessage(''); // Clear custom message
       setIsEditingBio(false);
@@ -120,7 +128,7 @@ export default function AgentEditProfile() {
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !authUser?.uid) return;
+    if (!file || !authUser?.id) return;
     try {
       setIsUploading(true);
       setPhotoMessage('');
@@ -132,7 +140,7 @@ export default function AgentEditProfile() {
         setPhotoMessage('Image must be less than 5MB.');
         return;
       }
-      const imageUrl = await uploadProfileImage(authUser.uid, file);
+      const imageUrl = await uploadProfileImage(authUser.id, file);
       setProfile((prev) => (prev ? { ...prev, avatar: imageUrl } : null));
       setPhotoMessage('Profile image updated successfully!');
       setTimeout(() => setPhotoMessage(''), 3000);
@@ -164,7 +172,7 @@ export default function AgentEditProfile() {
       )}
       <div className="max-w-7xl mx-auto p-6">
         <EditProfileHeader
-          userName={profile.firstName}
+          username={profile.first_name}
           profile={profile}
           isUploading={isUploading}
           photoMessage={photoMessage}
@@ -173,7 +181,7 @@ export default function AgentEditProfile() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="space-y-6">
             {/* Reviews Section */}
-            <ReviewSection profileUid={profile.uid} currentUser={authUser} />
+            <ReviewSection profileid={profile.id} currentUser={authUser} />
           </div>
 
           <div className="space-y-6">
