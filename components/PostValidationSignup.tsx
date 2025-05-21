@@ -4,7 +4,7 @@ import { supabase } from '../supabaseClient';
 import { INSTRUMENTS } from '../constants/instruments';
 import { postcodeValidator } from 'postcode-validator';
 import PostcodeAutocomplete from '../lib/utils/ValidatePostcode';
-import { postcodeToGeoPoint } from '../lib/utils/PostcodeUtils';
+import { postcodeToGeoPoint } from '@utils/GeoPoints';
 
 interface ProfileFields {
   first_name: string;
@@ -18,6 +18,7 @@ interface ProfileFields {
   transport: string;
   pa_system: string;
   lighting: string;
+  
 }
 
 // Utility to generate a username from first and last name
@@ -40,6 +41,7 @@ const PostValidationSignup: React.FC<{ initialProfile?: Partial<ProfileFields> }
     transport: initialProfile.transport || '',
     pa_system: initialProfile.pa_system || '',
     lighting: initialProfile.lighting || '',
+    
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -118,12 +120,18 @@ const PostValidationSignup: React.FC<{ initialProfile?: Partial<ProfileFields> }
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
       const username = generateUserName(fields.first_name, fields.last_name);
+      const formattedPostcode = fields.postcode.toUpperCase().replace(/\s+/g, '');
+      const geoPoint = await postcodeToGeoPoint(formattedPostcode);
       const userData = {
         id: user.id,
         email: user.email,
         ...fields,
         instrument: fields.instrument ? [fields.instrument] : [], // Ensure instrument is always an array
         username, // Add generated username
+        geo_point: geoPoint?.point,
+        ward: geoPoint?.ward,
+        region: geoPoint?.region,
+        country: geoPoint?.country,
       };
       console.log('Upserting userData:', userData); // Debug log
       const { data, error: upsertError } = await supabase

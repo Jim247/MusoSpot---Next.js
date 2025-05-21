@@ -3,7 +3,7 @@ import React from 'react';
 import MiniMap from '@components/maps/MiniMap';
 import { ExperienceBadge } from '@components/Profile/badges/ExperienceBadge';
 import { getExperienceLevel, getTransport } from '@lib/utils/BadgeRules';
-import { LightingBadge, pa_systemBadge, TransportBadge } from '../profile/badges/BadgeRender';
+import { LightingBadge, PaSystemBadge, TransportBadge } from '../profile/badges/BadgeRender';
 // import ReviewSection from '@components/ReviewSection';
 
 export default function MusoProfile() {
@@ -92,7 +92,7 @@ export default function MusoProfile() {
                   className="flex items-center justify-center transition-transform hover:scale-110 hover:shadow-xl rounded-md bg-gray-50 px-2 py-2"
                   title="PA System Owner"
                 >
-                  <pa_systemBadge boolean={profile.pa_system} size="xxl" />
+                  <PaSystemBadge boolean={profile.pa_system} size="xxl" />
                 </div>
               )}
               {profile.lighting && (

@@ -12,10 +12,7 @@ export interface Muso {
   years_experience?: number;
   agency_name?: string;
   city?: string;
-  geoPoint?: {
-    lat: number;
-    lng: number;
-  };
+  geo_point: string;
   ward?: string;
   region?: string;
   country?: string;
@@ -42,7 +39,7 @@ export interface Agent {
   years_experience?: number;
   agency_name?: string;
   city?: string;
-  geoPoint?: string
+  geo_point?: string
   ward?: string;
   region?: string;
   country?: string;
@@ -79,10 +76,7 @@ export interface UserDashboard {
   years_experience?: number;
   agency_name?: string;
   city?: string;
-  geoPoint?: {
-    lat: number;
-    lng: number;
-  };
+  geo_point:string;
   ward?: string;
   region?: string;
   country?: string;

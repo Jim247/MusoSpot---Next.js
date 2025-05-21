@@ -11,7 +11,7 @@ interface MiniMapProps {
   radius?: number;
 }
 
-const MiniMap = memo(({ lat, lng, className = 'h-full w-full', id, radius }: MiniMapProps) => {
+export const MiniMap = memo(({ lat, lng, className = 'h-full w-full', id, radius }: MiniMapProps) => {
   const [leaflet, setLeaflet] = useState<typeof import('leaflet') | null>(null);
   const mapRef = useRef<LeafletMap | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);

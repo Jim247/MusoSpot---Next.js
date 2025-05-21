@@ -11,6 +11,8 @@ import EditPromoVideo from './edit-profile-components/EditPromoVideo'
 import { supabase } from '../../supabaseClient'; // Adjust path as needed
 import type { Review } from '@constants/users';
 import { useAuth } from '@supabase/auth';
+import { getLatLngFromGeoPoint } from 'utils/getLatLngFromGeoPoint';
+import { updateUserAttributes } from 'utils/updateUserAttributes';
 
 export default function MusoEditProfile() {
   const { profile, loading, refresh } = useUserProfile();
@@ -151,10 +153,16 @@ export default function MusoEditProfile() {
                     <h3 className="text-gray-700 font-semibold w-1/3">Search Distance</h3>
                   </div>
                   <div>
-                    {profile.geoPoint ? (
+                    {(() => {
+                      // Add logging for geo_point and its type
+                      // eslint-disable-next-line no-console
+                      console.log('profile.geo_point:', profile.geo_point, 'type:', typeof profile.geo_point);
+                      return null;
+                    })()}
+                    {getLatLngFromGeoPoint(profile.geo_point) ? (
                       <SearchRadiusControl
                         initialRadius={profile.searchRadius || 100}
-                        center={profile.geoPoint}
+                        center={getLatLngFromGeoPoint(profile.geo_point)}
                         onSave={async (radius) => {
                           await updateUserAttributes(authUser!.id, { searchRadius: radius });
                           await refresh();

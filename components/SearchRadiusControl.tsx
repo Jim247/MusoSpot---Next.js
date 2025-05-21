@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import CoverageMap from '@components/maps/CoverageMap';
+import MiniMap from '@components/maps/MiniMap';
 
 interface SearchRadiusControlProps {
   initialRadius: number;
@@ -19,7 +20,10 @@ export const SearchRadiusControl = React.memo(
       onEditToggle(false);
     };
 
-    if (!center) {
+    // center is now { lat, lng } | null
+    const coords = center;
+
+    if (!coords) {
       return (
         <div className="bg-white rounded-lg p-6">
           <h3 className="text-gray-700 font-semibold mb-2">Search Distance</h3>
@@ -32,7 +36,8 @@ export const SearchRadiusControl = React.memo(
 
     return (
       <div className="space-y-4">
-        <CoverageMap center={center} radiusMiles={radiusValue} />
+        <CoverageMap center={coords} radiusMiles={radiusValue} />
+        <MiniMap lat={coords.lat} lng={coords.lng} id="mini-map" radius={10} />
         {isEditing ? (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="flex items-center gap-4">
@@ -65,10 +70,10 @@ export const SearchRadiusControl = React.memo(
         ) : (
           <div className="flex items-center justify-between">
             <p className="text-m text-gray-500">Your search radius is set to {radiusValue} miles</p>
-            <div className="position-absolute bottom-">
-            <button type="button" onClick={() => onEditToggle(true)} className="btn-primary">
-              Edit
-            </button>
+            <div>
+              <button type="button" onClick={() => onEditToggle(true)} className="btn-primary">
+                Edit
+              </button>
             </div>
           </div>
         )}

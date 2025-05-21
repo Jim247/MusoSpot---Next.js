@@ -48,6 +48,7 @@ const Dashboard = () => {
           <p>Invalid user role. Please contact support.</p>
         </div>
       );
+      
   }
 };
 
