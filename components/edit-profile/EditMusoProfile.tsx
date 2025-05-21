@@ -77,8 +77,8 @@ export default function MusoEditProfile() {
     supabase
       .from('reviews')
       .select('*')
-      .eq('user_id', profile.id)
-      .order('created_at', { ascending: false })
+      .eq('reviewed_user_id', profile.id)
+      .order('timestamp', { ascending: false }) // changed from 'created_at' to 'timestamp'
       .then(({ data, error }) => {
         if (error) {
           setReviewError('Error loading reviews');
@@ -156,7 +156,6 @@ export default function MusoEditProfile() {
                     {(() => {
                       // Add logging for geo_point and its type
                       // eslint-disable-next-line no-console
-                      console.log('profile.geo_point:', profile.geo_point, 'type:', typeof profile.geo_point);
                       return null;
                     })()}
                     {getLatLngFromGeoPoint(profile.geo_point) ? (

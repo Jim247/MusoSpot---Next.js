@@ -53,9 +53,9 @@ export interface Agent {
 }
 export interface Review {
   id: string;
-  reviewerId: string;
-  reviewedUserId: string;
-  reviewerName: string;
+  reviewer_id: string;
+  reviewed_user_id: string;
+  reviewer_name: string;
   rating: number;
   comment: string;
   timestamp?: Timestamp | string ;

@@ -10,12 +10,36 @@ interface BioSectionEditableProps {
   onBioSubmit: (data: { bio?: string }) => void | Promise<void>;
 }
 
+const MIN_WORDS = 30;
+const MAX_WORDS = 150;
+
+function stripHtmlTags(input: string) {
+  return input.replace(/<[^>]*>?/gm, '');
+}
+
 const BioSectionEditable: React.FC<BioSectionEditableProps> = ({ profile, bioMessage, setBioMessage, form, onBioSubmit }) => {
   const [isEditing, setIsEditing] = React.useState(false);
 
   React.useEffect(() => {
     form.reset({ bio: profile.bio || '' });
   }, [form, profile.bio]);
+
+  const handleBioSubmit = async (data: { bio?: string }) => {
+    const rawBio = data.bio || '';
+    const cleanBio = stripHtmlTags(rawBio).trim();
+    const wordCount = cleanBio.split(/\s+/).filter(Boolean).length;
+    if (wordCount < MIN_WORDS) {
+      setBioMessage(`Bio must be at least ${MIN_WORDS} words.`);
+      return;
+    }
+    if (wordCount > MAX_WORDS) {
+      setBioMessage(`Bio must be no more than ${MAX_WORDS} words.`);
+      return;
+    }
+    setBioMessage('');
+    await onBioSubmit({ bio: cleanBio });
+    setIsEditing(false);
+  };
 
   return (
     <div className="bg-white rounded-lg p-6 relative">
@@ -31,10 +55,7 @@ const BioSectionEditable: React.FC<BioSectionEditableProps> = ({ profile, bioMes
         <div className="mt-2">
           {isEditing ? (
             <form
-              onSubmit={form.handleSubmit(async (data) => {
-                await onBioSubmit(data);
-                setIsEditing(false);
-              })}
+              onSubmit={form.handleSubmit(handleBioSubmit)}
             >
               <textarea
                 {...form.register('bio')}
