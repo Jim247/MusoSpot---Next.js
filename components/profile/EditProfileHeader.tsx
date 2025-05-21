@@ -29,7 +29,7 @@ export const EditProfileHeader: React.FC<EditProfileHeaderProps> = ({
         <div className="relative inline-block cursor-pointer group">
           <label className="cursor-pointer">
             <Image
-              src={profile.avatar ? profile.avatar : '/images/User-avatar.svg'}
+              src={profile.avatar ? profile.avatar : '/default-avatar.svg'}
               alt="Profile"
               className="w-48 h-48 md:w-64 md:h-64 object-cover rounded-md border mx-auto"
               width={256}
