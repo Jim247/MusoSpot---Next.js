@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import MusoProfile from './MusoProfile';
 import AgentProfile from './AgentProfile';
-import { getUserBySlug } from '@lib/firebase'; // You need to implement this
+import { getPublicProfileByUsername } from '@supabase/auth';
 import { UserProfile } from 'firebase/auth';
 
 const PublicProfile = ({ slug }: { slug: string }) => {
@@ -12,7 +12,7 @@ const PublicProfile = ({ slug }: { slug: string }) => {
   useEffect(() => {
     async function loadProfile() {
       setLoading(true);
-      const user = await getUserBySlug(slug);
+      const user = await getPublicProfileByUsername(slug);
       setProfile(user);
       setLoading(false);
     }

@@ -98,3 +98,19 @@ export async function sendPasswordReset(email) {
   if (error) throw error;
   return data;
 }
+
+/**
+ * Fetches a user's public profile by username. Returns null if not found.
+ * This should be readable by public (RLS policy must allow select by username).
+ */
+export async function getPublicProfileByUsername(username) {
+  if (!username) return null;
+  const { data, error } = await supabase
+    .from('users')
+    .select('*')
+    .eq('username', username)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+

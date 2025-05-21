@@ -16,7 +16,7 @@ export default function AgentProfile() {
       {/* Updated header: Pic on top, name then instruments */}
       <div className="flex flex-col items-center space-y-4">
         <img
-          src={profile.avatar || '/images/User-avatar.svg'}
+          src={profile.avatar || '/default-avatar.svg'}
           alt={`${profile.first_name}'s profile`}
           className="w-48 h-48 rounded-md object-cover"
         />
