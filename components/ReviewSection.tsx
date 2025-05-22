@@ -140,7 +140,7 @@ export default function ReviewSection({ profileid, currentUser }: ReviewSectionP
     !reviews.some((r) => r.reviewer_id === (currentUser.id || currentUser.id));
 
   return (
-    <div className="">
+    <div className="pt-6">
       <h3 className="text-xl font-semibold mb-2">User Reviews</h3>
       {reviewLoading ? (
         <div>Loading reviews...</div>

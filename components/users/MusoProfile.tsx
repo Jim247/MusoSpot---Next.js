@@ -1,7 +1,7 @@
 import React from 'react';
 import MiniMap from '@components/maps/MiniMap';
 import { ExperienceBadge } from '@components/Profile/badges/ExperienceBadge';
-import { getExperienceLevel } from '@lib/utils/BadgeRules';
+import { getExperienceLevel } from '@utils/BadgeRules';
 import { LightingBadge, TransportBadge, paSystemBadge } from '../profile/badges/BadgeRender.jsx';
 import Image from 'next/image';
 import ReviewSection from '../ReviewSection';

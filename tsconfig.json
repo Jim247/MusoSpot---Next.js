@@ -23,7 +23,7 @@
       "@/*": ["./src/*"],
       "@components/*": ["./components/*"],
       "@lib/*": ["./lib/*"],
-      "@utils/*": ["./lib/utils/*"],
+      "@utils/*": ["./utils/*"],
       "@constants/*": ["./constants/*"],
       "@hooks/*": ["./hooks/*"],
       "@supabase/*": ["./supabase/*"]
