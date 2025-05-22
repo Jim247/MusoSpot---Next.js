@@ -2,12 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import type { Review, Muso } from '@constants/users';
-import { addUserReview, fetchUserReviews } from '@lib/firebase';
-import { FormatReviewDate } from '@utils/FormatReviewDate';
+import { supabase } from '../supabaseClient.js';
 
 interface ReviewSectionProps {
-  profileUid: string;
+  profileid: string;
   currentUser: Muso | null;
+  reviews: Review[]
 }
 
 interface ReviewFormData {
@@ -15,11 +15,67 @@ interface ReviewFormData {
   comment: string;
 }
 
-export default function ReviewSection({ profileUid, currentUser }: ReviewSectionProps) {
+// Helper to format timestamp (assumes ISO string, Date, or Timestamp)
+type TimestampLike = string | number | Date | { toDate: () => Date };
+function hasToDate(obj: unknown): obj is { toDate: () => Date } {
+  return typeof obj === 'object' && obj !== null && typeof (obj as { toDate: () => Date }).toDate === 'function';
+}
+function formatReviewDate(timestamp: TimestampLike) {
+  let date: Date;
+  if (hasToDate(timestamp)) {
+    date = timestamp.toDate();
+  } else {
+    date = new Date(timestamp as string | number | Date);
+  }
+  return date.toLocaleDateString();
+}
+
+// Fetch reviews for a user from Supabase
+async function fetchUserReviews(profileid: string): Promise<Review[]> {
+  const { data, error } = await supabase
+    .from('reviews')
+    .select('*')
+    .eq('id', profileid)
+    .order('timestamp', { ascending: false });
+  if (error) throw error;
+  return data || [];
+}
+
+// Add a review for a user in Supabase
+async function addUserReview(
+  profileid: string,
+  rating: number,
+  comment: string,
+  reviewer?: Muso | null
+) {
+  const { error } = await supabase.from('reviews').insert([
+    {
+      profile_id: profileid,
+      rating,
+      comment,
+      reviewer_id: reviewer?.id || reviewer?.id || null,
+      reviewer_name: reviewer?.first_name
+        ? `${reviewer.first_name} ${reviewer.last_name || ''}`.trim()
+        : null,
+      timestamp: new Date().toISOString(),
+    },
+  ]);
+  if (error) throw error;
+}
+
+// Helper to strip HTML tags
+function stripHtmlTags(input: string) {
+  return input.replace(/<[^>]*>?/gm, '');
+}
+
+const MIN_REVIEW_WORDS = 5;
+const MAX_REVIEW_WORDS = 300;
+
+export default function ReviewSection({ profileid, currentUser }: ReviewSectionProps) {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [reviewLoading, setReviewLoading] = useState(true);
   const [reviewError, setReviewError] = useState('');
-  const [submitting, setSubmitting] = useState(false); // Keep submitting state for button feedback
+  const [submitting, setSubmitting] = useState(false);
 
   const { register, handleSubmit, reset } = useForm<ReviewFormData>({
     defaultValues: {
@@ -30,11 +86,11 @@ export default function ReviewSection({ profileUid, currentUser }: ReviewSection
 
   useEffect(() => {
     async function loadReviews() {
-      if (!profileUid) return;
+      if (!profileid) return;
       setReviewLoading(true);
       setReviewError('');
       try {
-        const fetchedReviews = await fetchUserReviews(profileUid);
+        const fetchedReviews = await fetchUserReviews(profileid);
         setReviews(fetchedReviews);
       } catch (err) {
         console.error('Error loading reviews:', err);
@@ -43,23 +99,32 @@ export default function ReviewSection({ profileUid, currentUser }: ReviewSection
       setReviewLoading(false);
     }
     loadReviews();
-  }, [profileUid]);
+  }, [profileid]);
 
   const onReviewSubmit = async (data: ReviewFormData) => {
-    if (!profileUid) {
+    if (!profileid) {
       setReviewError('Profile not found');
+      return;
+    }
+    const cleanComment = stripHtmlTags(data.comment || '').trim();
+    const wordCount = cleanComment.split(/\s+/).filter(Boolean).length;
+    if (cleanComment && wordCount < MIN_REVIEW_WORDS) {
+      setReviewError(`Review must be at least ${MIN_REVIEW_WORDS} words if provided.`);
+      return;
+    }
+    if (wordCount > MAX_REVIEW_WORDS) {
+      setReviewError(`Review must be no more than ${MAX_REVIEW_WORDS} words.`);
       return;
     }
     setSubmitting(true);
     setReviewError('');
     try {
-      await addUserReview(profileUid, data.rating, data.comment);
-      reset({ rating: 5, comment: '' }); // Reset form using react-hook-form's reset
+      await addUserReview(profileid, data.rating, cleanComment, currentUser);
+      reset({ rating: 5, comment: '' });
       // Refresh reviews
-      const updatedReviews = await fetchUserReviews(profileUid);
+      const updatedReviews = await fetchUserReviews(profileid);
       setReviews(updatedReviews);
     } catch (err: unknown) {
-      // Safely extract error message
       let message = 'Failed to submit review';
       if (err instanceof Error) {
         message = err.message;
@@ -70,11 +135,13 @@ export default function ReviewSection({ profileUid, currentUser }: ReviewSection
   };
 
   const canLeaveReview =
-    currentUser && currentUser.uid !== profileUid && !reviews.some((r) => r.reviewerId === currentUser?.uid);
+    currentUser &&
+    (currentUser.id || currentUser.id) !== profileid &&
+    !reviews.some((r) => r.reviewer_id === (currentUser.id || currentUser.id));
 
   return (
-    <div className="mt-8">
-      <h2 className="text-xl font-semibold mb-2">User Reviews</h2>
+    <div className="">
+      <h3 className="text-xl font-semibold mb-2">User Reviews</h3>
       {reviewLoading ? (
         <div>Loading reviews...</div>
       ) : reviews.length === 0 ? (
@@ -90,14 +157,13 @@ export default function ReviewSection({ profileUid, currentUser }: ReviewSection
                   {'☆'.repeat(5 - review.rating)}
                 </span>
               </div>
-              {review.comment && <div className="mt-1 text-gray-800 italic">"{review.comment}"</div>}
+              {review.comment && <div className="mt-1 text-gray-800 italic">&ldquo;{review.comment}&rdquo;</div>}
               <div className="flex items-center gap-2 text-xs text-gray-500 mt-2">
-                {/* Add check for timestamp before formatting */}
                 {review.timestamp && <span>{formatReviewDate(review.timestamp)}</span>}
-                {review.reviewerName && (
+                {review.reviewer_name && (
                   <span>
-                    {review.timestamp ? ' · ' : ''} {/* Add separator only if date exists */}
-                    reviewed by <span className="font-semibold text-gray-700">{review.reviewerName}</span>
+                    {review.timestamp ? ' · ' : ''}
+                    reviewed by <span className="font-semibold text-gray-700">{review.reviewer_name}</span>
                   </span>
                 )}
               </div>
@@ -116,7 +182,7 @@ export default function ReviewSection({ profileUid, currentUser }: ReviewSection
             <select
               {...register('rating', { valueAsNumber: true })}
               className="ml-2 border rounded px-2 py-1"
-              defaultValue={5} // Keep default value for initial render
+              defaultValue={5}
             >
               {[5, 4, 3, 2, 1].map((val) => (
                 <option key={val} value={val}>

@@ -43,8 +43,8 @@ export const getTransport = (transport: boolean) => {
     };
   }
 };
-export const getPaSystem = (PaSystem: boolean) => {
-  if (PaSystem) {
+export const getPaSystem = (paSystem: boolean) => {
+  if (paSystem) {
     return {
       label: 'PA System',
       description: 'I have my own PA System',

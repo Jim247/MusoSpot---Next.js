@@ -13,7 +13,7 @@ interface HeaderProps {
 
 export default function Header({ links = [] }: HeaderProps) {
   return (
-    <header className="top-0 z-50 flex-none mx-auto w-full border-b border-gray-50/0 transition-[opacity] ease-in-out">
+    <header className="sticky top-0 bg-white z-50 flex-none mx-auto w-full border-b border-gray-50/0 ease-in-out">
       <div className="relative text-default py-3 px-3 md:px-6 mx-auto w-full max-w-7xl flex justify-between items-center">
         <Link className="flex items-center" href="/">
           <Logo /><span className='pl-4 text-xl font-bold'>MusoSpot</span> 

@@ -6,7 +6,7 @@ import { BioSection } from './BioSection';
 interface FormData {
   bio?: string;
   transport?: boolean;
-  paSystem?: boolean;
+  pa_system?: boolean;
   lighting?: boolean;
 }
 
@@ -41,7 +41,7 @@ export const MusoProfileInfo: React.FC<MusoProfileInfoProps> = ({
     reset({
       bio: profile.bio || '',
       transport: profile.transport,
-      paSystem: profile.paSystem,
+      pa_system: profile.pa_system,
       lighting: profile.lighting,
     });
     setIsEditingBio(false);
@@ -54,7 +54,7 @@ export const MusoProfileInfo: React.FC<MusoProfileInfoProps> = ({
       <div className="mb-6">
         <h3 className="text-gray-700 font-semibold mb-2">Name</h3>
         <p className="text-gray-600">
-          {profile.firstName} {profile.lastName}
+          {profile.first_name} {profile.last_name}
         </p>
       </div>
 
@@ -92,7 +92,7 @@ export const MusoProfileInfo: React.FC<MusoProfileInfoProps> = ({
             </label>
             <label className="flex items-center gap-2">
               <span>Own PA System?</span>
-              <select {...register('paSystem', { setValueAs: v => v === 'true' })} className="border rounded px-2 py-1">
+              <select {...register('pa_system', { setValueAs: v => v === 'true' })} className="border rounded px-2 py-1">
                 <option value="true">Yes</option>
                 <option value="false">No</option>
               </select>
@@ -124,7 +124,7 @@ export const MusoProfileInfo: React.FC<MusoProfileInfoProps> = ({
                 Own Transport: <span className="font-semibold">{profile.transport ? 'Yes' : 'No'}</span>
               </li>
               <li>
-                Own PA System: <span className="font-semibold">{profile.paSystem ? 'Yes' : 'No'}</span>
+                Own PA System: <span className="font-semibold">{profile.pa_system ? 'Yes' : 'No'}</span>
               </li>
               <li>
                 Own Lighting: <span className="font-semibold">{profile.lighting ? 'Yes' : 'No'}</span>

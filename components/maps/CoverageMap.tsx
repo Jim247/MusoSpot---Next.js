@@ -2,16 +2,16 @@
 import React, { useEffect, useRef } from 'react';
 
 interface CoverageMapProps {
-  center: { lat: number; lng: number };
+  center: { lat: number; lng: number } | null;
   radiusMiles: number;
 }
 
 export default function CoverageMap({ center, radiusMiles }: CoverageMapProps) {
-  // Always call hooks at the top level
   const mapRef = useRef<L.Map | null>(null);
   const mapId = useRef(`map-${Math.random().toString(36).slice(2, 11)}`);
 
   useEffect(() => {
+    if (!center) return;
     let leafletMap: L.Map | null = null;
     let L: typeof import('leaflet');
     let cleanup: (() => void) | undefined;
@@ -20,7 +20,6 @@ export default function CoverageMap({ center, radiusMiles }: CoverageMapProps) {
       if (typeof window === 'undefined') return;
       L = (await import('leaflet')).default;
 
-      // Initialize map only if it doesn't exist
       if (!mapRef.current) {
         leafletMap = L.map(mapId.current, {
           zoomControl: true,
@@ -35,10 +34,8 @@ export default function CoverageMap({ center, radiusMiles }: CoverageMapProps) {
         mapRef.current = leafletMap;
       }
 
-      // Update view and circle
       mapRef.current!.setView([center.lat, center.lng]);
 
-      // Clear existing layers except tile layers
       mapRef.current!.eachLayer((layer: L.Layer) => {
         if (
           layer instanceof L.Circle ||
@@ -48,7 +45,6 @@ export default function CoverageMap({ center, radiusMiles }: CoverageMapProps) {
         }
       });
 
-      // Create custom marker icon
       const markerIcon = L.divIcon({
         html: `<div style="
           width: 24px;
@@ -63,10 +59,8 @@ export default function CoverageMap({ center, radiusMiles }: CoverageMapProps) {
         iconAnchor: [12, 12],
       });
 
-      // Add marker with custom icon
       L.marker([center.lat, center.lng], { icon: markerIcon }).addTo(mapRef.current!);
 
-      // Add coverage circle
       L.circle([center.lat, center.lng], {
         radius: radiusMiles * 1609.34,
         color: 'var(--aw-color-primary)',
@@ -88,8 +82,7 @@ export default function CoverageMap({ center, radiusMiles }: CoverageMapProps) {
     };
   }, [center, radiusMiles]);
 
-  // Validate coordinates after hooks
-  if (!center?.lat || !center?.lng) {
+  if (!center) {
     return (
       <div className="w-full h-64 rounded-lg mt-2 bg-gray-100 flex items-center justify-center">
         <p className="text-gray-500">Location not available</p>

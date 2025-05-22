@@ -21,7 +21,7 @@ const Hero: React.FC<HeroProps> = ({
   id,
 }) => (
   <section
-    className="relative w-full h-[80vh] min-h-[400px] max-h-[900px] overflow-hidden flex items-center justify-center"
+    className="relative w-full h-[80vh] min-h-[400px] max-h-[900px] flex items-center justify-center"
     {...(id ? { id } : {})}
   >
     {/* Background Image */}
@@ -29,7 +29,7 @@ const Hero: React.FC<HeroProps> = ({
       <Image
         src={image.src}
         alt={image.alt || 'Hero Image'}
-        className="absolute inset-0 w-full h-full object-cover"
+        className="absolute w-full h-full object-cover"
         style={{ zIndex: 0 }}
         priority
         fill

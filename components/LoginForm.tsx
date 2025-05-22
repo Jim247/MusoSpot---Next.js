@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
-import { loginUser } from '../lib/firebase';
-import { getAuth, sendPasswordResetEmail } from 'firebase/auth';
+import { loginUser, sendPasswordReset } from '@supabase/auth';
+import { supabase } from '../supabaseClient';
+import PostValidationSignup from './PostValidationSignup';
 
 const LoginForm = () => {
   const [error, setError] = useState('');
   const [resetSent, setResetSent] = useState(false);
   const [isResetMode, setIsResetMode] = useState(false);
+  const [showValidatedSignup, setShowValidatedSignup] = useState(false);
+  // Use a generic object type for pendingProfile
+  const [pendingProfile, setPendingProfile] = useState<{ [key: string]: unknown } | null>(null);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -16,7 +20,21 @@ const LoginForm = () => {
 
     try {
       await loginUser(email, password);
-      // redirect to dashboard after successful login
+      // After login, check if user row exists in users table
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        // On first login, always show validation signup if profile_complete is not true
+        const { data: userRow } = await supabase
+          .from('users')
+          .select('profile_complete')
+          .eq('id', user.id)
+          .single();
+        if (!userRow || !userRow.profile_complete) {
+          setPendingProfile(userRow || { id: user.id, email: user.email });
+          setShowValidatedSignup(true);
+          return;
+        }
+      }
       window.location.href = '/dashboard';
     } catch {
       setError('Login failed. Please ensure you have signed up, and that your email is verified and try again.');
@@ -34,13 +52,16 @@ const LoginForm = () => {
     }
 
     try {
-      const auth = getAuth();
-      await sendPasswordResetEmail(auth, email);
+      await sendPasswordReset(email);
       setResetSent(true);
       setError('');
     } catch {
       setError('Failed to send password reset email. Please check your email address and try again.');
     }
+  }
+
+  if (showValidatedSignup) {
+    return <PostValidationSignup initialProfile={pendingProfile || {}} />;
   }
 
   return (

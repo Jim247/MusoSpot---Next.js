@@ -5,7 +5,7 @@ import Image from 'next/image'
 interface EditProfileHeaderProps {
   profile: UserDashboard;
   isUploading: boolean;
-  userName: string;
+  username: string;
   photoMessage: string;
   handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
@@ -22,14 +22,14 @@ export const EditProfileHeader: React.FC<EditProfileHeaderProps> = ({
     <div className="bg-white rounded-lg p-6 mb-8">
      {profile.role == 'agent' && (
         <div className="mb-6">
-          <h3 className="text-gray-700 font-semibold mb-2">Welcome, {profile.firstName}!</h3>
+          <h3 className="text-gray-700 font-semibold mb-2">Welcome, {profile.first_name}!</h3>
         </div>
       )}
       <div className="text-center">
         <div className="relative inline-block cursor-pointer group">
           <label className="cursor-pointer">
             <Image
-              src={profile.avatar ? profile.avatar : '/images/User-avatar.svg'}
+              src={profile.avatar ? profile.avatar : '/default-avatar.svg'}
               alt="Profile"
               className="w-48 h-48 md:w-64 md:h-64 object-cover rounded-md border mx-auto"
               width={256}
@@ -57,8 +57,8 @@ export const EditProfileHeader: React.FC<EditProfileHeaderProps> = ({
       </div>
 
       <div className="mt-4 text-center">
-        {profile?.slug && (
-          <a href={`users/${profile.slug}`} className="text-highlight hover:text-secondary text-sm">
+        {profile?.username && (
+          <a href={`users/${profile.username}`} className="text-highlight hover:text-secondary text-sm">
             See My Profile
           </a>
         )}

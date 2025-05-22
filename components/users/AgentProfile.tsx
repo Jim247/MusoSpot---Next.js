@@ -16,12 +16,12 @@ export default function AgentProfile() {
       {/* Updated header: Pic on top, name then instruments */}
       <div className="flex flex-col items-center space-y-4">
         <img
-          src={profile.avatar || '/images/User-avatar.svg'}
-          alt={`${profile.firstName}'s profile`}
+          src={profile.avatar || '/default-avatar.svg'}
+          alt={`${profile.first_name}'s profile`}
           className="w-48 h-48 rounded-md object-cover"
         />
         <h1 className="text-2xl font-bold">
-          {profile.agencyName}
+          {profile.agency_name}
         </h1>
         <h2 className="text-lg text-gray-600">Agency Account</h2>
         {(profile.ward || profile.region || profile.country) && (
@@ -34,7 +34,7 @@ export default function AgentProfile() {
       </div>
       {/* Badge Section - Only show experience for agents */}
       <div className="pt-4">
-        {!!(profile.yearsExperience && getExperienceLevel(profile.yearsExperience ?? 0)) && (
+        {!!(profile.years_experience && getExperienceLevel(profile.years_experience ?? 0)) && (
           <div className="mt-6">
             <div className="flex items-center justify-center gap-2 mb-2">
               <span className="text-2xl text-yellow-600 flex items-center">
@@ -63,7 +63,7 @@ export default function AgentProfile() {
                 className="flex items-center justify-center transition-transform hover:scale-110 hover:shadow-xl rounded-md px-2 py-2"
                 title="Experience Level"
               >
-                <ExperienceBadge yearsExperience={profile.yearsExperience} size="xxl" />
+                <ExperienceBadge years_experience={profile.years_experience} size="xxl" />
               </div>
             </div>
           </div>

@@ -1,18 +1,18 @@
 "use client"
 import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import type { Muso, Agent } from '../constants/users';
-import { useAuth } from '../lib/firebase';
 import { INSTRUMENTS } from '@constants/instruments';
-import { postcodeToGeoPoint } from '@utils/PostcodeUtils';
 import { EVENT_TYPES } from '../constants/event';
-import { Timestamp } from 'firebase/firestore';
 import PostcodeAutocomplete from '@utils/ValidatePostcode';
-import type { EventPost } from '@constants/event';
+import type { EventPost } from '@constants/event';;
+import { useAuth } from '../supabase/auth.js';
+import { postcodeToGeoPoint } from '../lib/utils/GeoPoints';
+import { createEvent } from '../supabase/events.js';
+import MiniMap from './maps/MiniMap';
 
 interface AddEventFormValues {
   postcode: string;
-  date: string;
+  event_date: string; // <-- change from 'date' to 'event_date'
   eventType: string;
   instrumentsNeeded: string[];
   budget: string;
@@ -20,7 +20,7 @@ interface AddEventFormValues {
 }
 
 export default function AddEvent() {
-  const { user } = useAuth() as { user: Muso | Agent | null };
+  const { user } = useAuth(); 
 
   const [isConfirming, setIsConfirming] = React.useState(false);
   const [eventDataToConfirm, setEventDataToConfirm] = React.useState<EventPost | null>(null);
@@ -36,7 +36,7 @@ export default function AddEvent() {
   } = useForm<AddEventFormValues>({
     defaultValues: {
       postcode: '',
-      date: '',
+      event_date: '', 
       eventType: '',
       instrumentsNeeded: [],
       budget: '',
@@ -76,26 +76,28 @@ export default function AddEvent() {
     }
 
     try {
-      const geoPoint = await postcodeToGeoPoint(data.postcode);
-      if (!geoPoint) {
+      const geoResult = await postcodeToGeoPoint(data.postcode);
+      if (!geoResult) {
         setError('postcode', { message: 'Unable to find location for the provided postcode' });
         return;
       }
 
-      const eventData: EventPost = {
+      // Prepare event data for Supabase
+      const eventData = {
         postcode: data.postcode,
-        geoPoint,
-        date: new Timestamp(Math.floor(new Date(data.date).getTime() / 1000), 0),
-        instrumentsNeeded: data.instrumentsNeeded,
+        geopoint: geoResult.point,
+        event_date: new Date(data.event_date),
+        instruments_needed: data.instrumentsNeeded,
         budget: Number(data.budget),
-        extraInfo: data.text,
-        eventType: data.eventType,
-        agentId: user.uid,
-        eventID: '',
+        extra_info: data.text,
+        event_type: data.eventType,
+        poster_id: (user && typeof user === 'object' && 'id' in user) ? (user as { id: string }).id : '',
         status: 'pending',
+        event_id: '',
+        created_at: new Date(),
       };
 
-      setEventDataToConfirm(eventData);
+      setEventDataToConfirm(eventData as EventPost);
       setIsConfirming(true);
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : 'Error preparing event data');
@@ -109,10 +111,16 @@ export default function AddEvent() {
     }
     setSubmitError('');
     try {
-      await createEventWithNotifications(eventDataToConfirm, user.uid);
+      const { error } = await createEvent(eventDataToConfirm);
+      if (error) {
+        console.error('Supabase insert error:', error);
+        throw error;
+      }
       window.location.href = '/dashboard';
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : 'Error creating event');
+      // Debug: log error
+      console.error('Event creation error:', error);
     }
   };
 
@@ -124,25 +132,35 @@ export default function AddEvent() {
 
   if (isConfirming && eventDataToConfirm) {
     return (
+      
       <div className="max-w-md mx-auto p-6 bg-white shadow rounded-lg">
+      <div className="mb-4">
+        {eventDataToConfirm?.geopoint && (
+          <MiniMap
+            geopoint={eventDataToConfirm.geopoint}
+            id={eventDataToConfirm.event_id}
+          />
+        )}
+      </div>
         <div className="mb-2">
-          <strong>Date:</strong> {eventDataToConfirm.date.toDate().toLocaleDateString()}
+          <strong>Date:</strong> {eventDataToConfirm.event_date instanceof Date ? eventDataToConfirm.event_date.toLocaleDateString() : String(eventDataToConfirm.event_date)}
         </div>
         <div className="mb-2">
-          <strong>Event Type:</strong> {eventDataToConfirm.eventType}
+          <strong>Event Type:</strong> {eventDataToConfirm.event_type}
         </div>
         <div className="mb-2">
           <strong>Postcode:</strong> {eventDataToConfirm.postcode}
         </div>
         <div className="mb-2">
-          <strong>Instruments Needed:</strong> {eventDataToConfirm.instrumentsNeeded.join(', ')}
+          <strong>Instruments Needed:</strong> {eventDataToConfirm.instruments_needed.join(', ')}
         </div>
         <div className="mb-2">
           <strong>Price Per Musician (£):</strong> {eventDataToConfirm.budget}
         </div>
-        <div className="mb-4">
-          <strong>More Information:</strong> {eventDataToConfirm.extraInfo}
-        </div>
+     <div className="mb-4 break-words whitespace-pre-line overflow-auto max-h-40">
+  <strong>More Information:</strong>
+  <div>{eventDataToConfirm.extra_info}</div>
+</div>
         <div className="flex justify-between">
           <button type="button" onClick={handleBack} className="btn btn-secondary">
             Back
@@ -176,16 +194,16 @@ export default function AddEvent() {
           {errors.postcode && <p className="text-red-500 text-sm mt-1">{errors.postcode.message}</p>}
         </div>
 
-        {/* Date Field */}
+        {/* Event Date Field */}
         <div className="mb-4">
           <label className="block mb-1">Date:</label>
           <input
             type="date"
-            {...register('date', { required: 'Please select a date' })}
+            {...register('event_date', { required: 'Please select a date' })} // <-- use event_date
             min={new Date().toISOString().split('T')[0]}
             className="w-full border rounded px-3 py-2"
           />
-          {errors.date && <p className="text-red-500 text-sm mt-1">{errors.date.message}</p>}
+          {errors.event_date && <p className="text-red-500 text-sm mt-1">{errors.event_date.message}</p>}
         </div>
 
         {/* Event Type Field */}

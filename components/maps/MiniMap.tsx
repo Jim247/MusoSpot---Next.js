@@ -2,19 +2,25 @@
 import React, { useEffect, useRef, memo, useState } from 'react';
 import 'leaflet/dist/leaflet.css';
 import type { Map as LeafletMap } from 'leaflet';
+import { getLatLngFromGeoPoint } from '../../utils/getLatLngFromGeoPoint';
+
+// Accepts GeoJSON Point object or WKT string
+export type GeoPointInput = { type: 'Point'; coordinates: [number, number] } | string | null | undefined;
 
 interface MiniMapProps {
-  lat: number;
-  lng: number;
+  geopoint: GeoPointInput;
   className?: string;
   id: string;
   radius?: number;
 }
 
-const MiniMap = memo(({ lat, lng, className = 'h-full w-full', id, radius }: MiniMapProps) => {
+export const MiniMap = memo(({ geopoint, className = 'h-full w-full', id, radius }: MiniMapProps) => {
   const [leaflet, setLeaflet] = useState<typeof import('leaflet') | null>(null);
   const mapRef = useRef<LeafletMap | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Parse lat/lng from geopoint
+  const latLng = getLatLngFromGeoPoint(geopoint);
 
   // Dynamically import Leaflet on the client
   useEffect(() => {
@@ -24,7 +30,7 @@ const MiniMap = memo(({ lat, lng, className = 'h-full w-full', id, radius }: Min
   }, []);
 
   useEffect(() => {
-    if (!leaflet || !containerRef.current) return;
+    if (!leaflet || !containerRef.current || !latLng) return;
 
     const container = containerRef.current;
     const L = leaflet; // Store reference for cleanup
@@ -43,7 +49,7 @@ const MiniMap = memo(({ lat, lng, className = 'h-full w-full', id, radius }: Min
         zoomControl: false,
         dragging: false,
         scrollWheelZoom: false,
-      }).setView([lat, lng], zoomLevel);
+      }).setView([latLng.lat, latLng.lng], zoomLevel);
 
       mapRef.current = map;
 
@@ -67,11 +73,11 @@ const MiniMap = memo(({ lat, lng, className = 'h-full w-full', id, radius }: Min
       });
 
       // Add marker with custom icon
-      L.marker([lat, lng], { icon: markerIcon }).addTo(map);
+      L.marker([latLng.lat, latLng.lng], { icon: markerIcon }).addTo(map);
 
       // Add radius circle if radius is provided (ensure radius is a number)
       if (typeof radius === 'number' && radius > 0) {
-        const circle = L.circle([lat, lng], {
+        const circle = L.circle([latLng.lat, latLng.lng], {
           radius: radius * 1609.34, // Convert miles to meters
           color: 'var(--aw-color-primary)', // Use primary color from CSS
           fillColor: 'var(--aw-color-primary)',
@@ -91,8 +97,9 @@ const MiniMap = memo(({ lat, lng, className = 'h-full w-full', id, radius }: Min
         mapRef.current = null;
       }
     };
-  }, [leaflet, lat, lng, radius, id]);
+  }, [leaflet, latLng, radius, id]);
 
+  if (!latLng) return null;
   return <div id={id} ref={containerRef} className={`${className}`} />;
 });
 

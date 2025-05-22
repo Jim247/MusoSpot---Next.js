@@ -1,21 +1,18 @@
 import type { Timestamp } from 'firebase/firestore';
 
 export interface Muso {
-  uid: string;
-  firstName: string;
-  lastName: string;
-  userName: string;
+  id: string;
+  first_name: string;
+  last_name: string;
+  username: string;
   email: string;
   phone: string;
   postcode?: string;
-  searchRadius?: number;
-  yearsExperience?: number;
-  agencyName?: string;
+  search_radius?: number;
+  years_experience?: number;
+  agency_name?: string;
   city?: string;
-  geoPoint?: {
-    lat: number;
-    lng: number;
-  };
+  geopoint: string;
   ward?: string;
   region?: string;
   country?: string;
@@ -27,25 +24,22 @@ export interface Muso {
   slug: string;
   reviews?: Review[];
   transport?: boolean;
-  paSystem?: boolean;
+  pa_system?: boolean;
   lighting?: boolean;
 }
 
 export interface Agent {
-  uid: string;
-  firstName: string;
-  lastName: string;
-  userName: string;
+  id: string;
+  first_name: string;
+  last_name: string;
+  username: string;
   email: string;
   phone: string;
   postcode?: string;
-  yearsExperience?: number;
-  agencyName?: string;
+  years_experience?: number;
+  agency_name?: string;
   city?: string;
-  geoPoint?: {
-    lat: number;
-    lng: number;
-  };
+  geopoint?: string
   ward?: string;
   region?: string;
   country?: string;
@@ -59,9 +53,9 @@ export interface Agent {
 }
 export interface Review {
   id: string;
-  reviewerId: string;
-  reviewedUserId: string;
-  reviewerName: string;
+  reviewer_id: string;
+  reviewed_user_id: string;
+  reviewer_name: string;
   rating: number;
   comment: string;
   timestamp?: Timestamp | string ;
@@ -69,23 +63,20 @@ export interface Review {
 
 export interface UserDashboard {
   lighting: boolean;
-  paSystem: boolean;
+  pa_system: boolean;
   transport: boolean;
-  uid: string;
-  firstName: string;
-  lastName: string;
-  userName?: string;
+  id: string;
+  first_name: string;
+  last_name: string;
+  username?: string;
   email: string;
   phone?: string;
   postcode?: string;
-  searchRadius?: number;
-  yearsExperience?: number;
-  agencyName?: string;
+  search_radius?: number;
+  years_experience?: number;
+  agency_name?: string;
   city?: string;
-  geoPoint?: {
-    lat: number;
-    lng: number;
-  };
+  geopoint:string;
   ward?: string;
   region?: string;
   country?: string;

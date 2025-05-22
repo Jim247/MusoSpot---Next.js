@@ -84,7 +84,7 @@ export default function UserSearch() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {users.map((user) => (
-            <a key={user.uid} href={`/user/${user.uid}`} className="block hover:scale-105 transition-transform">
+            <a key={user.id} href={`/user/${user.id}`} className="block hover:scale-105 transition-transform">
               <UserCard user={user} />
             </a>
           ))}

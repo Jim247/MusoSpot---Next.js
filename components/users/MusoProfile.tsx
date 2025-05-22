@@ -1,28 +1,117 @@
-import { useUserProfile } from '@components/UserProfileContext';
 import React from 'react';
 import MiniMap from '@components/maps/MiniMap';
 import { ExperienceBadge } from '@components/Profile/badges/ExperienceBadge';
-import { getExperienceLevel, getTransport } from '@lib/utils/BadgeRules'
-import { LightingBadge, PaSystemBadge, TransportBadge } from '../profile/badges/BadgeRender'
-import ReviewSection from '@components/ReviewSection';
+import { getExperienceLevel } from '@lib/utils/BadgeRules';
+import { LightingBadge, TransportBadge, paSystemBadge } from '../profile/badges/BadgeRender.jsx';
+import Image from 'next/image';
+import ReviewSection from '../ReviewSection';
 
-export default function MusoProfile() {
-  const { profile, loading } = useUserProfile();
+interface MusoProfileProps {
+  profile: {
+    id: string;
+    slug: string;
+    avatar?: string;
+    first_name: string;
+    last_name: string;
+    ward?: string;
+    region?: string;
+    country?: string;
+    instruments?: string[];
+    years_experience?: number;
+    transport?: boolean;
+    pa_system?: boolean;
+    lighting?: boolean;
+    video?: string;
+    bio?: string;
+    role?: string;
+    geopoint?: { type: 'Point'; coordinates: [number, number] } | string | null;
+    search_radius?: number;
+    postcode?: string;
+  };
+}
 
-  if (loading) return <div>Loading...</div>;
+export default function MusoProfile({ profile }: MusoProfileProps) {
+  console.log(profile)
   if (!profile) return <div>Profile not found</div>;
+
+  // Universal badge getter
+  function getBadge({
+    type,
+    value,
+    size = 'xxl',
+  }: {
+    type: 'experience' | 'transport' | 'paSystem' | 'lighting',
+    value: boolean | number | undefined,
+    size?: string,
+  }) {
+    switch (type) {
+      case 'experience':
+        if (typeof value === 'number' && value && getExperienceLevel(value)) {
+          return (
+            <div
+              className="flex items-center justify-center transition-transform hover:scale-110 hover:shadow-xl rounded-md px-2 py-2"
+              title="Experience Level"
+            >
+              <ExperienceBadge years_experience={value} size={size} />
+            </div>
+          );
+        }
+        break;
+      case 'transport':
+        if (value) {
+          return (
+            <div
+              className="flex items-center justify-center transition-transform hover:scale-110 hover:shadow-xl rounded-md bg-gray-50 px-2 py-2"
+              title="Transport Available"
+            >
+              <TransportBadge boolean={value} size={size} />
+            </div>
+          );
+        }
+        break;
+      case 'paSystem':
+        if (value) {
+          return (
+            <div
+              className="flex items-center justify-center transition-transform hover:scale-110 hover:shadow-xl rounded-md bg-gray-50 px-2 py-2"
+              title="PA System Owner"
+            >
+              {paSystemBadge({ boolean: value, size })}
+            </div>
+          );
+        }
+        break;
+      case 'lighting':
+        if (value) {
+          return (
+            <div
+              className="flex items-center justify-center transition-transform hover:scale-110 hover:shadow-xl rounded-md bg-gray-50 px-2 py-2"
+              title="Lighting Owner"
+            >
+              <LightingBadge boolean={value} size={size} />
+            </div>
+          );
+        }
+        break;
+      default:
+        return null;
+    }
+    return null;
+  }
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white">
       {/* Updated header: Pic on top, name then instruments */}
       <div className="flex flex-col items-center space-y-4">
-        <img
-          src={profile.avatar || '/images/User-avatar.svg'}
-          alt={`${profile.firstName}'s profile`}
+        <Image
+          src={profile.avatar || '/default-avatar.svg'}
+          alt={`${profile.first_name}'s profile`}
+          width={192}
+          height={192}
           className="w-48 h-48 rounded-md object-cover"
         />
         <h1 className="text-2xl font-bold">
-          {profile.firstName} {profile.lastName}
+          {profile.first_name} {profile.last_name}
         </h1>
         {(profile.ward || profile.region || profile.country) && (
           <h2 className="text-lg text-gray-600">
@@ -33,7 +122,7 @@ export default function MusoProfile() {
         )}
         {profile.instruments && profile.instruments.length > 0 && (
           <div className="flex flex-wrap gap-2 justify-center">
-            {profile.instruments.map((instrument, idx) => (
+            {profile.instruments.map((instrument: string, idx: number) => (
               <span key={idx} className="bg-highlight text-white px-3 py-1 rounded-md text-lg">
                 {instrument}
               </span>
@@ -43,9 +132,9 @@ export default function MusoProfile() {
       </div>
       {/* Badge Section */}
       <div className="pt-4">
-        {(!!(profile.yearsExperience && getExperienceLevel(profile.yearsExperience ?? 0)) ||
+        {(!!(profile.years_experience && getExperienceLevel(profile.years_experience ?? 0)) ||
           profile.transport ||
-          profile.paSystem ||
+          profile.pa_system ||
           profile.lighting) && (
           <div className="mt-6">
             <div className="flex items-center justify-center gap-2 mb-2">
@@ -71,38 +160,10 @@ export default function MusoProfile() {
               <h2 className="text-xl font-semibold text-black tracking-wide">MusoSpot Achievements</h2>
             </div>
             <div className="flex flex-wrap justify-center gap-6 items-center p-4">
-              {profile.yearsExperience && getExperienceLevel(profile.yearsExperience ?? 0) && (
-                <div
-                  className="flex items-center justify-center transition-transform hover:scale-110 hover:shadow-xl rounded-md px-2 py-2"
-                  title="Experience Level"
-                >
-                  <ExperienceBadge yearsExperience={profile.yearsExperience} size="xxl" />
-                </div>
-              )}
-              {profile.transport && (
-                <div
-                  className="flex items-center justify-center transition-transform hover:scale-110 hover:shadow-xl rounded-md bg-gray-50 px-2 py-2"
-                  title="Transport Available"
-                >
-                  <TransportBadge boolean={getTransport(profile.transport)} size="xxl" />
-                </div>
-              )}
-              {profile.paSystem && (
-                <div
-                  className="flex items-center justify-center transition-transform hover:scale-110 hover:shadow-xl rounded-md bg-gray-50 px-2 py-2"
-                  title="PA System Owner"
-                >
-                  <PaSystemBadge boolean={profile.paSystem} size="xxl" />
-                </div>
-              )}
-              {profile.lighting && (
-                <div
-                  className="flex items-center justify-center transition-transform hover:scale-110 hover:shadow-xl rounded-md bg-gray-50 px-2 py-2"
-                  title="Lighting Owner"
-                >
-                  <LightingBadge boolean={profile.lighting} size="xxl" />
-                </div>
-              )}
+              {getBadge({ type: 'experience', value: profile.years_experience })}
+              {getBadge({ type: 'transport', value: profile.transport })}
+              {getBadge({ type: 'paSystem', value: profile.pa_system })}
+              {getBadge({ type: 'lighting', value: profile.lighting })}
             </div>
           </div>
         )}
@@ -135,23 +196,22 @@ export default function MusoProfile() {
         </div>
       )}
       {/* Location Section */}
-      {profile.role !== 'agent' && profile.geoPoint && (
+      {profile.role !== 'agent' && profile.geopoint && (
         <div className="mt-6">
           <h2 className="text-xl font-semibold mb-2">Location</h2>
           <MiniMap
             id={`map-${profile.slug}`}
-            lat={profile.geoPoint.lat}
-            lng={profile.geoPoint.lng}
-            radius={profile.searchRadius || 100}
+            geopoint={profile.geopoint}
+            radius={profile.search_radius || 100}
             className="h-64 w-full rounded-lg"
           />
           <p className="mt-2 text-gray-600">
-            This user is available within {profile.searchRadius || 100} miles of {profile.postcode}
+            This user is available within {profile.search_radius || 100} miles of {profile.postcode}
           </p>
         </div>
       )}
-      {/* User Reviews Section - Replaced with ReviewSection component */}
-      <ReviewSection profileUid={profile.uid} currentUser={null} />
+      {/* User Reviews Section */}
+      <ReviewSection profileid={profile.id} currentUser={null} />
     </div>
   );
 }

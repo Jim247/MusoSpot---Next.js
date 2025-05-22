@@ -43,7 +43,7 @@ export const AgentProfileInfo: React.FC<AgentProfileInfoProps> = ({
       <div className="mb-6">
         <h3 className="text-gray-700 font-semibold mb-2">Name</h3>
         <p className="text-gray-600">
-          {profile.firstName} {profile.lastName}
+          {profile.first_name} {profile.last_name}
         </p>
       </div>
       <div className="mb-6">

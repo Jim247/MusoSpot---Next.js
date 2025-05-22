@@ -25,9 +25,9 @@ if (process.env.NODE_ENV === 'development') {
 
 const dummyUsers = [
   {
-    uid: 'user1',
-    firstName: 'James',
-    lastName: 'Burgess',
+    id: 'user1',
+    first_name: 'James',
+    last_name: 'Burgess',
     username: 'jburgess',
     email: 'jay249@hotmail.co.uk',
     phone: '07700900000',
@@ -45,16 +45,16 @@ const dummyUsers = [
     bio: 'The OG ',
     video: 'https://www.youtube.com/embed/dQw4w9WgXcQ?si=LlFVXa36FWalmdaO',
     slug: 'james-burgess-123',
-    paSystem: true,
+    pa_system: true,
     lighting: true,
     transport: true,
-    yearsExperience: 5,
+    years_experience: 5,
   },
   // New agent user
   {
-    uid: 'agent1',
-    firstName: 'Alex',
-    lastName: 'Agent',
+    id: 'agent1',
+    first_name: 'Alex',
+    last_name: 'Agent',
     username: 'agent',
     email: 'agent@agency.com',
     phone: '07700900001',
@@ -72,11 +72,11 @@ const dummyUsers = [
     bio: 'I am an agent looking for talented musicians to fill gigs across the South West.',
     video: '',
     slug: 'alex-agent-001',
-    paSystem: false,
+    pa_system: false,
     lighting: false,
     transport: true,
-    yearsExperience: 10,
-    agencyName: 'South West Talent',
+    years_experience: 10,
+    agency_name: 'South West Talent',
     city: 'Bristol',
   },
 ];
@@ -89,15 +89,15 @@ export async function seedUsers() {
       const authUser = userCredential.user;
 
       // Update display name
-      await updateProfile(authUser, { displayName: `${user.firstName} ${user.lastName}` });
+      await updateProfile(authUser, { displayName: `${user.first_name} ${user.last_name}` });
 
       // Store user profile in Firestore
-      await setDoc(doc(db, 'users', authUser.uid), {
+      await setDoc(doc(db, 'users', authUser.id), {
         ...user,
-        uid: authUser.uid, // Ensure Firestore UID matches Auth UID
+        id: authUser.id, // Ensure Firestore id matches Auth id
       });
 
-      console.log(`Created user: ${user.firstName} ${user.lastName}`);
+      console.log(`Created user: ${user.first_name} ${user.last_name}`);
     } catch (error) {
       console.error(`Error creating user ${user.email}:`, error);
     }

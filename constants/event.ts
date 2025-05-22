@@ -1,28 +1,24 @@
-import type { Timestamp } from 'firebase-admin/firestore';
 
-export type GeoPoint = {
-  lat: number;
-  lng: number;
-};
 
 // properties of the main Event object
 export type EventPost = {
   id?: string;
-  agentId: string;
-  eventID: string;
+  poster_id: string;
+  event_id: string;
   status: string;
-  eventType: string;
+  event_type: string;
   postcode: string;
-  geoPoint?: GeoPoint;
-  date: Timestamp;
-  instrumentsNeeded: string[];
+  geopoint?: string;
+  instruments_needed: string[];
   budget: number;
-  extraInfo: string;
+  extra_info: string;
+  event_date: Date;
+  created_at: Date;
 };
 
 // Properties of the Applicant object in event list component
 export type Applicant = {
-  applicantId: string;
+  applicant_id: string;
   slug: string;
   name?: string;
 };
@@ -31,31 +27,32 @@ export type Applicant = {
 export type EventListProps = {
   events: EventPost[];
   applications: {
-    [eventId: string]: Applicant[];
+    [event_id: string]: Applicant[];
   };
 };
 
 export const EVENT_TYPES = ['Public Event', 'Private Event'];
 
 export type EventApplication = {
-  eventID: string;
+  event_id: string;
   applicantId: string;
   slug: string;
-  createdAt: Timestamp;
+  created_at: Date;
 };
 
 // properties of the main Event object
 export type EventNotification = {
   id?: string;
-  agentId: string;
-  eventID: string;
+  agent_id: string;
+  event_id: string;
   status: string;
-  eventType: string;
+  event_type: string;
+  event_date: string;
   postcode: string;
-  geoPoint?: GeoPoint;
-  date: Timestamp;
-  instrumentsNeeded: string[];
+  geopoint?: string;
+  date: Date;
+  instruments_needed: string[];
   budget: number;
-  extraInfo: string;
+  extra_info: string;
   distance: number;
 };
