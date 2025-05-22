@@ -46,7 +46,7 @@ export default function UserDropdown() {
           e.stopPropagation();
           setDropdownOpen(!dropdownOpen);
         }}
-        className="text-muted dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 inline-flex items-center"
+        className="text-muted dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 inline-flex items-center z-9999"
         aria-label="Profile"
         type="button"
       >
