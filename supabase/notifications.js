@@ -1,12 +1,19 @@
 import { supabase } from './supabaseClient';
 
 // Create a new notification
-export async function createNotification(notificationData) {
-  const { data, error } = await supabase.from('event_notifications').insert([notificationData]).select();
+export async function createNotification(userId, eventId, type) {
+  const { error } = await supabase
+    .from('notifications')
+    .insert([
+      {
+        user_id: userId,
+        event_id: eventId,
+        type,
+        read: false,
+      },
+    ]);
   if (error) throw error;
-  return data[0];
 }
-
 // Update a notification
 export async function updateNotification(notificationId, updates) {
   const { data, error } = await supabase

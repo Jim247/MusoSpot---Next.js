@@ -1,14 +1,13 @@
 "use client"
 import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import type { Muso, Agent } from '../constants/users';
-import { useAuth } from '../lib/firebase';
 import { INSTRUMENTS } from '@constants/instruments';
-import { postcodeToGeoPoint } from '@utils/PostcodeUtils';
 import { EVENT_TYPES } from '../constants/event';
-import { Timestamp } from 'firebase/firestore';
 import PostcodeAutocomplete from '@utils/ValidatePostcode';
-import type { EventPost } from '@constants/event';
+import type { EventPost } from '@constants/event';;
+import { useAuth } from '../supabase/auth.js';
+import { postcodeToGeoPoint } from '../lib/utils/GeoPoints';
+import { createEvent } from '../supabase/events.js';
 
 interface AddEventFormValues {
   postcode: string;
@@ -20,7 +19,7 @@ interface AddEventFormValues {
 }
 
 export default function AddEvent() {
-  const { user } = useAuth() as { user: Muso | Agent | null };
+  const { user } = useAuth(); 
 
   const [isConfirming, setIsConfirming] = React.useState(false);
   const [eventDataToConfirm, setEventDataToConfirm] = React.useState<EventPost | null>(null);
@@ -76,26 +75,27 @@ export default function AddEvent() {
     }
 
     try {
-      const geoPoint = await postcodeToGeoPoint(data.postcode);
-      if (!geoPoint) {
+      const geoResult = await postcodeToGeoPoint(data.postcode); // returns { point, ward, region, country }
+      if (!geoResult) {
         setError('postcode', { message: 'Unable to find location for the provided postcode' });
         return;
       }
 
-      const eventData: EventPost = {
+      // Prepare event data for Supabase
+      const eventData = {
         postcode: data.postcode,
-        geoPoint,
-        date: new Timestamp(Math.floor(new Date(data.date).getTime() / 1000), 0),
-        instrumentsNeeded: data.instrumentsNeeded,
+        geo_point: geoResult.point, // WKT string for Supabase/PostGIS
+        date: new Date(data.date),
+        instruments_needed: data.instrumentsNeeded,
         budget: Number(data.budget),
-        extraInfo: data.text,
-        eventType: data.eventType,
-        agentId: user.id,
-        event_id: '',
+        extra_info: data.text,
+        event_type: data.eventType,
+        poster_id: (user && typeof user === 'object' && 'id' in user) ? (user as { id: string }).id : '',
         status: 'pending',
+        event_id: '', // will be set by Supabase trigger or after insert
       };
 
-      setEventDataToConfirm(eventData);
+      setEventDataToConfirm(eventData as EventPost);
       setIsConfirming(true);
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : 'Error preparing event data');
@@ -109,10 +109,18 @@ export default function AddEvent() {
     }
     setSubmitError('');
     try {
-      await createEventWithNotifications(eventDataToConfirm, user.id);
+      // Debug: log event data before insert
+      console.log('Inserting event:', eventDataToConfirm);
+      const { error } = await createEvent(eventDataToConfirm);
+      if (error) {
+        console.error('Supabase insert error:', error);
+        throw error;
+      }
       window.location.href = '/dashboard';
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : 'Error creating event');
+      // Debug: log error
+      console.error('Event creation error:', error);
     }
   };
 
@@ -126,22 +134,22 @@ export default function AddEvent() {
     return (
       <div className="max-w-md mx-auto p-6 bg-white shadow rounded-lg">
         <div className="mb-2">
-          <strong>Date:</strong> {eventDataToConfirm.date.toDate().toLocaleDateString()}
+          <strong>Date:</strong> {eventDataToConfirm.date instanceof Date ? eventDataToConfirm.date.toLocaleDateString() : String(eventDataToConfirm.date)}
         </div>
         <div className="mb-2">
-          <strong>Event Type:</strong> {eventDataToConfirm.eventType}
+          <strong>Event Type:</strong> {eventDataToConfirm.event_type}
         </div>
         <div className="mb-2">
           <strong>Postcode:</strong> {eventDataToConfirm.postcode}
         </div>
         <div className="mb-2">
-          <strong>Instruments Needed:</strong> {eventDataToConfirm.instrumentsNeeded.join(', ')}
+          <strong>Instruments Needed:</strong> {eventDataToConfirm.instruments_needed.join(', ')}
         </div>
         <div className="mb-2">
           <strong>Price Per Musician (£):</strong> {eventDataToConfirm.budget}
         </div>
         <div className="mb-4">
-          <strong>More Information:</strong> {eventDataToConfirm.extraInfo}
+          <strong>More Information:</strong> {eventDataToConfirm.extra_info}
         </div>
         <div className="flex justify-between">
           <button type="button" onClick={handleBack} className="btn btn-secondary">

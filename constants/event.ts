@@ -3,7 +3,7 @@
 // properties of the main Event object
 export type EventPost = {
   id?: string;
-  agent_id: string;
+  poster_id: string;
   event_id: string;
   status: string;
   event_type: string;
@@ -42,15 +42,15 @@ export type EventApplication = {
 // properties of the main Event object
 export type EventNotification = {
   id?: string;
-  agentId: string;
+  agent_id: string;
   event_id: string;
   status: string;
-  eventType: string;
+  event_type: string;
   postcode: string;
-  geoPoint?: GeoPoint;
+  geopoint?: string;
   date: Date;
-  instrumentsNeeded: string[];
+  instruments_needed: string[];
   budget: number;
-  extraInfo: string;
+  extra_info: string;
   distance: number;
 };

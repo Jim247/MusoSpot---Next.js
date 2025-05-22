@@ -64,7 +64,7 @@ export const NotificationList: React.FC<NotificationListProps> = ({ notification
   };
 
   return (
-    <div className="mt-8 mb-8 bg-white rounded-lg p-6">
+    <div className="mt-8 mb-8 bg-white rounded-lg shadow-md p-6">
       <h2 className="text-2xl font-bold">Events Matched to Me </h2>
       {notifications.length > 0 ? (
         <div className="space-y-4">

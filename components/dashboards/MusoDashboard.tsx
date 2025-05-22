@@ -6,7 +6,6 @@ import { EventsList } from '@components/events/EventsList';
 
 export default function MusoDashboard() {
     const { profile, events, notifications, loading, error } = useDashboardData();
-    console.log('MusoDashboard data:', { profile, events, notifications, loading, error });
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-screen">

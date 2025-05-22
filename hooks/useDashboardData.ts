@@ -25,7 +25,7 @@ export function useDashboardData() {
         const { data: userEvents, error: eventsError } = await supabase
           .from('events')
           .select('*')
-          .eq('user_id', profile.id);
+          .eq('poster_id', profile.id);
 
         // Fetch notifications for the user
         const { data: userNotifications, error: notifError } = await supabase
@@ -41,16 +41,16 @@ export function useDashboardData() {
         const mappedNotifications = (userNotifications as EventNotification[]).map((notif) => ({
           ...notif,
           id: notif.id || '',
-          agentId: notif.agent_id || '',
+          poster_id: notif.agent_id || '',
           event_id: notif.event_id || notif.event_id || '',
-          eventType: notif.event_type || '',
+          event_type: notif.event_type || '',
           postcode: notif.postcode || '',
           budget: notif.budget || 0,
-          instrumentsNeeded: notif.instruments_needed || [],
+          instruments_needed: notif.instruments_needed || [],
           distance: notif.distance || 0,
           date: notif.date || null,
           geoPoint: notif.geopoint,
-          extraInfo: notif.extra_info || '',
+          extra_info: notif.extra_info || '',
           status: notif.status || '',
         }));
         setNotifications(mappedNotifications);

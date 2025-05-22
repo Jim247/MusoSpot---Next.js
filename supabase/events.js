@@ -1,10 +1,13 @@
-import { supabase } from './supabaseClient';
+import { supabase } from '../supabaseClient.js';
 
-// Create a new event
+/**
+ * Inserts a new event into the Supabase events table.
+ * @param {object} eventData - The event data, matching your schema.
+ * @returns {Promise<{ data: any, error: any }>}
+ */
 export async function createEvent(eventData) {
-  const { data, error } = await supabase.from('events').insert([eventData]).select();
-  if (error) throw error;
-  return data[0];
+  const { data, error } = await supabase.from('events').insert([eventData]);
+  return { data, error };
 }
 
 // Update an event
