@@ -1,7 +1,6 @@
 import React from 'react';
 import MiniMap from '../maps/MiniMap';
 import type { EventApplication, EventPost } from '../../constants/event';
-import { getLatLngFromGeoPoint } from '../../utils/getLatLngFromGeoPoint';
 
 interface EventsListProps {
   events: EventPost[];
@@ -22,14 +21,13 @@ export const EventsList: React.FC<EventsListProps> = ({ events, applications }) 
           <div className="space-y-4">
             {events.map((event) => {
               const eventKey = event.event_id || event.id;
-              const latLng = event.geopoint ? getLatLngFromGeoPoint(event.geopoint) : null;
               const eventApplications = applications[String(eventKey)] || [];
               return (
                 <div key={eventKey} className="border rounded-lg p-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <p className="font-semibold" />
-                  <p>Date: {event.date instanceof Date ? event.date.toLocaleDateString() : event.date}</p>                     
+                  <p>Date: {event.event_date instanceof Date ? event.event_date.toLocaleDateString() : event.event_date}</p>                     
                    <p>Location: {event.postcode}</p>
                       <p>Budget: £{event.budget}</p>
                       <p>Looking for:</p>
@@ -42,13 +40,12 @@ export const EventsList: React.FC<EventsListProps> = ({ events, applications }) 
                       </div>
                       <div className="text-sm text-gray-500">Event is {event.status} to applications</div>
                     </div>
-                    {latLng && (
+                    {event.geopoint && (
                       <div>
                         <MiniMap
                           id={`map-${eventKey}`}
                           key={`map-${eventKey}`}
-                          lat={latLng.lat}
-                          lng={latLng.lng}
+                          geopoint={event.geopoint}
                           className="h-64 w-full rounded-lg"
                         />
                       </div>

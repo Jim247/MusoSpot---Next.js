@@ -1,39 +1,39 @@
-import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
-import { serverTimestamp } from 'firebase/firestore';
-import { initializeApp } from 'firebase/app';
-import { firebaseConfig } from '../src/firebase/client';
-import { createEventWithNotifications } from '../src/lib/firebase';
+import { config } from 'dotenv';
+config({ path: '.env.local' });
+import { createClient } from '@supabase/supabase-js';
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 
-// Connect to the Firestore emulator when in development
-if (process.env.NODE_ENV === 'development') {
-  connectFirestoreEmulator(db, 'localhost', 8080);
-}
+// Set your Supabase URL and service role key (never expose service role key in client code)
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
+const supabaseServiceRoleKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string;
+const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 
-// Fake event for testing, this is for the logged in user to apply for//
-
+// Mock events to seed
 const dummyPosts = [
   {
     id: 'post1',
-    agentId: 'user1',
+    poster_id: 'user1',
     postcode: 'GL1 1DG',
-    geoPoint: {
+    geo_point: {
       lat: 51.8642,
       lng: -2.238,
     },
-    date: new Date('2024-02-01'),
-    instrumentsNeeded: ['Violin'],
-    created_att: serverTimestamp(),
+    date: '2024-02-01',
+    instruments_needed: ['Violin'],
     status: 'open',
+    created_at: new Date().toISOString(),
   },
 ];
 
 async function seedEvents() {
   for (const post of dummyPosts) {
-    const { postId, matchCount } = await createEventWithNotifications(post, post.agentId);
-    console.log(`Created post: ${postId} with ${matchCount} matches`);
+    // Insert event into the "events" table
+    const { error } = await supabase.from('events').insert([post]);
+    if (error) {
+      console.error('Error inserting post:', error);
+    } else {
+      console.log(`Created post: ${post.id}`);
+    }
   }
 }
 

@@ -72,14 +72,14 @@ export const NotificationList: React.FC<NotificationListProps> = ({ notification
             <div key={notification.id} className="border rounded-lg p-4 bg-blue-50">
               <div className="flex justify-between">
                 <div>
-                  <p className="font-semibold">New matching event! ({notification.instrumentsNeeded.join(', ')})</p>
+                  <p className="font-semibold">New matching event! ({notification.instruments_needed.join(', ')})</p>
                   <p>Location: {notification.postcode}</p>
                   <p>Budget: £{notification.budget}</p>
                   <p className="text-sm text-gray-600">Distance: {notification.distance} miles away</p>
                 </div>
                 <div className="text-sm text-gray-500">
                   {notification.date && 'seconds' in notification.date
-                    ? new Date(notification.date.seconds * 1000).toLocaleDateString()
+                    ? new Date(notification.event_date.seconds * 1000).toLocaleDateString()
                     : ''}
                 </div>
               </div>

@@ -9,10 +9,11 @@ export type EventPost = {
   event_type: string;
   postcode: string;
   geopoint?: string;
-  date: Date;
   instruments_needed: string[];
   budget: number;
   extra_info: string;
+  event_date: Date;
+  created_at: Date;
 };
 
 // Properties of the Applicant object in event list component

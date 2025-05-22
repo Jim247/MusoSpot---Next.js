@@ -158,10 +158,10 @@ export default function MusoEditProfile() {
                       // eslint-disable-next-line no-console
                       return null;
                     })()}
-                    {getLatLngFromGeoPoint(profile.geo_point) ? (
+                    {getLatLngFromGeoPoint(profile.geopoint) ? (
                       <SearchRadiusControl
                         initialRadius={profile.searchRadius || 100}
-                        center={getLatLngFromGeoPoint(profile.geo_point)}
+                        center={getLatLngFromGeoPoint(profile.geopoint)}
                         onSave={async (radius) => {
                           await updateUserAttributes(authUser!.id, { searchRadius: radius });
                           await refresh();

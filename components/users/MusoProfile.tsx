@@ -2,14 +2,36 @@ import React from 'react';
 import MiniMap from '@components/maps/MiniMap';
 import { ExperienceBadge } from '@components/Profile/badges/ExperienceBadge';
 import { getExperienceLevel, getTransport } from '@lib/utils/BadgeRules';
-import { LightingBadge, paSystemBadge, TransportBadge } from '../profile/badges/BadgeRender';
-import { getLatLngFromGeoPoint } from 'utils/getLatLngFromGeoPoint';
-import ReviewSection from '@components/ReviewSection';
+import { LightingBadge, TransportBadge, paSystemBadge } from '../profile/badges/BadgeRender.jsx';
+import ReviewSection from '../ReviewSection';
 
-export default function MusoProfile({ profile }) {
-  // Remove useUserProfile hook, use the passed-in profile prop directly
+interface MusoProfileProps {
+  profile: {
+    id: string;
+    slug: string;
+    avatar?: string;
+    first_name: string;
+    last_name: string;
+    ward?: string;
+    region?: string;
+    country?: string;
+    instruments?: string[];
+    years_experience?: number;
+    transport?: boolean;
+    pa_system?: boolean;
+    lighting?: boolean;
+    video?: string;
+    bio?: string;
+    role?: string;
+    geopoint?: { type: 'Point'; coordinates: [number, number] } | string | null;
+    searchRadius?: number;
+    postcode?: string;
+  };
+}
+
+export default function MusoProfile({ profile }: MusoProfileProps) {
+  console.log(profile)
   if (!profile) return <div>Profile not found</div>;
-  const latLng = getLatLngFromGeoPoint(profile.geopoint);
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white">
@@ -91,7 +113,7 @@ export default function MusoProfile({ profile }) {
                   className="flex items-center justify-center transition-transform hover:scale-110 hover:shadow-xl rounded-md bg-gray-50 px-2 py-2"
                   title="PA System Owner"
                 >
-                  <paSystemBadge boolean={profile.pa_system} size="xxl" />
+                  {paSystemBadge({ boolean: profile.pa_system, size: 'xxl' })}
                 </div>
               )}
               {profile.lighting && (
@@ -137,15 +159,12 @@ export default function MusoProfile({ profile }) {
       {profile.role !== 'agent' && profile.geopoint && (
         <div className="mt-6">
           <h2 className="text-xl font-semibold mb-2">Location</h2>
-          {latLng && (
-            <MiniMap
-              id={`map-${profile.slug}`}
-              lat={latLng.lat}
-              lng={latLng.lng}
-              radius={profile.searchRadius || 100}
-              className="h-64 w-full rounded-lg"
-            />
-          )}
+          <MiniMap
+            id={`map-${profile.slug}`}
+            geopoint={profile.geopoint}
+            radius={profile.searchRadius || 100}
+            className="h-64 w-full rounded-lg"
+          />
           <p className="mt-2 text-gray-600">
             This user is available within {profile.searchRadius || 100} miles of {profile.postcode}
           </p>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import CoverageMap from '@components/maps/CoverageMap';
 import MiniMap from '@components/maps/MiniMap';
+import { latLngToGeoPoint } from '../utils/latLngToGeoPoint';
 
 interface SearchRadiusControlProps {
   initialRadius: number;
@@ -37,7 +38,11 @@ export const SearchRadiusControl = React.memo(
     return (
       <div className="space-y-4">
         <CoverageMap center={coords} radiusMiles={radiusValue} />
-        <MiniMap lat={coords.lat} lng={coords.lng} id="mini-map" radius={10} />
+        <MiniMap
+          geopoint={coords ? latLngToGeoPoint(coords) : null}
+          id="mini-map"
+          radius={10}
+        />
         {isEditing ? (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="flex items-center gap-4">
