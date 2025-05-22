@@ -160,14 +160,15 @@ export default function MusoEditProfile() {
                     })()}
                     {getLatLngFromGeoPoint(profile.geopoint) ? (
                       <SearchRadiusControl
-                        initialRadius={profile.searchRadius || 100}
+                        initialRadius={profile.search_radius || 100}
                         center={getLatLngFromGeoPoint(profile.geopoint)}
                         onSave={async (radius) => {
-                          await updateUserAttributes(authUser!.id, { searchRadius: radius });
+                          await updateUserAttributes(authUser!.id, { search_radius: radius });
                           await refresh();
                         }}
                         isEditing={isEditingRadius}
                         onEditToggle={setIsEditingRadius}
+                        key={profile.search_radius} // Force remount when radius changes
                       />
                     ) : (
                       <div className="w-full h-64 rounded-lg mt-2 bg-gray-100 flex items-center justify-center">

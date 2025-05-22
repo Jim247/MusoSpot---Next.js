@@ -24,7 +24,7 @@ interface MusoProfileProps {
     bio?: string;
     role?: string;
     geopoint?: { type: 'Point'; coordinates: [number, number] } | string | null;
-    searchRadius?: number;
+    search_radius?: number;
     postcode?: string;
   };
 }
@@ -162,11 +162,11 @@ export default function MusoProfile({ profile }: MusoProfileProps) {
           <MiniMap
             id={`map-${profile.slug}`}
             geopoint={profile.geopoint}
-            radius={profile.searchRadius || 100}
+            radius={profile.search_radius || 100}
             className="h-64 w-full rounded-lg"
           />
           <p className="mt-2 text-gray-600">
-            This user is available within {profile.searchRadius || 100} miles of {profile.postcode}
+            This user is available within {profile.search_radius || 100} miles of {profile.postcode}
           </p>
         </div>
       )}

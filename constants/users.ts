@@ -72,7 +72,7 @@ export interface UserDashboard {
   email: string;
   phone?: string;
   postcode?: string;
-  searchRadius?: number;
+  search_radius?: number;
   years_experience?: number;
   agency_name?: string;
   city?: string;
