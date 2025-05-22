@@ -34,13 +34,11 @@ const PublicProfile = ({ slug }: { slug: string }) => {
 
   
 
-  if (profile.role === 'musician') {
-    return <MusoProfile />;
-  } else if (profile.role === 'agent') {
-    return <AgentProfile />;
-  } else {
-    return <div>Unknown role.</div>;
-  }
+if (profile.role === 'musician') {
+  return <MusoProfile profile={profile} />;
+} else if (profile.role === 'agent') {
+  return <AgentProfile profile={profile} />;
+}
 };
 
 export default PublicProfile;

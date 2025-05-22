@@ -1,16 +1,15 @@
-import { useUserProfile } from '@components/UserProfileContext';
 import React from 'react';
 import MiniMap from '@components/maps/MiniMap';
 import { ExperienceBadge } from '@components/Profile/badges/ExperienceBadge';
 import { getExperienceLevel, getTransport } from '@lib/utils/BadgeRules';
 import { LightingBadge, paSystemBadge, TransportBadge } from '../profile/badges/BadgeRender';
-// import ReviewSection from '@components/ReviewSection';
+import { getLatLngFromGeoPoint } from 'utils/getLatLngFromGeoPoint';
+import ReviewSection from '@components/ReviewSection';
 
-export default function MusoProfile() {
-  const { profile, loading } = useUserProfile();
-
-  if (loading) return <div>Loading...</div>;
+export default function MusoProfile({ profile }) {
+  // Remove useUserProfile hook, use the passed-in profile prop directly
   if (!profile) return <div>Profile not found</div>;
+  const latLng = getLatLngFromGeoPoint(profile.geopoint);
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white">
@@ -135,23 +134,25 @@ export default function MusoProfile() {
         </div>
       )}
       {/* Location Section */}
-      {profile.role !== 'agent' && profile.geoPoint && (
+      {profile.role !== 'agent' && profile.geopoint && (
         <div className="mt-6">
           <h2 className="text-xl font-semibold mb-2">Location</h2>
-          <MiniMap
-            id={`map-${profile.slug}`}
-            lat={profile.geoPoint.lat}
-            lng={profile.geoPoint.lng}
-            radius={profile.searchRadius || 100}
-            className="h-64 w-full rounded-lg"
-          />
+          {latLng && (
+            <MiniMap
+              id={`map-${profile.slug}`}
+              lat={latLng.lat}
+              lng={latLng.lng}
+              radius={profile.searchRadius || 100}
+              className="h-64 w-full rounded-lg"
+            />
+          )}
           <p className="mt-2 text-gray-600">
             This user is available within {profile.searchRadius || 100} miles of {profile.postcode}
           </p>
         </div>
       )}
       {/* User Reviews Section */}
-    {/* <ReviewSection profileid={profile.id || profile.id} currentUser={null} /> */}
+      <ReviewSection profileid={profile.id} currentUser={null} />
     </div>
   );
 }

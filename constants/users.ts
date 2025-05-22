@@ -12,7 +12,7 @@ export interface Muso {
   years_experience?: number;
   agency_name?: string;
   city?: string;
-  geo_point: string;
+  geopoint: string;
   ward?: string;
   region?: string;
   country?: string;
@@ -39,7 +39,7 @@ export interface Agent {
   years_experience?: number;
   agency_name?: string;
   city?: string;
-  geo_point?: string
+  geopoint?: string
   ward?: string;
   region?: string;
   country?: string;
@@ -76,7 +76,7 @@ export interface UserDashboard {
   years_experience?: number;
   agency_name?: string;
   city?: string;
-  geo_point:string;
+  geopoint:string;
   ward?: string;
   region?: string;
   country?: string;

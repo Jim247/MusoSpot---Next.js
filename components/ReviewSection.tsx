@@ -140,6 +140,7 @@ export default function ReviewSection({ profileid, currentUser }: ReviewSectionP
 
   return (
     <div className="mt-8">
+      <h3 className="text-xl font-semibold mb-2">User Reviews</h3>
       {reviewLoading ? (
         <div>Loading reviews...</div>
       ) : reviews.length === 0 ? (
