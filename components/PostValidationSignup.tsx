@@ -11,7 +11,7 @@ interface ProfileFields {
   last_name: string;
   role: string;
   agency_name?: string;
-  instrument?: string;
+  instruments?: string;
   years_experience?: string;
   postcode: string;
   phone: string;
@@ -28,20 +28,20 @@ function generateUserName(first: string, last: string) {
   return `${clean(first)}.${clean(last)}`;
 }
 
-const PostValidationSignup: React.FC<{ initialProfile?: Partial<ProfileFields> }> = ({ initialProfile = {} }) => {
+const PostValidationSignup: React.FC<{ initialProfile?: Partial<ProfileFields> }> = () => {
+  // Always start with empty fields, no caching of previous fields
   const [fields, setFields] = useState<ProfileFields>({
-    first_name: initialProfile.first_name || '',
-    last_name: initialProfile.last_name || '',
-    role: initialProfile.role || 'musician',
-    agency_name: initialProfile.agency_name || '',
-    instrument: initialProfile.instrument || '',
-    years_experience: initialProfile.years_experience || '',
-    postcode: initialProfile.postcode || '',
-    phone: initialProfile.phone || '',
-    transport: initialProfile.transport || '',
-    pa_system: initialProfile.pa_system || '',
-    lighting: initialProfile.lighting || '',
-    
+    first_name: '',
+    last_name: '',
+    role: 'musician',
+    agency_name: '',
+    instruments: '',
+    years_experience: '',
+    postcode: '',
+    phone: '',
+    transport: '',
+    pa_system: '',
+    lighting: '',
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -57,7 +57,7 @@ const PostValidationSignup: React.FC<{ initialProfile?: Partial<ProfileFields> }
       }
     } else if (currentStep === 2) {
       if (fields.role === 'musician') {
-        if (!fields.instrument || !fields.years_experience || !fields.transport || !fields.pa_system || !fields.lighting) {
+        if (!fields.instruments || !fields.years_experience || !fields.transport || !fields.pa_system || !fields.lighting) {
           setError('All musician fields are required.');
           return false;
         }
@@ -126,12 +126,13 @@ const PostValidationSignup: React.FC<{ initialProfile?: Partial<ProfileFields> }
         id: user.id,
         email: user.email,
         ...fields,
-        instrument: fields.instrument ? [fields.instrument] : [], // Ensure instrument is always an array
+        instruments: fields.instruments ? [fields.instruments] : [], // Always an array, always called instruments
         username, // Add generated username
-        geo_point: geoPoint?.point,
+        geopoint: geoPoint?.point,
         ward: geoPoint?.ward,
         region: geoPoint?.region,
         country: geoPoint?.country,
+        profile_complete: true, // Set the complete flag on successful profile completion
       };
       console.log('Upserting userData:', userData); // Debug log
       const { data, error: upsertError } = await supabase
@@ -146,6 +147,9 @@ const PostValidationSignup: React.FC<{ initialProfile?: Partial<ProfileFields> }
         return;
       }
       setSuccess('Profile completed!');
+      setTimeout(() => {
+        window.location.href = '/edit-profile';
+      }, 1500); // Show message for 1.5s, then redirect
     } catch (err: unknown) {
       const errorMsg = err instanceof Error ? err.message : String(err);
       setError(errorMsg);
@@ -158,7 +162,7 @@ const PostValidationSignup: React.FC<{ initialProfile?: Partial<ProfileFields> }
 
   return (
     <div className="form-container">
-      <h1 className="form-title">Complete Your Profile {step < 4 ? `(Step ${step} of 3)` : ''}</h1>
+      <h1 className="form-title">Complete Your Profile<br /><span className="block text-base font-normal mt-2">Step {step} of 3</span></h1>
       {error && (
         <div className="form-error" style={{ margin: '24px 0', padding: '12px', background: '#fff0f0', color: '#b91c1c', border: '1px solid #fca5a5', borderRadius: '6px', fontWeight: 500, fontSize: '1.1em', textAlign: 'center' }}>
           {error}
@@ -172,7 +176,7 @@ const PostValidationSignup: React.FC<{ initialProfile?: Partial<ProfileFields> }
       <form ref={undefined} onSubmit={handleValidatedSubmit} className="form-section">
         {step === 1 && (
           <>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-4">
               <div className="form-group">
                 <label className="form-label" htmlFor="first_name">First Name</label>
                 <input className="form-input" type="text" id="first_name" name="first_name" value={fields.first_name} onChange={handleChange} required />
@@ -202,8 +206,8 @@ const PostValidationSignup: React.FC<{ initialProfile?: Partial<ProfileFields> }
             {fields.role === 'musician' && (
               <>
                 <div className="form-group">
-                  <label className="form-label" htmlFor="instrument">Primary Instrument</label>
-                  <select className="form-select" id="instrument" name="instrument" value={fields.instrument} onChange={handleChange} required>
+                  <label className="form-label" htmlFor="instruments">Primary Instrument</label>
+                  <select className="form-select" id="instruments" name="instruments" value={fields.instruments} onChange={handleChange} required>
                     <option value="">Select your instrument</option>
                     {INSTRUMENTS.map((inst) => (
                       <option key={inst} value={inst}>{inst}</option>

@@ -65,7 +65,7 @@ export const NotificationList: React.FC<NotificationListProps> = ({ notification
 
   return (
     <div className="mt-8 mb-8 bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-2xl font-bold">Events Matched to Me </h2>
+      <h2 className="text-xl font-bold">Events Matched to Me </h2>
       {notifications.length > 0 ? (
         <div className="space-y-4">
           {notifications.map((notification) => (
@@ -79,7 +79,7 @@ export const NotificationList: React.FC<NotificationListProps> = ({ notification
                 </div>
                 <div className="text-sm text-gray-500">
                   {notification.date && 'seconds' in notification.date
-                    ? new Date(notification.event_date.seconds * 1000).toLocaleDateString()
+                    ? new Date(notification.event_date).toLocaleDateString()
                     : ''}
                 </div>
               </div>

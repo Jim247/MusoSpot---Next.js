@@ -7,7 +7,6 @@ import { useUserProfile } from '@components/UserProfileContext';
 const Dashboard = () => {
   const { profile, loading } = useUserProfile();
 
-  console.log('Dashboard state:', { profile, loading }); // Debug log
 
   // Loading Screen for Dashboard
   if (loading) {

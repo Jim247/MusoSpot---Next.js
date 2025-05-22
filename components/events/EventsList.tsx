@@ -38,7 +38,7 @@ export const EventsList: React.FC<EventsListProps> = ({ events, applications }) 
                           </div>
                         ))}
                       </div>
-                      <div className="text-sm text-gray-500">Event is {event.status} to applications</div>
+                      <div className="text-sm text-gray-500">Event is {event.status} applications</div>
                     </div>
                     {event.geopoint && (
                       <div>

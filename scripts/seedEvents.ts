@@ -14,7 +14,7 @@ const dummyPosts = [
     id: 'post1',
     poster_id: 'user1',
     postcode: 'GL1 1DG',
-    geo_point: {
+    geowpoint: {
       lat: 51.8642,
       lng: -2.238,
     },

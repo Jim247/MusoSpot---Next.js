@@ -1,8 +1,9 @@
 import React from 'react';
 import MiniMap from '@components/maps/MiniMap';
 import { ExperienceBadge } from '@components/Profile/badges/ExperienceBadge';
-import { getExperienceLevel, getTransport } from '@lib/utils/BadgeRules';
+import { getExperienceLevel } from '@lib/utils/BadgeRules';
 import { LightingBadge, TransportBadge, paSystemBadge } from '../profile/badges/BadgeRender.jsx';
+import Image from 'next/image';
 import ReviewSection from '../ReviewSection';
 
 interface MusoProfileProps {
@@ -33,13 +34,80 @@ export default function MusoProfile({ profile }: MusoProfileProps) {
   console.log(profile)
   if (!profile) return <div>Profile not found</div>;
 
+  // Universal badge getter
+  function getBadge({
+    type,
+    value,
+    size = 'xxl',
+  }: {
+    type: 'experience' | 'transport' | 'paSystem' | 'lighting',
+    value: boolean | number | undefined,
+    size?: string,
+  }) {
+    switch (type) {
+      case 'experience':
+        if (typeof value === 'number' && value && getExperienceLevel(value)) {
+          return (
+            <div
+              className="flex items-center justify-center transition-transform hover:scale-110 hover:shadow-xl rounded-md px-2 py-2"
+              title="Experience Level"
+            >
+              <ExperienceBadge years_experience={value} size={size} />
+            </div>
+          );
+        }
+        break;
+      case 'transport':
+        if (value) {
+          return (
+            <div
+              className="flex items-center justify-center transition-transform hover:scale-110 hover:shadow-xl rounded-md bg-gray-50 px-2 py-2"
+              title="Transport Available"
+            >
+              <TransportBadge boolean={value} size={size} />
+            </div>
+          );
+        }
+        break;
+      case 'paSystem':
+        if (value) {
+          return (
+            <div
+              className="flex items-center justify-center transition-transform hover:scale-110 hover:shadow-xl rounded-md bg-gray-50 px-2 py-2"
+              title="PA System Owner"
+            >
+              {paSystemBadge({ boolean: value, size })}
+            </div>
+          );
+        }
+        break;
+      case 'lighting':
+        if (value) {
+          return (
+            <div
+              className="flex items-center justify-center transition-transform hover:scale-110 hover:shadow-xl rounded-md bg-gray-50 px-2 py-2"
+              title="Lighting Owner"
+            >
+              <LightingBadge boolean={value} size={size} />
+            </div>
+          );
+        }
+        break;
+      default:
+        return null;
+    }
+    return null;
+  }
+
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white">
       {/* Updated header: Pic on top, name then instruments */}
       <div className="flex flex-col items-center space-y-4">
-        <img
+        <Image
           src={profile.avatar || '/default-avatar.svg'}
           alt={`${profile.first_name}'s profile`}
+          width={192}
+          height={192}
           className="w-48 h-48 rounded-md object-cover"
         />
         <h1 className="text-2xl font-bold">
@@ -92,38 +160,10 @@ export default function MusoProfile({ profile }: MusoProfileProps) {
               <h2 className="text-xl font-semibold text-black tracking-wide">MusoSpot Achievements</h2>
             </div>
             <div className="flex flex-wrap justify-center gap-6 items-center p-4">
-              {profile.years_experience && getExperienceLevel(profile.years_experience ?? 0) && (
-                <div
-                  className="flex items-center justify-center transition-transform hover:scale-110 hover:shadow-xl rounded-md px-2 py-2"
-                  title="Experience Level"
-                >
-                  <ExperienceBadge years_experience={profile.years_experience} size="xxl" />
-                </div>
-              )}
-              {profile.transport && (
-                <div
-                  className="flex items-center justify-center transition-transform hover:scale-110 hover:shadow-xl rounded-md bg-gray-50 px-2 py-2"
-                  title="Transport Available"
-                >
-                  <TransportBadge boolean={getTransport(profile.transport)} size="xxl" />
-                </div>
-              )}
-              {profile.pa_system && (
-                <div
-                  className="flex items-center justify-center transition-transform hover:scale-110 hover:shadow-xl rounded-md bg-gray-50 px-2 py-2"
-                  title="PA System Owner"
-                >
-                  {paSystemBadge({ boolean: profile.pa_system, size: 'xxl' })}
-                </div>
-              )}
-              {profile.lighting && (
-                <div
-                  className="flex items-center justify-center transition-transform hover:scale-110 hover:shadow-xl rounded-md bg-gray-50 px-2 py-2"
-                  title="Lighting Owner"
-                >
-                  <LightingBadge boolean={profile.lighting} size="xxl" />
-                </div>
-              )}
+              {getBadge({ type: 'experience', value: profile.years_experience })}
+              {getBadge({ type: 'transport', value: profile.transport })}
+              {getBadge({ type: 'paSystem', value: profile.pa_system })}
+              {getBadge({ type: 'lighting', value: profile.lighting })}
             </div>
           </div>
         )}

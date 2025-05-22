@@ -135,7 +135,7 @@ export default function MusoEditProfile() {
               }}
             />
             <div className="bg-white rounded-lg p-6">
-              <h2 className="text-xl font-semibold mb-2">User Reviews</h2>
+              <h2 className="text-xl font-semibold mb-2"></h2>
               <ReviewSection
                 profileid={profile.id}
                 currentUser={authUser}
@@ -154,8 +154,6 @@ export default function MusoEditProfile() {
                   </div>
                   <div>
                     {(() => {
-                      // Add logging for geo_point and its type
-                      // eslint-disable-next-line no-console
                       return null;
                     })()}
                     {getLatLngFromGeoPoint(profile.geopoint) ? (

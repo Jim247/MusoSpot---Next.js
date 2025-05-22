@@ -47,6 +47,7 @@ export type EventNotification = {
   event_id: string;
   status: string;
   event_type: string;
+  event_date: string;
   postcode: string;
   geopoint?: string;
   date: Date;

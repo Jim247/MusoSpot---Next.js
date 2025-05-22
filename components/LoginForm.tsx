@@ -8,7 +8,8 @@ const LoginForm = () => {
   const [resetSent, setResetSent] = useState(false);
   const [isResetMode, setIsResetMode] = useState(false);
   const [showValidatedSignup, setShowValidatedSignup] = useState(false);
-  const [pendingProfile, setPendingProfile] = useState(null);
+  // Use a generic object type for pendingProfile
+  const [pendingProfile, setPendingProfile] = useState<{ [key: string]: unknown } | null>(null);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -22,37 +23,16 @@ const LoginForm = () => {
       // After login, check if user row exists in users table
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        const { data: userRow, error: userRowError } = await supabase
+        // On first login, always show validation signup if profile_complete is not true
+        const { data: userRow } = await supabase
           .from('users')
-          .select('*')
+          .select('profile_complete')
           .eq('id', user.id)
           .single();
-        // Check for required fields (customize as needed)
-        const requiredFields = ['first_name', 'last_name', 'role', 'postcode', 'phone'];
-        let missingFields = [];
-        if (!userRow || !userRowError) {
-          // No user row: check for pending profile in localStorage
-          const pending = typeof window !== 'undefined' ? localStorage.getItem('pendingProfile') : null;
-          if (pending) {
-            setPendingProfile(JSON.parse(pending));
-            setShowValidatedSignup(true);
-            return;
-          } else {
-            // No pending profile, create minimal row and prompt to complete profile
-            await supabase.from('users').insert([
-              { id: user.id, email: user.email }
-            ]);
-            setShowValidatedSignup(true);
-            return;
-          }
-        } else {
-          // User row exists, check for missing required fields
-          missingFields = requiredFields.filter(f => !userRow[f]);
-          if (missingFields.length > 0) {
-            setPendingProfile(userRow);
-            setShowValidatedSignup(true);
-            return;
-          }
+        if (!userRow || !userRow.profile_complete) {
+          setPendingProfile(userRow || { id: user.id, email: user.email });
+          setShowValidatedSignup(true);
+          return;
         }
       }
       window.location.href = '/dashboard';

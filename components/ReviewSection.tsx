@@ -7,6 +7,7 @@ import { supabase } from '../supabaseClient.js';
 interface ReviewSectionProps {
   profileid: string;
   currentUser: Muso | null;
+  reviews: Review[]
 }
 
 interface ReviewFormData {
@@ -139,7 +140,7 @@ export default function ReviewSection({ profileid, currentUser }: ReviewSectionP
     !reviews.some((r) => r.reviewer_id === (currentUser.id || currentUser.id));
 
   return (
-    <div className="mt-8">
+    <div className="">
       <h3 className="text-xl font-semibold mb-2">User Reviews</h3>
       {reviewLoading ? (
         <div>Loading reviews...</div>
