@@ -13,12 +13,14 @@ type TestimonialItem = {
   image?: any;
 };
 
-const Testimonials: React.FC<Props & {
-  id?: string;
-  isDark?: boolean;
-  classes?: { container?: string };
-  bg?: React.ReactNode;
-}> = ({
+const Testimonials: React.FC<
+  Props & {
+    id?: string;
+    isDark?: boolean;
+    classes?: { container?: string };
+    bg?: React.ReactNode;
+  }
+> = ({
   title = '',
   subtitle = '',
   tagline = '',

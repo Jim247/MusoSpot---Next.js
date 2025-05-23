@@ -30,7 +30,11 @@ const UserBadges: React.FC<UserBadgesProps> = ({ profile, size = 'md' }) => {
           {...badge}
           color={level.color}
           pillboxColor={level.color}
-          tooltip={profile.years_experience === 1 ? '1 year experience' : `${profile.years_experience} years experience`}
+          tooltip={
+            profile.years_experience === 1
+              ? '1 year experience'
+              : `${profile.years_experience} years experience`
+          }
           size={size}
         />
       );

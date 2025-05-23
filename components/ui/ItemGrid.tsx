@@ -3,12 +3,7 @@ import type { ItemGrid as Props } from '~/types';
 import { twMerge } from 'tailwind-merge';
 import { Button } from './Button';
 
-const ItemGrid: React.FC<Props> = ({
-  items = [],
-  columns,
-  defaultIcon = '',
-  classes = {},
-}) => {
+const ItemGrid: React.FC<Props> = ({ items = [], columns, defaultIcon = '', classes = {} }) => {
   const {
     container: containerClass = '',
     panel: panelClass = '',
@@ -26,87 +21,64 @@ const ItemGrid: React.FC<Props> = ({
             columns === 4
               ? 'lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2'
               : columns === 3
-              ? 'lg:grid-cols-3 sm:grid-cols-2'
-              : columns === 2
-              ? 'sm:grid-cols-2 '
-              : ''
+                ? 'lg:grid-cols-3 sm:grid-cols-2'
+                : columns === 2
+                  ? 'sm:grid-cols-2 '
+                  : ''
           }`,
           containerClass
         )}
       >
-        {items.map(
-          (
-            {
-              title,
-              description,
-              icon,
-              callToAction,
-              classes: itemClasses = {},
-            },
-            idx
-          ) => (
-            <div
-              key={idx}
-              className="intersect-once motion-safe:md:opacity-0 motion-safe:md:intersect:animate-fade"
-            >
-              <div
-                className={twMerge(
-                  'flex flex-row max-w-md',
-                  panelClass,
-                  itemClasses?.panel
+        {items.map(({ title, description, icon, callToAction, classes: itemClasses = {} }, idx) => (
+          <div
+            key={idx}
+            className="intersect-once motion-safe:md:opacity-0 motion-safe:md:intersect:animate-fade"
+          >
+            <div className={twMerge('flex flex-row max-w-md', panelClass, itemClasses?.panel)}>
+              <div className="flex justify-center">
+                {(icon || defaultIcon) && (
+                  <Icon
+                    name={icon || defaultIcon}
+                    className={twMerge(
+                      'w-7 h-7 mr-2 rtl:mr-0 rtl:ml-2',
+                      defaultIconClass,
+                      itemClasses?.icon
+                    )}
+                  />
                 )}
-              >
-                <div className="flex justify-center">
-                  {(icon || defaultIcon) && (
-                    <Icon
-                      name={icon || defaultIcon}
-                      className={twMerge(
-                        'w-7 h-7 mr-2 rtl:mr-0 rtl:ml-2',
-                        defaultIconClass,
-                        itemClasses?.icon
-                      )}
-                    />
-                  )}
-                </div>
-                <div className="mt-0.5">
-                  {title && (
-                    <h3
-                      className={twMerge(
-                        'text-xl font-bold',
-                        titleClass,
-                        itemClasses?.title
-                      )}
-                    >
-                      {title}
-                    </h3>
-                  )}
-                  {description && (
-                    <p
-                      className={twMerge(
-                        `${title ? 'mt-3' : ''} text-muted`,
-                        descriptionClass,
-                        itemClasses?.description
-                      )}
-                      // If description is HTML, use dangerouslySetInnerHTML
-                      dangerouslySetInnerHTML={{ __html: description }}
-                    />
-                  )}
-                  {callToAction && (
-                    <div
-                      className={twMerge(
-                        `${title || description ? 'mt-3' : ''}`,
-                        actionClass,
-                        itemClasses?.actionClass
-                      )}
-                    >
-                      <Button variant="link" {...callToAction} />
-                    </div>
-                  )}
-                </div>
+              </div>
+              <div className="mt-0.5">
+                {title && (
+                  <h3 className={twMerge('text-xl font-bold', titleClass, itemClasses?.title)}>
+                    {title}
+                  </h3>
+                )}
+                {description && (
+                  <p
+                    className={twMerge(
+                      `${title ? 'mt-3' : ''} text-muted`,
+                      descriptionClass,
+                      itemClasses?.description
+                    )}
+                    // If description is HTML, use dangerouslySetInnerHTML
+                    dangerouslySetInnerHTML={{ __html: description }}
+                  />
+                )}
+                {callToAction && (
+                  <div
+                    className={twMerge(
+                      `${title || description ? 'mt-3' : ''}`,
+                      actionClass,
+                      itemClasses?.actionClass
+                    )}
+                  >
+                    <Button variant="link" {...callToAction} />
+                  </div>
+                )}
               </div>
             </div>
-          )
-        )}
+          </div>
+        ))}
       </div>
     )
   );

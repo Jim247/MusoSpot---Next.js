@@ -1,4 +1,4 @@
-"use client"
+'use client';
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth, signOut } from '@supabase/auth';
 
@@ -8,7 +8,7 @@ export default function UserDropdown() {
   const dropdownRef = useRef(null);
 
   useEffect(() => {
-    const handleClickOutside = (e) => {
+    const handleClickOutside = e => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setDropdownOpen(false);
       }
@@ -17,7 +17,7 @@ export default function UserDropdown() {
     return () => document.removeEventListener('click', handleClickOutside, true);
   }, []);
 
-  const handleLogout = async (e) => {
+  const handleLogout = async e => {
     e.preventDefault();
     try {
       await signOut();
@@ -42,7 +42,7 @@ export default function UserDropdown() {
   return (
     <div className="relative" ref={dropdownRef}>
       <button
-        onClick={(e) => {
+        onClick={e => {
           e.stopPropagation();
           setDropdownOpen(!dropdownOpen);
         }}

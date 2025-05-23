@@ -2,7 +2,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-First, run the development server: 
+First, run the development server:
 
 ```bash
 npm run dev
@@ -14,14 +14,13 @@ pnpm dev
 bun dev
 ```
 
-## Personal Project Notes 
+## Personal Project Notes
 
 - run 'npm run seed-users' - to set emulator up with dummy users
 
 - run 'depcheck' for unused dependencies
 
 - 'npx unimported' for unused files and imports
-
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 

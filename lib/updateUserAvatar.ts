@@ -6,9 +6,6 @@ import { supabase } from '../supabaseClient';
  * @param avatarUrl - The public URL of the uploaded image
  */
 export async function updateUserAvatar(userId: string, avatarUrl: string) {
-  const { error } = await supabase
-    .from('users')
-    .update({ avatar: avatarUrl })
-    .eq('id', userId);
+  const { error } = await supabase.from('users').update({ avatar: avatarUrl }).eq('id', userId);
   if (error) throw error;
 }

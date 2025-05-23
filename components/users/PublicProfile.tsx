@@ -1,4 +1,4 @@
-"use client"
+'use client';
 import { useEffect, useState } from 'react';
 import PublicMusoProfile from './PublicMusoProfile';
 import PublicAgentProfile from './PublicAgentProfile';
@@ -39,7 +39,7 @@ const PublicProfile = ({ username }: { username: string }) => {
     loadProfile();
   }, [username]);
 
-    // Loading Screen for Dashboard
+  // Loading Screen for Dashboard
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">

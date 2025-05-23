@@ -1,6 +1,11 @@
 import React from 'react';
 import type { UserDashboard } from '../../constants/users';
-import type { UseFormRegister, FieldErrors, UseFormHandleSubmit, UseFormReset } from 'react-hook-form';
+import type {
+  UseFormRegister,
+  FieldErrors,
+  UseFormHandleSubmit,
+  UseFormReset,
+} from 'react-hook-form';
 import { BioSection } from './BioSection';
 
 interface FormData {

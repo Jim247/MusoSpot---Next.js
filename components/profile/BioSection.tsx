@@ -1,5 +1,10 @@
 import React from 'react';
-import type { UseFormRegister, FieldErrors, UseFormHandleSubmit, UseFormReset } from 'react-hook-form';
+import type {
+  UseFormRegister,
+  FieldErrors,
+  UseFormHandleSubmit,
+  UseFormReset,
+} from 'react-hook-form';
 import type { UserDashboard } from '../../constants/users';
 
 interface FormData {
@@ -63,14 +68,20 @@ export const BioSection: React.FC<BioSectionProps> = ({
                 <button type="submit" className="btn-primary text-white text-sm rounded">
                   Save
                 </button>
-                <button type="button" onClick={handleCancel} className="px-3 py-1 bg-gray-300 text-sm rounded">
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  className="px-3 py-1 bg-gray-300 text-sm rounded"
+                >
                   Cancel
                 </button>
               </div>
             </form>
           ) : (
             <div className="space-y-4">
-              <p className="text-m text-gray-500">{profile.bio || 'Add a bio to tell people about yourself'}</p>
+              <p className="text-m text-gray-500">
+                {profile.bio || 'Add a bio to tell people about yourself'}
+              </p>
               <div className="flex justify-end">
                 <button
                   onClick={() => {

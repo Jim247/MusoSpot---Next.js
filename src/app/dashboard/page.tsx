@@ -1,6 +1,5 @@
-
-import WidgetWrapper from '@components/widgets/WidgetWrapper'
-import Dashboard from '../../../components/dashboards/Dashboard'
+import WidgetWrapper from '@components/widgets/WidgetWrapper';
+import Dashboard from '../../../components/dashboards/Dashboard';
 
 export default function DashboardPage() {
   return (
@@ -9,5 +8,5 @@ export default function DashboardPage() {
         <Dashboard />
       </WidgetWrapper>
     </>
-  )
+  );
 }

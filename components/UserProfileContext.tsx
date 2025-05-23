@@ -1,7 +1,14 @@
-"use client";
-import React, { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
-import { useAuth, getCurrentUser } from '../supabase/auth'
-import type { UserDashboard } from '../constants/users'
+'use client';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  type ReactNode,
+} from 'react';
+import { useAuth, getCurrentUser } from '../supabase/auth';
+import type { UserDashboard } from '../constants/users';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 
 interface UserProfileContextType {
@@ -42,7 +49,7 @@ export const UserProfileProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [authUser?.id]);
 
-  useEffect(() => { 
+  useEffect(() => {
     fetchProfile();
   }, [authUser?.id, fetchProfile]);
 

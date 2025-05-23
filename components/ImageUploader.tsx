@@ -20,13 +20,11 @@ export async function uploadProfileImageSupabase(userId: string, file: File): Pr
   console.log('File type:', file.type, 'File size:', file.size);
 
   // Upload to Supabase Storage (bucket: profile-images)
-  const uploadResult = await supabase.storage
-    .from('profile-images')
-    .upload(filePath, file, {
-      cacheControl: '3600',
-      upsert: true,
-      contentType: file.type,
-    });
+  const uploadResult = await supabase.storage.from('profile-images').upload(filePath, file, {
+    cacheControl: '3600',
+    upsert: true,
+    contentType: file.type,
+  });
   console.log('Upload result:', uploadResult);
   const { error: uploadError } = uploadResult;
   if (uploadError) {
@@ -53,7 +51,7 @@ export async function uploadProfileImageSupabase(userId: string, file: File): Pr
 interface ImageUploaderProps {
   userId: string;
   initialUrl: string;
-  onImageChange: (url: string) => void; 
+  onImageChange: (url: string) => void;
   size?: number; // Optional, for avatar size
   className?: string;
 }
@@ -119,7 +117,9 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
             style={{ width: size, height: size }}
           />
           <div className="absolute inset-0 bg-black bg-opacity-40 rounded-md opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-            <span className="text-white text-sm">{currentUrl ? 'Change Photo' : 'Add a Photo'}</span>
+            <span className="text-white text-sm">
+              {currentUrl ? 'Change Photo' : 'Add a Photo'}
+            </span>
           </div>
           <input
             type="file"
@@ -133,7 +133,9 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
       </div>
       {isUploading && <p className="mt-2 text-sm text-gray-500">Uploading...</p>}
       {photoMessage && (
-        <p className={`mt-2 text-sm ${photoMessage.includes('Error') ? 'text-red-500' : 'text-green-600'}`}>
+        <p
+          className={`mt-2 text-sm ${photoMessage.includes('Error') ? 'text-red-500' : 'text-green-600'}`}
+        >
           {photoMessage}
         </p>
       )}

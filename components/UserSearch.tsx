@@ -29,7 +29,9 @@ export default function UserSearch() {
 
         console.log('Fetching users with params:', params.toString());
         // Update API endpoint URL
-        const response = await fetch(`/api/users${params.toString() ? '?' + params.toString() : ''}`);
+        const response = await fetch(
+          `/api/users${params.toString() ? '?' + params.toString() : ''}`
+        );
 
         if (!response.ok) {
           console.error('Response status:', response.status);
@@ -59,17 +61,25 @@ export default function UserSearch() {
   return (
     <div>
       <div className="flex gap-4 mb-8">
-        <select value={region} onChange={(e) => setRegion(e.target.value)} className="px-4 py-2 border rounded">
+        <select
+          value={region}
+          onChange={e => setRegion(e.target.value)}
+          className="px-4 py-2 border rounded"
+        >
           <option value="">All Regions</option>
-          {UK_REGIONS.map((region) => (
+          {UK_REGIONS.map(region => (
             <option key={region} value={region}>
               {region}
             </option>
           ))}
         </select>
-        <select value={instrument} onChange={(e) => setInstrument(e.target.value)} className="px-4 py-2 border rounded">
+        <select
+          value={instrument}
+          onChange={e => setInstrument(e.target.value)}
+          className="px-4 py-2 border rounded"
+        >
           <option value="">All Instruments</option>
-          {INSTRUMENTS.map((instrument) => (
+          {INSTRUMENTS.map(instrument => (
             <option key={instrument} value={instrument}>
               {instrument}
             </option>
@@ -83,8 +93,12 @@ export default function UserSearch() {
         <div className="text-center p-4">No users found</div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {users.map((user) => (
-            <a key={user.id} href={`/user/${user.id}`} className="block hover:scale-105 transition-transform">
+          {users.map(user => (
+            <a
+              key={user.id}
+              href={`/user/${user.id}`}
+              className="block hover:scale-105 transition-transform"
+            >
               <UserCard user={user} />
             </a>
           ))}

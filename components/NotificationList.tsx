@@ -1,4 +1,4 @@
-"use client"
+'use client';
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@supabase/auth';
 import { supabase } from '../supabaseClient.js';
@@ -54,7 +54,7 @@ export const NotificationList: React.FC = () => {
         .insert([{ event_id, user_id: user.id }]);
       if (error) throw error;
       alert('Applied successfully!');
-      setAppliedEvents((prev) => ({ ...prev, [event_id]: true }));
+      setAppliedEvents(prev => ({ ...prev, [event_id]: true }));
     } catch (error) {
       alert('Failed to apply. Check console for details.');
       console.error(error);
@@ -66,7 +66,7 @@ export const NotificationList: React.FC = () => {
       <h2 className="text-xl font-bold pb-2">Events Matched to Me</h2>
       {notifications.length > 0 ? (
         <div className="space-y-4">
-          {notifications.map((notification) => (
+          {notifications.map(notification => (
             <MatchedEventCard
               key={notification.event_id}
               event={notification}

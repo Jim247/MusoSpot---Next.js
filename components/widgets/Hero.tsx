@@ -1,5 +1,5 @@
 import React from 'react';
-import Image from 'next/image'
+import Image from 'next/image';
 
 type HeroProps = {
   title?: React.ReactNode;
@@ -13,13 +13,7 @@ type HeroProps = {
   id?: string;
 };
 
-const Hero: React.FC<HeroProps> = ({
-  title,
-  subtitle,
-  actions,
-  image,
-  id,
-}) => (
+const Hero: React.FC<HeroProps> = ({ title, subtitle, actions, image, id }) => (
   <section
     className="relative w-full h-[80vh] min-h-[400px] max-h-[900px] flex items-center justify-center"
     {...(id ? { id } : {})}
@@ -49,11 +43,7 @@ const Hero: React.FC<HeroProps> = ({
           {subtitle}
         </p>
       )}
-      {actions && (
-        <div className="flex flex-wrap justify-center gap-4">
-          {actions}
-        </div>
-      )}
+      {actions && <div className="flex flex-wrap justify-center gap-4">{actions}</div>}
     </div>
   </section>
 );

@@ -1,5 +1,3 @@
-
-
 // properties of the main Event object
 export type EventPost = {
   id?: string;

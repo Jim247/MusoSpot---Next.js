@@ -1,11 +1,11 @@
-import AddEvent from "@components/AddEvent";
+import AddEvent from '@components/AddEvent';
 
-import React from 'react'
+import React from 'react';
 
 export default function AddEventPage() {
   return (
     <div>
       <AddEvent />
     </div>
-  )
+  );
 }

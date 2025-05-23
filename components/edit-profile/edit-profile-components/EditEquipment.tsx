@@ -3,10 +3,17 @@ import type { UserDashboard } from '@constants/users';
 
 interface EquipmentSectionEditableProps {
   profile: UserDashboard;
-  onUpdateEquipment: (equipment: { transport: boolean; pa_system: boolean; lighting: boolean }) => void | Promise<void>;
+  onUpdateEquipment: (equipment: {
+    transport: boolean;
+    pa_system: boolean;
+    lighting: boolean;
+  }) => void | Promise<void>;
 }
 
-const EquipmentSectionEditable: React.FC<EquipmentSectionEditableProps> = ({ profile, onUpdateEquipment }) => {
+const EquipmentSectionEditable: React.FC<EquipmentSectionEditableProps> = ({
+  profile,
+  onUpdateEquipment,
+}) => {
   const [isEditing, setIsEditing] = useState(false);
   const [equipment, setEquipment] = useState({
     transport: !!profile.transport,
@@ -24,7 +31,7 @@ const EquipmentSectionEditable: React.FC<EquipmentSectionEditableProps> = ({ pro
   }, [profile.transport, profile.pa_system, profile.lighting]);
 
   const handleChange = (field: keyof typeof equipment, value: boolean) => {
-    setEquipment((prev) => ({ ...prev, [field]: value }));
+    setEquipment(prev => ({ ...prev, [field]: value }));
   };
 
   const handleSave = async () => {
@@ -45,19 +52,18 @@ const EquipmentSectionEditable: React.FC<EquipmentSectionEditableProps> = ({ pro
   };
 
   return (
-    <div className="bg-white rounded-lg p-6 relative" >
-        {!isEditing && (
-    <button
-      className="btn-primary absolute bottom-3 right-3"
-      onClick={() => setIsEditing(true)}
-    >
-      Edit
-    </button>
-  )}
+    <div className="bg-white rounded-lg p-6 relative">
+      {!isEditing && (
+        <button
+          className="btn-primary absolute bottom-3 right-3"
+          onClick={() => setIsEditing(true)}
+        >
+          Edit
+        </button>
+      )}
       <div className="mb-6 flex flex-col relative">
-      <div className="mb-2 relative">
-        
-  <h3 className="text-gray-700 font-semibold">Equipment</h3>
+        <div className="mb-2 relative">
+          <h3 className="text-gray-700 font-semibold">Equipment</h3>
         </div>
         {isEditing ? (
           <div className="flex flex-col gap-2">
@@ -95,17 +101,23 @@ const EquipmentSectionEditable: React.FC<EquipmentSectionEditableProps> = ({ pro
               </select>
             </label>
             <div className="flex gap-2 mt-2">
-              <button className="btn-primary" onClick={handleSave}>Save</button>
-              <button className="bg-gray-300 px-4 py-2 rounded" onClick={handleCancel}>Cancel</button>
+              <button className="btn-primary" onClick={handleSave}>
+                Save
+              </button>
+              <button className="bg-gray-300 px-4 py-2 rounded" onClick={handleCancel}>
+                Cancel
+              </button>
             </div>
           </div>
         ) : (
           <ul className="text-gray-600 space-y-2">
             <li>
-              Own Transport: <span className="font-semibold">{profile.transport ? 'Yes' : 'No'}</span>
+              Own Transport:{' '}
+              <span className="font-semibold">{profile.transport ? 'Yes' : 'No'}</span>
             </li>
             <li>
-              Own PA System: <span className="font-semibold">{profile.pa_system ? 'Yes' : 'No'}</span>
+              Own PA System:{' '}
+              <span className="font-semibold">{profile.pa_system ? 'Yes' : 'No'}</span>
             </li>
             <li>
               Own Lighting: <span className="font-semibold">{profile.lighting ? 'Yes' : 'No'}</span>

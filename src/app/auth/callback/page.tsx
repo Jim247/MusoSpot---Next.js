@@ -13,12 +13,14 @@ export default function AuthCallback() {
       const access_token = params.get('access_token');
       const refresh_token = params.get('refresh_token');
       if (access_token && refresh_token) {
-        supabase.auth.setSession({
-          access_token,
-          refresh_token,
-        }).then(() => {
-          router.replace('/'); // Redirect to home or your desired page
-        });
+        supabase.auth
+          .setSession({
+            access_token,
+            refresh_token,
+          })
+          .then(() => {
+            router.replace('/'); // Redirect to home or your desired page
+          });
       }
     }
   }, [router]);

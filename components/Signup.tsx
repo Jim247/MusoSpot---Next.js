@@ -1,7 +1,7 @@
-"use client"
+'use client';
 import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { sendPasswordReset } from '@supabase/auth'
+import { sendPasswordReset } from '@supabase/auth';
 import { supabase } from '../supabaseClient';
 import { useRouter } from 'next/navigation';
 
@@ -39,7 +39,9 @@ const BasicSignupForm = () => {
   useEffect(() => {
     // If user is logged in but has no profile, log them out and redirect to login
     const checkProfile = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (user) {
         // Check if user has a profile in the users table
         const { data: profile } = await supabase
@@ -89,7 +91,9 @@ const BasicSignupForm = () => {
       if (signUpError) {
         // If error is about email already registered, show a friendly message
         if (signUpError.message && signUpError.message.toLowerCase().includes('email')) {
-          setError('This email address is already registered. Please log in or use a different email.');
+          setError(
+            'This email address is already registered. Please log in or use a different email.'
+          );
         } else {
           setError(signUpError.message || 'An error occurred during registration.');
         }
@@ -101,7 +105,9 @@ const BasicSignupForm = () => {
 
       setRegisteredEmail(data.email);
       setEmailSent(true);
-      setSuccess('Account created! Please check your email to verify your account before logging in.');
+      setSuccess(
+        'Account created! Please check your email to verify your account before logging in.'
+      );
       setShowForgotPassword(false);
       reset();
     } catch {
@@ -140,22 +146,27 @@ const BasicSignupForm = () => {
     <div className="form-container">
       <h1 className="form-title">Create Account</h1>
       {error && <div className="form-error">{error}</div>}
-      {success && !emailSent && (
-        <div className="form-success">{success}</div>
-      )}
+      {success && !emailSent && <div className="form-success">{success}</div>}
       {emailSent ? (
         <div className="flex flex-col items-center justify-center bg-white border border-slate-300 rounded-lg shadow-md p-6 mt-4 text-center transition-all duration-500">
-          <svg className="w-12 h-12 text-green-500 mb-2 mx-auto animate-bounce" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <svg
+            className="w-12 h-12 text-green-500 mb-2 mx-auto animate-bounce"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            viewBox="0 0 24 24"
+          >
             <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="white" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2l4-4" />
           </svg>
           <p className="text-lg font-semibold text-green-700 mb-2">Account created!</p>
-          <p className="text-black mb-2">A verification email has been sent to <strong>{registeredEmail}</strong>.</p>
-          <p className="text-black mb-4">Please check your inbox and click the verification link to activate your account.</p>
-          <button
-            onClick={handleResendEmail}
-            className="btn-primary mb-2 mx-auto"
-          >
+          <p className="text-black mb-2">
+            A verification email has been sent to <strong>{registeredEmail}</strong>.
+          </p>
+          <p className="text-black mb-4">
+            Please check your inbox and click the verification link to activate your account.
+          </p>
+          <button onClick={handleResendEmail} className="btn-primary mb-2 mx-auto">
             Resend Verification Email
           </button>
           <button
@@ -213,7 +224,7 @@ const BasicSignupForm = () => {
               type="checkbox"
               id="terms"
               checked={agreedToTerms}
-              onChange={(e) => setAgreedToTerms(e.target.checked)}
+              onChange={e => setAgreedToTerms(e.target.checked)}
               className="form-checkbox mt-1"
             />
             <label htmlFor="terms" className="form-label">
@@ -240,9 +251,10 @@ const BasicSignupForm = () => {
         <div className="form-section mt-4">
           <h2 className="form-title">Reset Password</h2>
           <form
-            onSubmit={async (e) => {
+            onSubmit={async e => {
               e.preventDefault();
-              const email = (formRef.current?.elements.namedItem('email') as HTMLInputElement)?.value;
+              const email = (formRef.current?.elements.namedItem('email') as HTMLInputElement)
+                ?.value;
               if (email) await handleForgotPassword(email);
             }}
           >
@@ -257,7 +269,9 @@ const BasicSignupForm = () => {
               Send Reset Email
             </button>
           </form>
-          {forgotPasswordSent && <div className="form-success mt-2">Password reset email sent!</div>}
+          {forgotPasswordSent && (
+            <div className="form-success mt-2">Password reset email sent!</div>
+          )}
         </div>
       )}
     </div>

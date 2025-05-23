@@ -4,7 +4,7 @@ import MiniMap from './maps/MiniMap';
 export const MatchedEventCard = ({ event, applied, onApply }: any) => (
   <div className="border rounded-lg p-4 bg-slate-50">
     <div className="flex flex-col lg:flex-row gap-6">
-           {/* Right column: Map */}
+      {/* Right column: Map */}
       <div className="w-full lg:w-80 flex-shrink-0">
         {event.geopoint && (
           <MiniMap
@@ -26,9 +26,7 @@ export const MatchedEventCard = ({ event, applied, onApply }: any) => (
           </li>
           <li>
             <span className="font-semibold">Instruments Required:</span>{' '}
-            <span className="text-gray-700">
-              {event.instruments_needed?.join(', ') || '—'}
-            </span>
+            <span className="text-gray-700">{event.instruments_needed?.join(', ') || '—'}</span>
           </li>
           <li>
             <span className="font-semibold">Event Location:</span>{' '}

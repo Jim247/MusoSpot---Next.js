@@ -4,7 +4,7 @@ import { supabase } from '../supabaseClient';
 import { INSTRUMENTS } from '../constants/instruments';
 import { postcodeValidator } from 'postcode-validator';
 import PostcodeAutocomplete from '@utils/ValidatePostcode';
-import { postcodeToGeoPoint } from '../utils/postcodeUtils'
+import { postcodeToGeoPoint } from '../utils/postcodeUtils';
 
 interface ProfileFields {
   first_name: string;
@@ -24,12 +24,15 @@ interface ProfileFields {
 // Utility to generate a username from first and last name
 function generateUserName(first: string, last: string) {
   // Lowercase, remove non-alphanumeric, join with dot, and trim
-  const clean = (s: string) => s.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+  const clean = (s: string) =>
+    s
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '');
   return `${clean(first)}.${clean(last)}`;
 }
 
 const PostValidationSignup: React.FC<{ initialProfile?: Partial<ProfileFields> }> = () => {
-
   const [fields, setFields] = useState<ProfileFields>({
     first_name: '',
     last_name: '',
@@ -42,7 +45,7 @@ const PostValidationSignup: React.FC<{ initialProfile?: Partial<ProfileFields> }
     transport: '',
     pa_system: '',
     lighting: '',
-    search_radius: '100', 
+    search_radius: '100',
   });
 
   const [error, setError] = useState('');
@@ -59,7 +62,13 @@ const PostValidationSignup: React.FC<{ initialProfile?: Partial<ProfileFields> }
       }
     } else if (currentStep === 2) {
       if (fields.role === 'musician') {
-        if (!fields.instruments || !fields.years_experience || !fields.transport || !fields.pa_system || !fields.lighting) {
+        if (
+          !fields.instruments ||
+          !fields.years_experience ||
+          !fields.transport ||
+          !fields.pa_system ||
+          !fields.lighting
+        ) {
           setError('All musician fields are required.');
           return false;
         }
@@ -99,13 +108,13 @@ const PostValidationSignup: React.FC<{ initialProfile?: Partial<ProfileFields> }
 
   const nextStep = async () => {
     if (await validateStep(step)) {
-      setStep((prev) => Math.min(prev + 1, 4));
+      setStep(prev => Math.min(prev + 1, 4));
     }
   };
 
   const prevStep = () => {
     setError('');
-    setStep((prev) => Math.max(prev - 1, 1));
+    setStep(prev => Math.max(prev - 1, 1));
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -119,48 +128,52 @@ const PostValidationSignup: React.FC<{ initialProfile?: Partial<ProfileFields> }
     setError('');
     setSuccess('');
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
       const username = generateUserName(fields.first_name, fields.last_name);
       const formattedPostcode = fields.postcode.toUpperCase().replace(/\s+/g, '');
       const geoPoint = await postcodeToGeoPoint(formattedPostcode);
       const userData: any = {
-  id: user.id,
-  email: user.email,
-  ...fields,
-  instruments: fields.instruments ? [fields.instruments] : [],
-  username,
-  geopoint: geoPoint?.geopoint || null,
-  ward: geoPoint?.ward,
-  region: geoPoint?.region,
-  country: geoPoint?.country,
-  profile_complete: true,
-  search_radius: fields.search_radius ? Number(fields.search_radius) : 160934, // 100 miles in meters
-};
+        id: user.id,
+        email: user.email,
+        ...fields,
+        instruments: fields.instruments ? [fields.instruments] : [],
+        username,
+        geopoint: geoPoint?.geopoint || null,
+        ward: geoPoint?.ward,
+        region: geoPoint?.region,
+        country: geoPoint?.country,
+        profile_complete: true,
+        search_radius: fields.search_radius ? Number(fields.search_radius) : 160934, // 100 miles in meters
+      };
 
-// Role-specific fields
-if (fields.role === "musician") {
-  userData.instruments = fields.instruments ? [fields.instruments] : [];
-  userData.years_experience = fields.years_experience ? Number(fields.years_experience) : null;
-  userData.transport = fields.transport === "yes" ? true : fields.transport === "no" ? false : null;
-  userData.pa_system = fields.pa_system === "yes" ? true : fields.pa_system === "no" ? false : null;
-  userData.lighting = fields.lighting === "yes" ? true : fields.lighting === "no" ? false : null;
-  userData.agency_name = null; // Explicitly null for musicians
-
-} else if (fields.role === "agent") {
-  userData.agency_name = fields.agency_name || null;
-  userData.instruments = null;
-  userData.years_experience = null;
-  userData.transport = null;
-  userData.pa_system = null;
-  userData.lighting = null;
-}
+      // Role-specific fields
+      if (fields.role === 'musician') {
+        userData.instruments = fields.instruments ? [fields.instruments] : [];
+        userData.years_experience = fields.years_experience
+          ? Number(fields.years_experience)
+          : null;
+        userData.transport =
+          fields.transport === 'yes' ? true : fields.transport === 'no' ? false : null;
+        userData.pa_system =
+          fields.pa_system === 'yes' ? true : fields.pa_system === 'no' ? false : null;
+        userData.lighting =
+          fields.lighting === 'yes' ? true : fields.lighting === 'no' ? false : null;
+        userData.agency_name = null; // Explicitly null for musicians
+      } else if (fields.role === 'agent') {
+        userData.agency_name = fields.agency_name || null;
+        userData.instruments = null;
+        userData.years_experience = null;
+        userData.transport = null;
+        userData.pa_system = null;
+        userData.lighting = null;
+      }
       console.log('Upserting userData:', userData); // Debug log
       const { data, error: upsertError } = await supabase
         .from('users')
-        .upsert([
-          userData,
-        ], { onConflict: 'id' });
+        .upsert([userData], { onConflict: 'id' });
       console.log('Supabase upsert response:', data, upsertError); // Debug log
       if (upsertError) {
         setError(upsertError.message);
@@ -183,14 +196,44 @@ if (fields.role === "musician") {
 
   return (
     <div className="form-container">
-      <h1 className="form-title">Complete Your Profile<br /><span className="block text-base font-normal mt-2">Step {step} of 3</span></h1>
+      <h1 className="form-title">
+        Complete Your Profile
+        <br />
+        <span className="block text-base font-normal mt-2">Step {step} of 3</span>
+      </h1>
       {error && (
-        <div className="form-error" style={{ margin: '24px 0', padding: '12px', background: '#fff0f0', color: '#b91c1c', border: '1px solid #fca5a5', borderRadius: '6px', fontWeight: 500, fontSize: '1.1em', textAlign: 'center' }}>
+        <div
+          className="form-error"
+          style={{
+            margin: '24px 0',
+            padding: '12px',
+            background: '#fff0f0',
+            color: '#b91c1c',
+            border: '1px solid #fca5a5',
+            borderRadius: '6px',
+            fontWeight: 500,
+            fontSize: '1.1em',
+            textAlign: 'center',
+          }}
+        >
           {error}
         </div>
       )}
       {success && (
-        <div className="form-success" style={{ margin: '24px 0', padding: '12px', background: '#f0fff4', color: '#047857', border: '1px solid #6ee7b7', borderRadius: '6px', fontWeight: 500, fontSize: '1.1em', textAlign: 'center' }}>
+        <div
+          className="form-success"
+          style={{
+            margin: '24px 0',
+            padding: '12px',
+            background: '#f0fff4',
+            color: '#047857',
+            border: '1px solid #6ee7b7',
+            borderRadius: '6px',
+            fontWeight: 500,
+            fontSize: '1.1em',
+            textAlign: 'center',
+          }}
+        >
           {success}
         </div>
       )}
@@ -199,12 +242,32 @@ if (fields.role === "musician") {
           <>
             <div className="flex flex-col gap-4">
               <div className="form-group">
-                <label className="form-label" htmlFor="first_name">First Name</label>
-                <input className="form-input" type="text" id="first_name" name="first_name" value={fields.first_name} onChange={handleChange} required />
+                <label className="form-label" htmlFor="first_name">
+                  First Name
+                </label>
+                <input
+                  className="form-input"
+                  type="text"
+                  id="first_name"
+                  name="first_name"
+                  value={fields.first_name}
+                  onChange={handleChange}
+                  required
+                />
               </div>
               <div className="form-group">
-                <label className="form-label" htmlFor="last_name">Last Name</label>
-                <input className="form-input" type="text" id="last_name" name="last_name" value={fields.last_name} onChange={handleChange} required />
+                <label className="form-label" htmlFor="last_name">
+                  Last Name
+                </label>
+                <input
+                  className="form-input"
+                  type="text"
+                  id="last_name"
+                  name="last_name"
+                  value={fields.last_name}
+                  onChange={handleChange}
+                  required
+                />
               </div>
             </div>
           </>
@@ -212,52 +275,121 @@ if (fields.role === "musician") {
         {step === 2 && (
           <>
             <div className="form-group">
-              <label className="form-label" htmlFor="role">Are you a musician or an agent?</label>
-              <select className="form-select" id="role" name="role" value={fields.role} onChange={handleChange} required>
+              <label className="form-label" htmlFor="role">
+                Are you a musician or an agent?
+              </label>
+              <select
+                className="form-select"
+                id="role"
+                name="role"
+                value={fields.role}
+                onChange={handleChange}
+                required
+              >
                 <option value="musician">Musician</option>
                 <option value="agent">Agent</option>
               </select>
             </div>
             {fields.role === 'agent' && (
               <div className="form-group">
-                <label className="form-label" htmlFor="agency_name">Agency Name</label>
-                <input className="form-input" type="text" id="agency_name" name="agency_name" value={fields.agency_name} onChange={handleChange} required />
+                <label className="form-label" htmlFor="agency_name">
+                  Agency Name
+                </label>
+                <input
+                  className="form-input"
+                  type="text"
+                  id="agency_name"
+                  name="agency_name"
+                  value={fields.agency_name}
+                  onChange={handleChange}
+                  required
+                />
               </div>
             )}
             {fields.role === 'musician' && (
               <>
                 <div className="form-group">
-                  <label className="form-label" htmlFor="instruments">Primary Instrument</label>
-                  <select className="form-select" id="instruments" name="instruments" value={fields.instruments} onChange={handleChange} required>
+                  <label className="form-label" htmlFor="instruments">
+                    Primary Instrument
+                  </label>
+                  <select
+                    className="form-select"
+                    id="instruments"
+                    name="instruments"
+                    value={fields.instruments}
+                    onChange={handleChange}
+                    required
+                  >
                     <option value="">Select your instrument</option>
-                    {INSTRUMENTS.map((inst) => (
-                      <option key={inst} value={inst}>{inst}</option>
+                    {INSTRUMENTS.map(inst => (
+                      <option key={inst} value={inst}>
+                        {inst}
+                      </option>
                     ))}
                   </select>
                 </div>
                 <div className="form-group">
-                  <label className="form-label" htmlFor="years_experience">Years Of Professional Experience</label>
-                  <input className="form-input" type="number" id="years_experience" name="years_experience" value={fields.years_experience} onChange={handleChange} min={0} max={50} required />
+                  <label className="form-label" htmlFor="years_experience">
+                    Years Of Professional Experience
+                  </label>
+                  <input
+                    className="form-input"
+                    type="number"
+                    id="years_experience"
+                    name="years_experience"
+                    value={fields.years_experience}
+                    onChange={handleChange}
+                    min={0}
+                    max={50}
+                    required
+                  />
                 </div>
                 <div className="form-group">
-                  <label className="form-label" htmlFor="transport">Do you have your own transport?</label>
-                  <select className="form-select" id="transport" name="transport" value={fields.transport} onChange={handleChange} required>
+                  <label className="form-label" htmlFor="transport">
+                    Do you have your own transport?
+                  </label>
+                  <select
+                    className="form-select"
+                    id="transport"
+                    name="transport"
+                    value={fields.transport}
+                    onChange={handleChange}
+                    required
+                  >
                     <option value="">Select an option</option>
                     <option value="yes">Yes</option>
                     <option value="no">No</option>
                   </select>
                 </div>
                 <div className="form-group">
-                  <label className="form-label" htmlFor="pa_system">Do you have your own PA system?</label>
-                  <select className="form-select" id="pa_system" name="pa_system" value={fields.pa_system} onChange={handleChange} required>
+                  <label className="form-label" htmlFor="pa_system">
+                    Do you have your own PA system?
+                  </label>
+                  <select
+                    className="form-select"
+                    id="pa_system"
+                    name="pa_system"
+                    value={fields.pa_system}
+                    onChange={handleChange}
+                    required
+                  >
                     <option value="">Select an option</option>
                     <option value="yes">Yes</option>
                     <option value="no">No</option>
                   </select>
                 </div>
                 <div className="form-group">
-                  <label className="form-label" htmlFor="lighting">Do you have your own lighting?</label>
-                  <select className="form-select" id="lighting" name="lighting" value={fields.lighting} onChange={handleChange} required>
+                  <label className="form-label" htmlFor="lighting">
+                    Do you have your own lighting?
+                  </label>
+                  <select
+                    className="form-select"
+                    id="lighting"
+                    name="lighting"
+                    value={fields.lighting}
+                    onChange={handleChange}
+                    required
+                  >
                     <option value="">Select an option</option>
                     <option value="yes">Yes</option>
                     <option value="no">No</option>
@@ -270,24 +402,47 @@ if (fields.role === "musician") {
         {step === 3 && (
           <>
             <div className="form-group">
-              <label className="form-label" htmlFor="postcode">Postcode</label>
-              <PostcodeAutocomplete value={fields.postcode} onChange={(val: string) => setFields(f => ({ ...f, postcode: val }))} required />
+              <label className="form-label" htmlFor="postcode">
+                Postcode
+              </label>
+              <PostcodeAutocomplete
+                value={fields.postcode}
+                onChange={(val: string) => setFields(f => ({ ...f, postcode: val }))}
+                required
+              />
             </div>
             <div className="form-group">
-              <label className="form-label" htmlFor="phone">Mobile Phone</label>
-              <input className="form-input" type="tel" id="phone" name="phone" value={fields.phone} onChange={handleChange} placeholder="e.g. 07123 456789" required />
+              <label className="form-label" htmlFor="phone">
+                Mobile Phone
+              </label>
+              <input
+                className="form-input"
+                type="tel"
+                id="phone"
+                name="phone"
+                value={fields.phone}
+                onChange={handleChange}
+                placeholder="e.g. 07123 456789"
+                required
+              />
             </div>
           </>
         )}
         <div className="flex items-center justify-center pt-3 space-x-4">
           {step > 1 && (
-            <button type="button" className="btn-secondary" onClick={prevStep}>Back</button>
+            <button type="button" className="btn-secondary" onClick={prevStep}>
+              Back
+            </button>
           )}
           {step < 3 && (
-            <button type="button" className="btn-primary" onClick={nextStep}>Next</button>
+            <button type="button" className="btn-primary" onClick={nextStep}>
+              Next
+            </button>
           )}
           {step === 3 && (
-            <button type="submit" className="btn-primary" disabled={isLoading}>{isLoading ? 'Saving...' : 'Save Profile'}</button>
+            <button type="submit" className="btn-primary" disabled={isLoading}>
+              {isLoading ? 'Saving...' : 'Save Profile'}
+            </button>
           )}
         </div>
       </form>

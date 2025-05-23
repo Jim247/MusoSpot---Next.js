@@ -3,7 +3,6 @@ config({ path: '.env.local' });
 import { createClient } from '@supabase/supabase-js';
 import { v4 as uuidv4 } from 'uuid';
 
-
 // Set your Supabase URL and service role key (never expose service role key in client code)
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
 const supabaseServiceRoleKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string;
@@ -17,7 +16,7 @@ const dummyPosts = [
     postcode: 'GL1 1DG',
     geopoint: {
       type: 'Point',
-      coordinates: [-2.238, 51.8642]  // GeoJSON uses [longitude, latitude] order
+      coordinates: [-2.238, 51.8642], // GeoJSON uses [longitude, latitude] order
     },
     event_date: '2024-02-01',
     event_type: 'private',

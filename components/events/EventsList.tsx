@@ -21,7 +21,7 @@ export const EventsList: React.FC<EventsListProps> = ({ events, applications }) 
         </div>
         {events.length > 0 ? (
           <div className="space-y-4">
-            {events.map((event) => {
+            {events.map(event => {
               const eventKey = event.event_id || event.id;
               const eventApplications = safeApplications[String(eventKey)] || [];
               return (
@@ -29,18 +29,28 @@ export const EventsList: React.FC<EventsListProps> = ({ events, applications }) 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <p className="font-semibold" />
-                  <p>Date: {event.event_date instanceof Date ? event.event_date.toLocaleDateString() : event.event_date}</p>                     
-                   <p>Location: {event.postcode}</p>
+                      <p>
+                        Date:{' '}
+                        {event.event_date instanceof Date
+                          ? event.event_date.toLocaleDateString()
+                          : event.event_date}
+                      </p>
+                      <p>Location: {event.postcode}</p>
                       <p>Budget: £{event.budget}</p>
                       <p>Looking for:</p>
                       <div className="flex flex-wrap gap-2 mt-1">
                         {event.instruments_needed.map((instrument: string, idx: number) => (
-                          <div key={idx} className="bg-primary text-white px-2 py-1 rounded text-sm">
+                          <div
+                            key={idx}
+                            className="bg-primary text-white px-2 py-1 rounded text-sm"
+                          >
                             {instrument}
                           </div>
                         ))}
                       </div>
-                      <div className="text-sm text-gray-500">Event is {event.status} applications</div>
+                      <div className="text-sm text-gray-500">
+                        Event is {event.status} applications
+                      </div>
                     </div>
                     {event.geopoint && (
                       <div>
@@ -59,7 +69,10 @@ export const EventsList: React.FC<EventsListProps> = ({ events, applications }) 
                       <ul className="list-disc ml-6">
                         {eventApplications.map((app: EventApplication) => (
                           <li key={app.applicantId}>
-                            <a href={`/users/${app.slug}`} className="text-highlight hover:text-secondary">
+                            <a
+                              href={`/users/${app.slug}`}
+                              className="text-highlight hover:text-secondary"
+                            >
                               {app.slug}
                             </a>
                           </li>

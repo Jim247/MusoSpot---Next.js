@@ -8,7 +8,12 @@ interface PromoVideoSectionProps {
   onSave: (videoUrl: string) => Promise<void>;
 }
 
-const PromoVideoSection: React.FC<PromoVideoSectionProps> = ({ videoUrl, isEditing, setIsEditing, onSave }) => (
+const PromoVideoSection: React.FC<PromoVideoSectionProps> = ({
+  videoUrl,
+  isEditing,
+  setIsEditing,
+  onSave,
+}) => (
   <div className="bg-white rounded-lg p-6">
     <div className="py-4 group">
       <div className="flex justify-between items-center mb-4">
@@ -23,7 +28,12 @@ const PromoVideoSection: React.FC<PromoVideoSectionProps> = ({ videoUrl, isEditi
         <div className="text-center p-6 bg-gray-100 rounded-lg">
           <div className="aspect-w-16 aspect-h-9 bg-gray-100 rounded-lg flex items-center justify-center">
             <div className="text-center text-gray-600">
-              <svg className="w-16 h-16 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                className="w-16 h-16 mx-auto mb-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -50,7 +60,7 @@ const PromoVideoSection: React.FC<PromoVideoSectionProps> = ({ videoUrl, isEditi
       ) : (
         <PromoVideo
           initialUrl={videoUrl || ''}
-          onSave={async (url) => {
+          onSave={async url => {
             await onSave(url);
             setIsEditing(false);
           }}

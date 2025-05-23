@@ -38,11 +38,7 @@ export const SearchRadiusControl = React.memo(
     return (
       <div className="space-y-4">
         <CoverageMap center={coords} radiusMiles={radiusValue} />
-        <MiniMap
-          geopoint={coords ? latLngToGeoPoint(coords) : null}
-          id="mini-map"
-          radius={10}
-        />
+        <MiniMap geopoint={coords ? latLngToGeoPoint(coords) : null} id="mini-map" radius={10} />
         {isEditing ? (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="flex items-center gap-4">
@@ -51,13 +47,16 @@ export const SearchRadiusControl = React.memo(
                 min="1"
                 max="200"
                 value={radiusValue}
-                onChange={(e) => setRadiusValue(Number(e.target.value))}
+                onChange={e => setRadiusValue(Number(e.target.value))}
                 className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider-thumb"
               />
               <span className="text-sm text-gray-500 w-16">{radiusValue} miles</span>
             </div>
             <div className="flex justify-end gap-2">
-              <button type="submit" className="btn btn-primary px-3 py-1 text-white text-sm rounded">
+              <button
+                type="submit"
+                className="btn btn-primary px-3 py-1 text-white text-sm rounded"
+              >
                 Save
               </button>
               <button

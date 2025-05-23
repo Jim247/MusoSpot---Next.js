@@ -1,4 +1,4 @@
-"use client"
+'use client';
 import React, { useEffect, useRef } from 'react';
 
 interface CoverageMapProps {
@@ -37,10 +37,7 @@ export default function CoverageMap({ center, radiusMiles }: CoverageMapProps) {
       mapRef.current!.setView([center.lat, center.lng]);
 
       mapRef.current!.eachLayer((layer: L.Layer) => {
-        if (
-          layer instanceof L.Circle ||
-          layer instanceof L.Marker
-        ) {
+        if (layer instanceof L.Circle || layer instanceof L.Marker) {
           mapRef.current!.removeLayer(layer);
         }
       });

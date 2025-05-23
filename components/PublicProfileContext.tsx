@@ -32,11 +32,11 @@ interface PublicProfileContextType {
 
 const PublicProfileContext = createContext<PublicProfileContextType | undefined>(undefined);
 
-export function PublicProfileProvider({ 
-  children, 
-  profile, 
-  loading 
-}: { 
+export function PublicProfileProvider({
+  children,
+  profile,
+  loading,
+}: {
   children: ReactNode;
   profile: DatabaseUser | null;
   loading: boolean;

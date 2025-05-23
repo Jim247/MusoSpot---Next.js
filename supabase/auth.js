@@ -1,11 +1,11 @@
-import { supabase } from '../supabaseClient.js'
+import { supabase } from '../supabaseClient.js';
 
 // Sign up a new user
 export async function signUpUser(email, password, userData) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: userData }
+    options: { data: userData },
   });
   if (error) throw error;
   return data.user;
@@ -113,4 +113,3 @@ export async function getPublicProfileByUsername(username) {
   if (error) throw error;
   return data;
 }
-

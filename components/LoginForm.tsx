@@ -21,7 +21,9 @@ const LoginForm = () => {
     try {
       await loginUser(email, password);
       // After login, check if user row exists in users table
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (user) {
         // On first login, always show validation signup if profile_complete is not true
         const { data: userRow } = await supabase
@@ -37,7 +39,9 @@ const LoginForm = () => {
       }
       window.location.href = '/dashboard';
     } catch {
-      setError('Login failed. Please ensure you have signed up, and that your email is verified and try again.');
+      setError(
+        'Login failed. Please ensure you have signed up, and that your email is verified and try again.'
+      );
     }
   }
 
@@ -56,7 +60,9 @@ const LoginForm = () => {
       setResetSent(true);
       setError('');
     } catch {
-      setError('Failed to send password reset email. Please check your email address and try again.');
+      setError(
+        'Failed to send password reset email. Please check your email address and try again.'
+      );
     }
   }
 
@@ -66,15 +72,11 @@ const LoginForm = () => {
 
   return (
     <div className="form-container">
-      <h1 className="form-title">
-        {isResetMode ? 'Reset Password' : 'Login'}
-      </h1>
-      
+      <h1 className="form-title">{isResetMode ? 'Reset Password' : 'Login'}</h1>
+
       {error && <div className="form-error">{error}</div>}
       {resetSent && (
-        <div className="form-success">
-          Password reset email sent! Check your inbox.
-        </div>
+        <div className="form-success">Password reset email sent! Check your inbox.</div>
       )}
 
       <form onSubmit={isResetMode ? handlePasswordReset : handleSubmit} className="form-section">
@@ -82,13 +84,7 @@ const LoginForm = () => {
           <label className="form-label" htmlFor="email">
             Email
           </label>
-          <input
-            className="form-input"
-            type="email"
-            id="email"
-            name="email"
-            required
-          />
+          <input className="form-input" type="email" id="email" name="email" required />
         </div>
 
         {!isResetMode && (
@@ -96,23 +92,14 @@ const LoginForm = () => {
             <label className="form-label" htmlFor="password">
               Password
             </label>
-            <input
-              className="form-input"
-              type="password"
-              id="password"
-              name="password"
-              required
-            />
+            <input className="form-input" type="password" id="password" name="password" required />
           </div>
         )}
 
-        <div className='mb-4'>
-        <button
-          type="submit"
-          className="btn-primary w-full"
-        >
-          {isResetMode ? 'Send Reset Link' : 'Login'}
-        </button>
+        <div className="mb-4">
+          <button type="submit" className="btn-primary w-full">
+            {isResetMode ? 'Send Reset Link' : 'Login'}
+          </button>
         </div>
 
         <div className="form-nav flex flex-col">
@@ -132,10 +119,10 @@ const LoginForm = () => {
           {!isResetMode && (
             <div className="text-gray-600 mt-2">
               <span>Don&apos;t have an account? </span>
-              <div className='flex flex-col items-center'>
-              <a href="/signup" className="form-link font-semibold">
-                Sign up
-              </a>
+              <div className="flex flex-col items-center">
+                <a href="/signup" className="form-link font-semibold">
+                  Sign up
+                </a>
               </div>
             </div>
           )}

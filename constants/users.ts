@@ -1,5 +1,3 @@
-import type { Timestamp } from 'firebase/firestore';
-
 export interface Muso {
   id: string;
   first_name: string;
@@ -39,7 +37,7 @@ export interface Agent {
   years_experience?: number;
   agency_name?: string;
   city?: string;
-  geopoint?: string
+  geopoint?: string;
   ward?: string;
   region?: string;
   country?: string;
@@ -49,7 +47,6 @@ export interface Agent {
   video?: string;
   slug: string;
   reviews?: Review[];
-
 }
 export interface Review {
   id: string;
@@ -58,7 +55,8 @@ export interface Review {
   reviewer_name: string;
   rating: number;
   comment: string;
-  timestamp?: Timestamp | string ;
+  timestamp?: Timestamp | string;
+  created_at: Date;
 }
 
 export interface UserDashboard {
@@ -76,7 +74,7 @@ export interface UserDashboard {
   years_experience?: number;
   agency_name?: string;
   city?: string;
-  geopoint:string;
+  geopoint: string;
   ward?: string;
   region?: string;
   country?: string;

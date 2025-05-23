@@ -6,7 +6,7 @@ import { SearchRadiusControl } from '@components/SearchRadiusControl';
 import type { Muso } from '@constants/users';
 import BioSectionEditable from './edit-profile-components/EditBioSection';
 import ReviewSection from '@components/ReviewSection';
-import EditPromoVideo from './edit-profile-components/EditPromoVideo'
+import EditPromoVideo from './edit-profile-components/EditPromoVideo';
 import { supabase } from '../../supabaseClient'; // Adjust path as needed
 import type { Review } from '@constants/users';
 import { useAuth } from '@supabase/auth';
@@ -73,9 +73,7 @@ export default function MusoEditProfile() {
         </div>
       )}
       <div className="max-w-7xl mx-auto p-6">
-        <EditProfileHeader
-          profile={profile}
-        />
+        <EditProfileHeader profile={profile} />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="space-y-6">
             <BioSectionEditable
@@ -92,11 +90,7 @@ export default function MusoEditProfile() {
               ) : !reviews ? (
                 <div className="text-gray-500 text-sm mb-2">No reviews found.</div>
               ) : (
-                <ReviewSection
-                  profileid={profile.id}
-                  currentUser={authUser}
-                  reviews={reviews}
-                />
+                <ReviewSection profileid={profile.id} currentUser={authUser} reviews={reviews} />
               )}
             </div>
           </div>
@@ -115,7 +109,7 @@ export default function MusoEditProfile() {
                       <SearchRadiusControl
                         initialRadius={profile.search_radius || 100}
                         center={getLatLngFromGeoPoint(profile.geopoint)}
-                        onSave={async (radius) => {
+                        onSave={async radius => {
                           await updateUserAttributes(authUser!.id, { search_radius: radius });
                           await refresh();
                         }}
@@ -137,7 +131,7 @@ export default function MusoEditProfile() {
                 videoUrl={profile.video || ''}
                 isEditing={isEditingVideo}
                 setIsEditing={setIsEditingVideo}
-                onSave={async (videoUrl) => {
+                onSave={async videoUrl => {
                   await updateUserAttributes(authUser!.id, { video: videoUrl });
                   await refresh();
                   setIsEditingVideo(false);

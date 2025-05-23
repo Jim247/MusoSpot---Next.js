@@ -22,9 +22,7 @@ export default function PublicAgentProfile() {
           width={300}
           height={300}
         />
-        <h1 className="text-2xl font-bold">
-          {profile.agency_name}
-        </h1>
+        <h1 className="text-2xl font-bold">{profile.agency_name}</h1>
         <h2 className="text-lg text-gray-600">Agency Account</h2>
         {(profile.ward || profile.region || profile.country) && (
           <h2 className="text-lg text-gray-600">
@@ -34,10 +32,10 @@ export default function PublicAgentProfile() {
           </h2>
         )}
       </div>
-      
+
       {/* Badge Section */}
       <UserBadges profile={profile} size="xxl" />
-      
+
       {/* Location Section */}
       {profile.role !== 'agent' && profile.geopoint && (
         <div className="mt-8">
@@ -60,7 +58,7 @@ export default function PublicAgentProfile() {
           </div>
         </div>
       )}
-  
+
       {/* Bio Section */}
       {profile.bio ? (
         <div className="mt-6">
@@ -73,7 +71,7 @@ export default function PublicAgentProfile() {
           <p className="text-gray-600">No bio provided yet</p>
         </div>
       )}
-      
+
       {/* User Reviews Section */}
       <ReviewSection profileid={profile.id} currentUser={null} reviews={[]} />
     </div>

@@ -39,10 +39,16 @@ const Timeline = ({ items = [], classes = {} }: Props) => {
                 </div>
               </div>
             </div>
-            {index !== items.length - 1 && <div className="w-px h-full bg-black/10 dark:bg-slate-400/50" />}
+            {index !== items.length - 1 && (
+              <div className="w-px h-full bg-black/10 dark:bg-slate-400/50" />
+            )}
           </div>
           <div className={`pt-1 ${index !== items.length - 1 ? 'pb-8' : ''}`}>
-            {title && <p className={`text-xl font-bold ${titleClass} ${itemClasses?.title || ''}`}>{title}</p>}
+            {title && (
+              <p className={`text-xl font-bold ${titleClass} ${itemClasses?.title || ''}`}>
+                {title}
+              </p>
+            )}
             {description && (
               <p
                 className={`text-muted mt-2 ${descriptionClass} ${itemClasses?.description || ''}`}

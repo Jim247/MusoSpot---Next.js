@@ -1,4 +1,4 @@
-"use client"
+'use client';
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import type { Review, Muso } from '@constants/users';
@@ -40,7 +40,7 @@ async function addUserReview(
 ) {
   const { error } = await supabase.from('reviews').insert([
     {
-      reviewed_user_id: profileid, 
+      reviewed_user_id: profileid,
       rating,
       comment,
       reviewer_id: reviewer?.id || reviewer?.id || null,
@@ -109,7 +109,7 @@ export default function ReviewSection({ profileid, currentUser }: ReviewSectionP
   const canLeaveReview =
     currentUser &&
     (currentUser.id || currentUser.id) !== profileid &&
-    !reviews.some((r) => r.reviewer_id === (currentUser.id || currentUser.id));
+    !reviews.some(r => r.reviewer_id === (currentUser.id || currentUser.id));
 
   return (
     <div className="mt-8">
@@ -120,7 +120,7 @@ export default function ReviewSection({ profileid, currentUser }: ReviewSectionP
         <div className="text-gray-500">No reviews yet.</div>
       ) : (
         <ul className="space-y-4">
-          {reviews.slice(0, 3).map((review) => (
+          {reviews.slice(0, 3).map(review => (
             <li key={review.id} className="border rounded-lg p-4 bg-gray-50 shadow-sm">
               <div className="flex items-center gap-2 mb-1">
                 <span className="font-bold text-gray-700">Rating:</span>
@@ -129,13 +129,14 @@ export default function ReviewSection({ profileid, currentUser }: ReviewSectionP
                   {'☆'.repeat(5 - review.rating)}
                 </span>
               </div>
-              {review.comment && <div className="mt-1 text-gray-800 italic">"{review.comment}"</div>}
+              {review.comment && <div className="mt-1 text-gray-800 italic">{review.comment}</div>}
               <div className="flex items-center gap-2 text-xs text-gray-500 mt-2">
-                {review.timestamp && <span>{formatReviewDate(review.timestamp)}</span>}
+                {review.timestamp && <span>{formatReviewDate(review.created_at)}</span>}
                 {review.reviewer_name && (
                   <span>
                     {review.timestamp ? ' · ' : ''}
-                    reviewed by <span className="font-semibold text-gray-700">{review.reviewer_name}</span>
+                    reviewed by{' '}
+                    <span className="font-semibold text-gray-700">{review.reviewer_name}</span>
                   </span>
                 )}
               </div>
@@ -156,7 +157,7 @@ export default function ReviewSection({ profileid, currentUser }: ReviewSectionP
               className="ml-2 border rounded px-2 py-1"
               defaultValue={5}
             >
-              {[5, 4, 3, 2, 1].map((val) => (
+              {[5, 4, 3, 2, 1].map(val => (
                 <option key={val} value={val}>
                   {val}
                 </option>
@@ -171,7 +172,11 @@ export default function ReviewSection({ profileid, currentUser }: ReviewSectionP
               rows={3}
             />
           </div>
-          <button type="submit" className="btn-primary px-4 py-2 rounded disabled:opacity-50" disabled={submitting}>
+          <button
+            type="submit"
+            className="btn-primary px-4 py-2 rounded disabled:opacity-50"
+            disabled={submitting}
+          >
             {submitting ? 'Submitting...' : 'Submit Review'}
           </button>
         </form>

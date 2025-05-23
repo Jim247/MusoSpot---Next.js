@@ -51,7 +51,7 @@ export function PromoVideo({ initialUrl, onSave, isEditing, onEditToggle }: Prom
           <input
             type="text"
             value={url}
-            onChange={(e) => {
+            onChange={e => {
               setUrl(e.target.value);
               setError('');
             }}

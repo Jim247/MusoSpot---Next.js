@@ -4,27 +4,24 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --aw-font-sans: 'Inter Variable';
+  --aw-font-serif: 'Inter Variable';
+  --aw-font-heading: 'Inter Variable';
 
+  --aw-color-primary: #e91e63;
+  --aw-color-secondary: rgb(124, 37, 88);
+  --aw-color-accent: rgb(255, 255, 255);
 
-  :root {
-    --aw-font-sans: 'Inter Variable';
-    --aw-font-serif: 'Inter Variable';
-    --aw-font-heading: 'Inter Variable';
+  --aw-color-text-heading: rgb(0 0 0);
+  --aw-color-text-default: rgb(16 16 16);
+  --aw-color-text-muted: rgb(16 16 16 / 66%);
+  --aw-color-bg-page: rgb(255 255 255);
+  --aw-color-bg-contrast: rgb(248 248 248);
+  --aw-color-bg-page--dark: rgb(36, 37, 40);
+}
 
-    --aw-color-primary: #e91e63;
-    --aw-color-secondary: rgb(124, 37, 88);
-    --aw-color-accent: rgb(255, 255, 255);
-
-    --aw-color-text-heading: rgb(0 0 0);
-    --aw-color-text-default: rgb(16 16 16);
-    --aw-color-text-muted: rgb(16 16 16 / 66%);
-    --aw-color-bg-page: rgb(255 255 255);
-    --aw-color-bg-contrast: rgb(248 248 248);
-    --aw-color-bg-page--dark: rgb(36, 37, 40);
-
-    }
-
-    /* Update the base font family */
+/* Update the base font family */
 @layer base {
   html {
     font-family: 'Inter Variable', system-ui, sans-serif;
@@ -140,60 +137,59 @@ input[type='range'].slider-thumb::-moz-range-thumb {
   z-index: 2 !important;
 }
 
-
- /* FORM STYLING E.G SIGNUP 
+/* FORM STYLING E.G SIGNUP 
 
   /* Form Layout */
-  .form-container {
-    @apply max-w-md mx-auto p-6 bg-white dark:bg-gray-800 shadow-lg rounded-lg;
-  }
+.form-container {
+  @apply max-w-md mx-auto p-6 bg-white dark:bg-gray-800 shadow-lg rounded-lg;
+}
 
-  .form-section {
-    @apply space-y-4;
-  }
+.form-section {
+  @apply space-y-4;
+}
 
-  /* Form Inputs */
-  .form-input {
-    @apply w-full border rounded-md px-3 py-2 
+/* Form Inputs */
+.form-input {
+  @apply w-full border rounded-md px-3 py-2 
     bg-white dark:bg-gray-700 
     border-gray-300 dark:border-gray-600 
     text-gray-900 dark:text-white
     focus:ring-2 focus:ring-primary focus:border-transparent
     transition duration-200 ease-in-out;
-  }
+}
 
-  .form-label {
-    @apply block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1;
-  }
+.form-label {
+  @apply block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1;
+}
 
-  .form-group {
-    @apply flex flex-col gap-1;
-  }
+.form-group {
+  @apply flex flex-col gap-1;
+}
 
-  /* Form Select */
-  .form-select {
-    @apply form-input appearance-none bg-no-repeat;
-  }
+/* Form Select */
+.form-select {
+  @apply form-input appearance-none bg-no-repeat;
+}
 
-  /* Form Validation */
-  .form-error {
-    @apply text-red-600 dark:text-red-400 text-sm mt-1;
-  }
+/* Form Validation */
+.form-error {
+  @apply text-red-600 dark:text-red-400 text-sm mt-1;
+}
 
-  .form-success {
-    @apply text-green-600 dark:text-green-400 text-sm mt-1;
-  }
+.form-success {
+  @apply text-green-600 dark:text-green-400 text-sm mt-1;
+}
 
-  /* Form Header */
-  .form-title {
-    @apply text-2xl font-bold mb-6 text-center text-gray-900 dark:text-white;
-  }
+/* Form Header */
+.form-title {
+  @apply text-2xl font-bold mb-6 text-center text-gray-900 dark:text-white;
+}
 
-  /* Form Navigation */
-  .form-nav {
-    @apply flex justify-between items-center mt-4;
-  }
+/* Form Navigation */
+.form-nav {
+  @apply flex justify-between items-center mt-4;
+}
 
-  .form-link {
-    @apply text-primary hover:text-secondary transition-colors duration-200;
-  }
+.form-link {
+  @apply text-primary hover:text-secondary transition-colors duration-200;
+}

@@ -23,7 +23,7 @@ const BADGE_COLORS = {
 
 export default function Badge({ label, svg, tooltip, color, size = 'md', pillboxColor }) {
   // Get appropriate sizes for mobile and desktop
-  const getMobileSize = (size) => {
+  const getMobileSize = size => {
     switch (size) {
       case 'xxl':
         return SIZES['mobile-xl'];
@@ -52,7 +52,7 @@ export default function Badge({ label, svg, tooltip, color, size = 'md', pillbox
   let labelLines = [label];
   if (label && /years/i.test(label) && /experience/i.test(label)) {
     const parts = label.split(' ');
-    const expIndex = parts.findIndex((part) => /experience/i.test(part));
+    const expIndex = parts.findIndex(part => /experience/i.test(part));
     if (expIndex > 0) {
       labelLines = [parts.slice(0, expIndex).join(' '), parts.slice(expIndex).join(' ')];
     }

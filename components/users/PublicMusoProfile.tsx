@@ -12,12 +12,12 @@ export default function PublicMusoProfile() {
 
   if (loading) return <div>Loading...</div>;
   if (!profile) return <div>Profile not found</div>;
-  
+
   // Debug logging for geopoint
   console.log('Profile geopoint:', profile.geopoint);
   console.log('Profile search_radius:', (profile as any).search_radius);
   console.log('Full profile object:', profile);
-  
+
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white">
       {/* Updated header: Pic on top, name then instruments */}
@@ -32,12 +32,12 @@ export default function PublicMusoProfile() {
         <h1 className="text-2xl font-bold">
           {profile.first_name} {profile.last_name}
         </h1>
-      {/* Instruments Section */}
-      {profile.instruments && profile.instruments.length > 0 && (
-        <div className="mt-6">
-          <ProfileInstruments instruments={profile.instruments} />
-        </div>
-      )}
+        {/* Instruments Section */}
+        {profile.instruments && profile.instruments.length > 0 && (
+          <div className="mt-6">
+            <ProfileInstruments instruments={profile.instruments} />
+          </div>
+        )}
         {(profile.ward || profile.region || profile.country) && (
           <h2 className="text-lg text-gray-600">
             {profile.ward ? `${profile.ward}, ` : ''}
@@ -46,18 +46,17 @@ export default function PublicMusoProfile() {
           </h2>
         )}
       </div>
-      
+
       {/* Badge Section */}
       <UserBadges profile={profile} size="xxl" />
-      
-      
+
       {/* Location Section */}
       {profile.geopoint && (
         <div className="mt-8">
           <h2 className="text-2xl font-semibold mb-3">Location</h2>
           <div className="h-64 w-full">
-            <MiniMap 
-              geopoint={profile.geopoint} 
+            <MiniMap
+              geopoint={profile.geopoint}
               id={`map-${profile.id}`}
               className="h-full w-full rounded-lg"
               radius={profile.search_radius}
@@ -95,7 +94,7 @@ export default function PublicMusoProfile() {
           <p className="text-gray-600">No bio provided yet</p>
         </div>
       )}
-      
+
       {/* User Reviews Section */}
       <ReviewSection profileid={profile.id} currentUser={null} />
     </div>

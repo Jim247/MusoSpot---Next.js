@@ -31,7 +31,7 @@ export default function UserCard({ user }: UserCardProps) {
       <div className="mt-4">
         <h4 className="text-sm font-medium text-gray-700">Instruments:</h4>
         <div className="flex flex-wrap gap-2 mt-2">
-          {user.instruments?.map((instrument) => (
+          {user.instruments?.map(instrument => (
             <span key={instrument} className="px-2 py-1 bg-gray-100 rounded-md text-sm">
               {instrument}
             </span>

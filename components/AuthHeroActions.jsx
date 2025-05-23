@@ -1,4 +1,4 @@
-"use client"
+'use client';
 import { useUserProfile } from './UserProfileContext';
 
 export default function AuthHeroActions() {

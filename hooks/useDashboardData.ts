@@ -1,8 +1,8 @@
-"use client";
-import { useState, useEffect } from "react";
-import { useUserProfile } from "@components/UserProfileContext";
-import { supabase } from "../supabaseClient.js";
-import type { EventNotification, EventPost } from "@constants/event";
+'use client';
+import { useState, useEffect } from 'react';
+import { useUserProfile } from '@components/UserProfileContext';
+import { supabase } from '../supabaseClient.js';
+import type { EventNotification, EventPost } from '@constants/event';
 
 export function useDashboardData() {
   const { profile, loading: profileLoading } = useUserProfile();
@@ -22,14 +22,8 @@ export function useDashboardData() {
 
         // Run both queries in parallel
         const [eventsRes, notificationsRes] = await Promise.all([
-          supabase
-            .from('events')
-            .select('*')
-            .eq('poster_id', profile.id),
-          supabase
-            .from('notifications')
-            .select('*')
-            .eq('user_id', profile.id),
+          supabase.from('events').select('*').eq('poster_id', profile.id),
+          supabase.from('notifications').select('*').eq('user_id', profile.id),
         ]);
 
         if (eventsRes.error || notificationsRes.error) {
@@ -37,7 +31,7 @@ export function useDashboardData() {
         }
 
         setEvents(eventsRes.data || []);
-        const mappedNotifications = (notificationsRes.data as EventNotification[]).map((notif) => ({
+        const mappedNotifications = (notificationsRes.data as EventNotification[]).map(notif => ({
           ...notif,
           id: notif.id || '',
           poster_id: notif.agent_id || '',

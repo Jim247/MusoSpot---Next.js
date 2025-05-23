@@ -9,8 +9,10 @@ type ButtonProps = Props & {
 
 const variants = {
   primary: 'btn-primary',
-  secondary: 'inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-gray-700 bg-gray-100 hover:bg-gray-200',
-  tertiary: 'inline-flex items-center justify-center px-6 py-3 border border-gray-300 rounded-md shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50',
+  secondary:
+    'inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-gray-700 bg-gray-100 hover:bg-gray-200',
+  tertiary:
+    'inline-flex items-center justify-center px-6 py-3 border border-gray-300 rounded-md shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50',
   link: 'text-primary-600 hover:text-primary-700 font-medium',
 };
 

@@ -2,10 +2,7 @@ import { supabase } from './supabaseClient';
 
 // Update user attributes
 export async function updateUserAttributes(id, attributes) {
-  const { error } = await supabase
-    .from('users')
-    .update(attributes)
-    .eq('id', id);
+  const { error } = await supabase.from('users').update(attributes).eq('id', id);
   if (error) throw error;
 }
 
@@ -18,11 +15,7 @@ export async function fetchAllUsers() {
 
 // Get a single user profile
 export async function getUserProfile(id) {
-  const { data, error } = await supabase
-    .from('users')
-    .select('*')
-    .eq('id', id)
-    .single();
+  const { data, error } = await supabase.from('users').select('*').eq('id', id).single();
   if (error) throw error;
   return data;
 }
@@ -39,7 +32,7 @@ export async function uploadProfileImage(id, file) {
 
   await updateUserAttributes(id, {
     avatar: urlData.publicUrl,
-    avatarupdated_at: new Date().toISOString()
+    avatarupdated_at: new Date().toISOString(),
   });
 
   return urlData.publicUrl;

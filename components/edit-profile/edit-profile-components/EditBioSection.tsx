@@ -17,7 +17,13 @@ function stripHtmlTags(input: string) {
   return input.replace(/<[^>]*>?/gm, '');
 }
 
-const BioSectionEditable: React.FC<BioSectionEditableProps> = ({ profile, bioMessage, setBioMessage, form, onBioSubmit }) => {
+const BioSectionEditable: React.FC<BioSectionEditableProps> = ({
+  profile,
+  bioMessage,
+  setBioMessage,
+  form,
+  onBioSubmit,
+}) => {
   const [isEditing, setIsEditing] = React.useState(false);
 
   React.useEffect(() => {
@@ -42,49 +48,55 @@ const BioSectionEditable: React.FC<BioSectionEditableProps> = ({ profile, bioMes
   };
 
   return (
-  <div className="bg-white rounded-lg p-6 flex flex-col min-h-[250px] relative">
-    <div>
-      <h3 className="text-gray-700 font-semibold w-1/3">About Me</h3>
-    </div>
+    <div className="bg-white rounded-lg p-6 flex flex-col min-h-[250px] relative">
+      <div>
+        <h3 className="text-gray-700 font-semibold w-1/3">About Me</h3>
+      </div>
 
-    <div className="flex-1 relative mt-4">
-      {isEditing ? (
-        <form onSubmit={form.handleSubmit(handleBioSubmit)}>
-          <textarea
-            {...form.register('bio')}
-            className="w-full border rounded px-3 py-2 min-h-[120px]"
-            rows={6}
-          />
-          <div className="flex gap-2 mt-2">
-            <button type="submit" className="btn-primary">Save</button>
-            <button
-              type="button"
-              className="bg-gray-300 px-4 py-2 rounded"
-              onClick={() => { setIsEditing(false); setBioMessage(''); form.reset({ bio: profile.bio || '' }); }}
-            >
-              Cancel
-            </button>
+      <div className="flex-1 relative mt-4">
+        {isEditing ? (
+          <form onSubmit={form.handleSubmit(handleBioSubmit)}>
+            <textarea
+              {...form.register('bio')}
+              className="w-full border rounded px-3 py-2 min-h-[120px]"
+              rows={6}
+            />
+            <div className="flex gap-2 mt-2">
+              <button type="submit" className="btn-primary">
+                Save
+              </button>
+              <button
+                type="button"
+                className="bg-gray-300 px-4 py-2 rounded"
+                onClick={() => {
+                  setIsEditing(false);
+                  setBioMessage('');
+                  form.reset({ bio: profile.bio || '' });
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        ) : (
+          <div className="space-y-4 min-h-[120px] flex items-center">
+            <p className="text-m text-gray-800 break-words whitespace-pre-line pb-6">
+              {profile.bio || 'Add a short bio to tell people about yourself'}
+            </p>
           </div>
-        </form>
-      ) : (
-        <div className="space-y-4 min-h-[120px] flex items-center">
-          <p className="text-m text-gray-800 break-words whitespace-pre-line pb-6">
-            {profile.bio || 'Add a short bio to tell people about yourself'}
-          </p>
+        )}
+        {bioMessage && <p className="text-red-500 text-sm mt-1">{bioMessage}</p>}
+      </div>
+
+      {!isEditing && (
+        <div className="mt-auto self-end">
+          <button className="btn-primary" onClick={() => setIsEditing(true)}>
+            Edit
+          </button>
         </div>
       )}
-      {bioMessage && <p className="text-red-500 text-sm mt-1">{bioMessage}</p>}
     </div>
-
-    {!isEditing && (
-      <div className="mt-auto self-end">
-        <button className="btn-primary" onClick={() => setIsEditing(true)}>
-          Edit
-        </button>
-      </div>
-    )}
-  </div>
-);
-}
+  );
+};
 
 export default BioSectionEditable;

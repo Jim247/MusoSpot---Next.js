@@ -1,6 +1,5 @@
-"use client"
+'use client';
 import React, { useState } from 'react';
-
 
 export interface FAQItem {
   question: string;
@@ -53,7 +52,9 @@ const FAQs: React.FC<FAQsProps> = ({
               <p className="text-base text-primary font-bold tracking-wide uppercase">{tagline}</p>
             )}
             {title && (
-              <h2 className="font-bold leading-tighter tracking-tighter text-3xl md:text-4xl text-heading mb-2">{title}</h2>
+              <h2 className="font-bold leading-tighter tracking-tighter text-3xl md:text-4xl text-heading mb-2">
+                {title}
+              </h2>
             )}
             {subtitle && <p className="mt-4 text-muted text-xl">{subtitle}</p>}
           </div>
@@ -75,16 +76,32 @@ const FAQs: React.FC<FAQsProps> = ({
                   onClick={() => handleToggle(idx)}
                 >
                   {item.icon && (
-                    <span className={`faq-icon flex justify-center mr-2 rtl:mr-0 rtl:ml-2 flex-shrink-0 mt-1 w-6 h-6 text-primary transition-transform duration-200 ${isOpen ? 'rotate-180' : ''} ${classes.icon || ''}`}>
+                    <span
+                      className={`faq-icon flex justify-center mr-2 rtl:mr-0 rtl:ml-2 flex-shrink-0 mt-1 w-6 h-6 text-primary transition-transform duration-200 ${isOpen ? 'rotate-180' : ''} ${classes.icon || ''}`}
+                    >
                       <item.icon size={24} />
                     </span>
                   )}
                   <span className="text-xl font-bold flex-1">{item.question}</span>
-                  <span className={`ml-2 transition-transform duration-200 text-highlight ${isOpen ? 'rotate-180' : ''}`}
-                        aria-hidden="true">
+                  <span
+                    className={`ml-2 transition-transform duration-200 text-highlight ${isOpen ? 'rotate-180' : ''}`}
+                    aria-hidden="true"
+                  >
                     {/* Chevron Down SVG */}
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M6 9L12 15L18 9"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
                     </svg>
                   </span>
                 </button>
@@ -105,5 +122,3 @@ const FAQs: React.FC<FAQsProps> = ({
 };
 
 export default FAQs;
-
-

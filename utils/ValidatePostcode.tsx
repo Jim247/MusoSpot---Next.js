@@ -32,7 +32,7 @@ const PostcodeAutocomplete: React.FC<Props> = ({
       const res = await fetch(`https://api.postcodes.io/postcodes?q=${encodeURIComponent(input)}`);
       const data: { result: Array<{ postcode: string }> } = await res.json();
       if (data.result && Array.isArray(data.result)) {
-        setSuggestions(data.result.map((item) => item.postcode));
+        setSuggestions(data.result.map(item => item.postcode));
       } else {
         setSuggestions([]);
       }
@@ -73,7 +73,7 @@ const PostcodeAutocomplete: React.FC<Props> = ({
       />
       {showSuggestions && suggestions.length > 0 && (
         <ul className="absolute z-10 bg-white border w-full mt-1 rounded shadow max-h-48 overflow-auto">
-          {suggestions.map((postcode) => (
+          {suggestions.map(postcode => (
             <li
               key={postcode}
               className="px-3 py-2 hover:bg-gray-100 cursor-pointer"

@@ -1,4 +1,4 @@
-"use client"
+'use client';
 import React from 'react';
 import MusoDashboard from './MusoDashboard';
 import AgentDashboard from './AgentDashboard';
@@ -6,7 +6,6 @@ import { useUserProfile } from '@components/UserProfileContext';
 
 const Dashboard = () => {
   const { profile, loading } = useUserProfile();
-
 
   // Loading Screen for Dashboard
   if (loading) {
@@ -47,7 +46,6 @@ const Dashboard = () => {
           <p>Invalid user role. Please contact support.</p>
         </div>
       );
-      
   }
 };
 

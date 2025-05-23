@@ -1,13 +1,12 @@
-"use client"
-import EditMusoProfile from '@components/edit-profile/EditMusoProfile'
-import EditAgentProfile from '@components/edit-profile/EditAgentProfile'
+'use client';
+import EditMusoProfile from '@components/edit-profile/EditMusoProfile';
+import EditAgentProfile from '@components/edit-profile/EditAgentProfile';
 import { useUserProfile } from '@components/UserProfileContext';
 import 'leaflet/dist/leaflet.css';
 
-
 export const EditMyProfile = () => {
-const { profile, loading } = useUserProfile();
-  
+  const { profile, loading } = useUserProfile();
+
   if (loading) return <div>Loading...</div>;
   if (!profile) return <div>No profile found.</div>;
 

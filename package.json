@@ -7,6 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "check": "npm run check:eslint && npm run check:prettier",
+    "check:eslint": "eslint .",
+    "check:prettier": "prettier --check .",
+    "fix": "npm run fix:eslint && npm run fix:prettier",
+    "fix:eslint": "eslint --fix .",
+    "fix:prettier": "prettier -w .",
     "seed-users": "NODE_ENV=development tsx scripts/seedUsers.ts",
     "seed-events": "NODE_ENV=development tsx scripts/seedEvents.ts",
     "seed-applications": "NODE_ENV=development tsx scripts/seedApplication.ts"
@@ -32,19 +38,24 @@
     "uuid": "^11.1.0"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
+    "@eslint/eslintrc": "^3.0.0",
     "@tailwindcss/postcss": "^4.1.5",
     "@types/leaflet": "^1.9.17",
     "@types/node": "^20.17.50",
     "@types/react": "^19.1.5",
     "@types/react-dom": "^19",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
     "autoprefixer": "^10.4.17",
-    "eslint": "^9",
+    "eslint": "^8.57.0",
     "eslint-config-next": "15.3.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
     "postcss": "^8.4.35",
+    "prettier": "^3.2.5",
     "tailwindcss": "^3.4.1",
     "tsx": "^4.19.4",
-    "typescript": "^5.8.3"
+    "typescript": "5.0.4"
   },
   "engines": {
     "node": ">=22.0.0",

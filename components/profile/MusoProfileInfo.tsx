@@ -1,6 +1,11 @@
 import React from 'react';
 import type { UserDashboard } from '../../constants/users';
-import type { UseFormRegister, FieldErrors, UseFormHandleSubmit, UseFormReset } from 'react-hook-form';
+import type {
+  UseFormRegister,
+  FieldErrors,
+  UseFormHandleSubmit,
+  UseFormReset,
+} from 'react-hook-form';
 import { BioSection } from './BioSection';
 
 interface FormData {
@@ -85,21 +90,31 @@ export const MusoProfileInfo: React.FC<MusoProfileInfoProps> = ({
           <form onSubmit={handleFormSubmit} className="flex flex-col gap-2">
             <label className="flex items-center gap-2">
               <span>Own Transport?</span>
-              <select {...register('transport', { setValueAs: v => v === 'true' })} className="border rounded px-2 py-1" autoFocus>
+              <select
+                {...register('transport', { setValueAs: v => v === 'true' })}
+                className="border rounded px-2 py-1"
+                autoFocus
+              >
                 <option value="true">Yes</option>
                 <option value="false">No</option>
               </select>
             </label>
             <label className="flex items-center gap-2">
               <span>Own PA System?</span>
-              <select {...register('pa_system', { setValueAs: v => v === 'true' })} className="border rounded px-2 py-1">
+              <select
+                {...register('pa_system', { setValueAs: v => v === 'true' })}
+                className="border rounded px-2 py-1"
+              >
                 <option value="true">Yes</option>
                 <option value="false">No</option>
               </select>
             </label>
             <label className="flex items-center gap-2">
               <span>Own Lighting?</span>
-              <select {...register('lighting', { setValueAs: v => v === 'true' })} className="border rounded px-2 py-1">
+              <select
+                {...register('lighting', { setValueAs: v => v === 'true' })}
+                className="border rounded px-2 py-1"
+              >
                 <option value="true">Yes</option>
                 <option value="false">No</option>
               </select>
@@ -121,13 +136,16 @@ export const MusoProfileInfo: React.FC<MusoProfileInfoProps> = ({
           <>
             <ul className="text-gray-600 space-y-2">
               <li>
-                Own Transport: <span className="font-semibold">{profile.transport ? 'Yes' : 'No'}</span>
+                Own Transport:{' '}
+                <span className="font-semibold">{profile.transport ? 'Yes' : 'No'}</span>
               </li>
               <li>
-                Own PA System: <span className="font-semibold">{profile.pa_system ? 'Yes' : 'No'}</span>
+                Own PA System:{' '}
+                <span className="font-semibold">{profile.pa_system ? 'Yes' : 'No'}</span>
               </li>
               <li>
-                Own Lighting: <span className="font-semibold">{profile.lighting ? 'Yes' : 'No'}</span>
+                Own Lighting:{' '}
+                <span className="font-semibold">{profile.lighting ? 'Yes' : 'No'}</span>
               </li>
             </ul>
             <button
@@ -142,7 +160,7 @@ export const MusoProfileInfo: React.FC<MusoProfileInfoProps> = ({
         )}
       </div>
 
-    {/* Bio Section */}
+      {/* Bio Section */}
       <BioSection
         profile={profile}
         isEditing={isEditingBio}

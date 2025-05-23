@@ -1,15 +1,14 @@
-"use client"
+'use client';
 import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { INSTRUMENTS } from '@constants/instruments';
 import { EVENT_TYPES } from '../constants/event';
-import type { EventPost } from '@constants/event';;
+import type { EventPost } from '@constants/event';
 import { useAuth } from '../supabase/auth.js';
 import { createEvent } from '../supabase/events.js';
 import MiniMap from './maps/MiniMap';
 import { postcodeToGeoPoint } from '@utils/postcodeUtils';
 import PostcodeAutocomplete from '@utils/ValidatePostcode';
-
 
 interface AddEventFormValues {
   postcode: string;
@@ -21,7 +20,7 @@ interface AddEventFormValues {
 }
 
 export default function AddEvent() {
-  const { user } = useAuth(); 
+  const { user } = useAuth();
 
   const [isConfirming, setIsConfirming] = React.useState(false);
   const [eventDataToConfirm, setEventDataToConfirm] = React.useState<EventPost | null>(null);
@@ -37,7 +36,7 @@ export default function AddEvent() {
   } = useForm<AddEventFormValues>({
     defaultValues: {
       postcode: '',
-      event_date: '', 
+      event_date: '',
       eventType: '',
       instrumentsNeeded: [],
       budget: '',
@@ -71,7 +70,8 @@ export default function AddEvent() {
 
     if (data.text.length < 50) {
       setError('text', {
-        message: 'Please provide more information, so our musicians are well informed (at least 50 characters).',
+        message:
+          'Please provide more information, so our musicians are well informed (at least 50 characters).',
       });
       return;
     }
@@ -92,7 +92,8 @@ export default function AddEvent() {
         budget: Number(data.budget),
         extra_info: data.text,
         event_type: data.eventType,
-        poster_id: (user && typeof user === 'object' && 'id' in user) ? (user as { id: string }).id : '',
+        poster_id:
+          user && typeof user === 'object' && 'id' in user ? (user as { id: string }).id : '',
         status: 'pending',
         created_at: new Date(),
       };
@@ -132,18 +133,17 @@ export default function AddEvent() {
 
   if (isConfirming && eventDataToConfirm) {
     return (
-      
       <div className="max-w-md mx-auto p-6 bg-white shadow rounded-lg">
-      <div className="mb-4">
-        {eventDataToConfirm?.geopoint && (
-          <MiniMap
-            geopoint={eventDataToConfirm.geopoint}
-            id={eventDataToConfirm.event_id}
-          />
-        )}
-      </div>
+        <div className="mb-4">
+          {eventDataToConfirm?.geopoint && (
+            <MiniMap geopoint={eventDataToConfirm.geopoint} id={eventDataToConfirm.event_id} />
+          )}
+        </div>
         <div className="mb-2">
-          <strong>Date:</strong> {eventDataToConfirm.event_date instanceof Date ? eventDataToConfirm.event_date.toLocaleDateString() : String(eventDataToConfirm.event_date)}
+          <strong>Date:</strong>{' '}
+          {eventDataToConfirm.event_date instanceof Date
+            ? eventDataToConfirm.event_date.toLocaleDateString()
+            : String(eventDataToConfirm.event_date)}
         </div>
         <div className="mb-2">
           <strong>Event Type:</strong> {eventDataToConfirm.event_type}
@@ -157,10 +157,10 @@ export default function AddEvent() {
         <div className="mb-2">
           <strong>Price Per Musician (£):</strong> {eventDataToConfirm.budget}
         </div>
-     <div className="mb-4 break-words whitespace-pre-line overflow-auto max-h-40">
-  <strong>More Information:</strong>
-  <div>{eventDataToConfirm.extra_info}</div>
-</div>
+        <div className="mb-4 break-words whitespace-pre-line overflow-auto max-h-40">
+          <strong>More Information:</strong>
+          <div>{eventDataToConfirm.extra_info}</div>
+        </div>
         <div className="flex justify-between">
           <button type="button" onClick={handleBack} className="btn btn-secondary">
             Back
@@ -188,10 +188,17 @@ export default function AddEvent() {
             control={control}
             rules={{ required: 'Please enter a valid UK postcode' }}
             render={({ field }) => (
-              <PostcodeAutocomplete {...field} value={field.value} onChange={field.onChange} required />
+              <PostcodeAutocomplete
+                {...field}
+                value={field.value}
+                onChange={field.onChange}
+                required
+              />
             )}
           />
-          {errors.postcode && <p className="text-red-500 text-sm mt-1">{errors.postcode.message}</p>}
+          {errors.postcode && (
+            <p className="text-red-500 text-sm mt-1">{errors.postcode.message}</p>
+          )}
         </div>
 
         {/* Event Date Field */}
@@ -203,7 +210,9 @@ export default function AddEvent() {
             min={new Date().toISOString().split('T')[0]}
             className="w-full border rounded px-3 py-2"
           />
-          {errors.event_date && <p className="text-red-500 text-sm mt-1">{errors.event_date.message}</p>}
+          {errors.event_date && (
+            <p className="text-red-500 text-sm mt-1">{errors.event_date.message}</p>
+          )}
         </div>
 
         {/* Event Type Field */}
@@ -216,13 +225,15 @@ export default function AddEvent() {
             <option value="" disabled>
               What is the event?
             </option>
-            {EVENT_TYPES.map((event) => (
+            {EVENT_TYPES.map(event => (
               <option key={event} value={event}>
                 {event}
               </option>
             ))}
           </select>
-          {errors.eventType && <p className="text-red-500 text-sm mt-1">{errors.eventType.message}</p>}
+          {errors.eventType && (
+            <p className="text-red-500 text-sm mt-1">{errors.eventType.message}</p>
+          )}
         </div>
 
         {/* Instruments Selection */}
@@ -235,11 +246,16 @@ export default function AddEvent() {
               <>
                 <div className="flex flex-wrap gap-2 mb-2">
                   {field.value.map((instr: string, idx: number) => (
-                    <span key={idx} className="bg-gray-200 px-2 py-1 rounded inline-flex items-center">
+                    <span
+                      key={idx}
+                      className="bg-gray-200 px-2 py-1 rounded inline-flex items-center"
+                    >
                       {instr}
                       <button
                         type="button"
-                        onClick={() => field.onChange(field.value.filter((i: string) => i !== instr))}
+                        onClick={() =>
+                          field.onChange(field.value.filter((i: string) => i !== instr))
+                        }
                         className="ml-2 text-gray-500 hover:text-gray-700"
                       >
                         ×
@@ -249,7 +265,7 @@ export default function AddEvent() {
                 </div>
                 <select
                   value=""
-                  onChange={(e) => {
+                  onChange={e => {
                     if (e.target.value && !field.value.includes(e.target.value)) {
                       field.onChange([...field.value, e.target.value]);
                     }
@@ -257,7 +273,7 @@ export default function AddEvent() {
                   className="w-full border rounded px-3 py-2"
                 >
                   <option value="">Select instruments</option>
-                  {INSTRUMENTS.filter((i) => !field.value.includes(i)).map((instrument) => (
+                  {INSTRUMENTS.filter(i => !field.value.includes(i)).map(instrument => (
                     <option key={instrument} value={instrument}>
                       {instrument}
                     </option>
@@ -265,9 +281,11 @@ export default function AddEvent() {
                 </select>
               </>
             )}
-            rules={{ validate: (v) => v.length > 0 || 'Please select at least one instrument' }}
+            rules={{ validate: v => v.length > 0 || 'Please select at least one instrument' }}
           />
-          {errors.instrumentsNeeded && <p className="text-red-500 text-sm mt-1">{errors.instrumentsNeeded.message}</p>}
+          {errors.instrumentsNeeded && (
+            <p className="text-red-500 text-sm mt-1">{errors.instrumentsNeeded.message}</p>
+          )}
         </div>
 
         {/* Budget Field */}
@@ -313,4 +331,3 @@ export default function AddEvent() {
     </div>
   );
 }
-
