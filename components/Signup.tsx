@@ -1,8 +1,9 @@
 "use client"
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { sendPasswordReset } from '@supabase/auth'
 import { supabase } from '../supabaseClient';
+import { useRouter } from 'next/router';
 
 interface FormDataState {
   email: string;
@@ -12,6 +13,7 @@ interface FormDataState {
 // BasicSignupForm: only collects email and password for Supabase Auth
 const BasicSignupForm = () => {
   const formRef = useRef<HTMLFormElement>(null);
+  const router = useRouter();
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -33,6 +35,26 @@ const BasicSignupForm = () => {
     },
     mode: 'onBlur',
   });
+
+  useEffect(() => {
+    // If user is logged in but has no profile, log them out and redirect to login
+    const checkProfile = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        // Check if user has a profile in the users table
+        const { data: profile } = await supabase
+          .from('users')
+          .select('id')
+          .eq('id', user.id)
+          .single();
+        if (!profile) {
+          await supabase.auth.signOut();
+          router.replace('/login');
+        }
+      }
+    };
+    checkProfile();
+  }, [router]);
 
   // --- Forgot Password Handler ---
   const handleForgotPassword = async (email: string) => {
