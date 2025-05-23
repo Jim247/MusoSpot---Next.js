@@ -39,7 +39,7 @@ export default function AgentDashboard() {
     }
 
     return (
-        <div className="bg-contrast min-h-screen">
+        <div className="bg-white min-h-screen">
             <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
                 <div className="mb-6 p-4 bg-white rounded-lg shadow">
                     <h1 className="text-2xl font-semibold text-gray-900">

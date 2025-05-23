@@ -69,7 +69,7 @@ const BioSectionEditable: React.FC<BioSectionEditableProps> = ({ profile, bioMes
             </form>
           ) : (
             <div className="space-y-4">
-              <p className="text-m text-gray-500">{profile.bio || 'Add a short bio to tell people about yourself'}</p>
+              <p className="text-m text-gray-800 break-words whitespace-pre-line">{profile.bio || 'Add a short bio to tell people about yourself'}</p>
             </div>
           )}
           {bioMessage && <p className="text-red-500 text-sm mt-1">{bioMessage}</p>}

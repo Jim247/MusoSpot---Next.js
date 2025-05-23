@@ -60,7 +60,23 @@ export default function MusoProfile({ profile }: MusoProfileProps) {
               </span>
             ))}
           </div>
+          
         )}
+          {/* Location Section */}
+      {profile.role !== 'agent' && profile.geopoint && (
+        <div className="mt-6">
+          <h2 className="text-xl font-semibold mb-2">Location</h2>
+          <MiniMap
+            id={`map-${profile.slug}`}
+            geopoint={profile.geopoint}
+            radius={profile.search_radius || 100}
+            className="h-64 w-full rounded-lg"
+          />
+          <p className="mt-2 text-gray-600">
+            This user is available within {profile.search_radius || 100} miles of {profile.postcode}
+          </p>
+        </div>
+      )}
       </div>
       {/* Badge Section */}
      
@@ -92,21 +108,7 @@ export default function MusoProfile({ profile }: MusoProfileProps) {
           <p className="text-gray-600">No bio provided yet</p>
         </div>
       )}
-      {/* Location Section */}
-      {profile.role !== 'agent' && profile.geopoint && (
-        <div className="mt-6">
-          <h2 className="text-xl font-semibold mb-2">Location</h2>
-          <MiniMap
-            id={`map-${profile.slug}`}
-            geopoint={profile.geopoint}
-            radius={profile.search_radius || 100}
-            className="h-64 w-full rounded-lg"
-          />
-          <p className="mt-2 text-gray-600">
-            This user is available within {profile.search_radius || 100} miles of {profile.postcode}
-          </p>
-        </div>
-      )}
+    
       {/* User Reviews Section */}
       <ReviewSection profileid={profile.id} currentUser={null} reviews={[]} />
     </div>

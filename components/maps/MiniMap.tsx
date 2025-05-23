@@ -12,9 +12,10 @@ interface MiniMapProps {
   className?: string;
   id: string;
   radius?: number;
+  showCoverage?: boolean; 
 }
 
-export const MiniMap = memo(({ geopoint, className = 'h-full w-full', id, radius }: MiniMapProps) => {
+export const MiniMap = memo(({ geopoint, className = 'h-full w-full', id, radius, showCoverage = true }: MiniMapProps) => {
   const [leaflet, setLeaflet] = useState<typeof import('leaflet') | null>(null);
   const mapRef = useRef<LeafletMap | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -33,7 +34,7 @@ export const MiniMap = memo(({ geopoint, className = 'h-full w-full', id, radius
     if (!leaflet || !containerRef.current || !latLng) return;
 
     const container = containerRef.current;
-    const L = leaflet; // Store reference for cleanup
+    const L = leaflet;
 
     const timer = setTimeout(() => {
       if (mapRef.current) {
@@ -41,8 +42,12 @@ export const MiniMap = memo(({ geopoint, className = 'h-full w-full', id, radius
         mapRef.current = null;
       }
 
-      // Calculate zoom level based on radius
-      const zoomLevel = radius ? Math.min(13, Math.max(8, 13 - Math.log2(radius / 10))) : 13;
+      // Determine if we should show the coverage circle
+      const hasValidRadius = typeof radius === 'number' && isFinite(radius) && radius > 0;
+      const shouldShowCoverage = showCoverage && hasValidRadius;
+
+      // Use a fixed zoom if not showing coverage, else calculate based on radius
+      const zoomLevel = !shouldShowCoverage ? 13 : Math.min(13, Math.max(8, 13 - Math.log2(radius / 10)));
 
       const map = L.map(container, {
         attributionControl: false,
@@ -57,7 +62,7 @@ export const MiniMap = memo(({ geopoint, className = 'h-full w-full', id, radius
         attribution: '',
       }).addTo(map);
 
-      // Create custom marker icon
+      // Marker
       const markerIcon = L.divIcon({
         html: `<div style="
           width: 24px;
@@ -72,20 +77,18 @@ export const MiniMap = memo(({ geopoint, className = 'h-full w-full', id, radius
         iconAnchor: [12, 12],
       });
 
-      // Add marker with custom icon
       L.marker([latLng.lat, latLng.lng], { icon: markerIcon }).addTo(map);
 
-      // Add radius circle if radius is provided (ensure radius is a number)
-      if (typeof radius === 'number' && radius > 0) {
+      // Only add circle if shouldShowCoverage is true
+      if (shouldShowCoverage) {
         const circle = L.circle([latLng.lat, latLng.lng], {
-          radius: radius * 1609.34, // Convert miles to meters
-          color: 'var(--aw-color-primary)', // Use primary color from CSS
+          radius: radius * 1609.34,
+          color: 'var(--aw-color-primary)',
           fillColor: 'var(--aw-color-primary)',
           fillOpacity: 0.1,
           weight: 1,
         }).addTo(map);
 
-        // Fit bounds to include the circle
         map.fitBounds(circle.getBounds(), { padding: [20, 20] });
       }
     }, 100);
@@ -97,7 +100,7 @@ export const MiniMap = memo(({ geopoint, className = 'h-full w-full', id, radius
         mapRef.current = null;
       }
     };
-  }, [leaflet, latLng, radius, id]);
+  }, [leaflet, latLng, radius, id, showCoverage]);
 
   if (!latLng) return null;
   return <div id={id} ref={containerRef} className={`${className}`} />;

@@ -2,61 +2,56 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@supabase/auth';
 import { supabase } from '../supabaseClient.js';
-import type { EventNotification } from '../constants/event';
+import { MatchedEventCard } from './MatchedEventCard';
 
-interface NotificationListProps {
-  notifications: EventNotification[];
-  onApplicationSuccess?: (event_id: string) => void;
-}
-
-export const NotificationList: React.FC<NotificationListProps> = ({ notifications, onApplicationSuccess }) => {
+export const NotificationList: React.FC = () => {
   const { user } = useAuth();
+  const [notifications, setNotifications] = useState<any[]>([]);
   const [appliedEvents, setAppliedEvents] = useState<{ [key: string]: boolean }>({});
-
-  // Check if user has applied to event
-  const hasUserAppliedToEvent = async (event_id: string, userID: string) => {
-    const { data, error } = await supabase
-      .from('event_applications')
-      .select('id')
-      .eq('event_id', event_id)
-      .eq('user_id', userID)
-      .maybeSingle();
-    return !!data;
-  };
-
-  // Apply to event
-  const applyToEvent = async (event_id: string, userID: string) => {
-    const { error } = await supabase
-      .from('event_applications')
-      .insert([{ event_id: event_id, user_id: userID }]);
-    if (error) throw error;
-  };
 
   useEffect(() => {
     if (!user) return;
     (async () => {
+      const { data, error } = await supabase
+        .from('matched_events')
+        .select('event_id, events(*)')
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Error fetching matched events:', error);
+        setNotifications([]);
+        return;
+      }
+      const notifs = (data || []).map((row: any) => ({
+        ...row.events,
+        event_id: row.event_id,
+      }));
+      setNotifications(notifs);
+
+      // Check which events the user has already applied to
       const tracking: { [key: string]: boolean } = {};
-      for (const notif of notifications) {
-        if (!notif.event_id) {
-          console.error('Missing event_id in notification:', notif);
-          continue;
-        }
-        const alreadyApplied = await hasUserAppliedToEvent(notif.event_id, user.id);
-        tracking[notif.event_id] = alreadyApplied;
+      for (const notif of notifs) {
+        const { data: app } = await supabase
+          .from('event_applications')
+          .select('id')
+          .eq('event_id', notif.event_id)
+          .eq('user_id', user.id)
+          .maybeSingle();
+        tracking[notif.event_id] = !!app;
       }
       setAppliedEvents(tracking);
     })();
-  }, [notifications, user]);
+  }, [user]);
 
   const handleApply = async (event_id: string) => {
     if (!user) return;
     try {
-      await applyToEvent(event_id, user.id);
+      const { error } = await supabase
+        .from('event_applications')
+        .insert([{ event_id, user_id: user.id }]);
+      if (error) throw error;
       alert('Applied successfully!');
       setAppliedEvents((prev) => ({ ...prev, [event_id]: true }));
-      if (onApplicationSuccess) {
-        onApplicationSuccess(event_id);
-      }
     } catch (error) {
       alert('Failed to apply. Check console for details.');
       console.error(error);
@@ -64,35 +59,17 @@ export const NotificationList: React.FC<NotificationListProps> = ({ notification
   };
 
   return (
-    <div className="mt-8 mb-8 bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-xl font-bold">Events Matched to Me </h2>
+    <div className="mt-8 mb-8 bg-white rounded-lg shadow-md p-2">
+      <h2 className="text-xl font-bold pb-2">Events Matched to Me</h2>
       {notifications.length > 0 ? (
         <div className="space-y-4">
           {notifications.map((notification) => (
-            <div key={notification.id} className="border rounded-lg p-4 bg-blue-50">
-              <div className="flex justify-between">
-                <div>
-                  <p className="font-semibold">New matching event! ({notification.instruments_needed.join(', ')})</p>
-                  <p>Location: {notification.postcode}</p>
-                  <p>Budget: £{notification.budget}</p>
-                  <p className="text-sm text-gray-600">Distance: {notification.distance} miles away</p>
-                </div>
-                <div className="text-sm text-gray-500">
-                  {notification.date && 'seconds' in notification.date
-                    ? new Date(notification.event_date).toLocaleDateString()
-                    : ''}
-                </div>
-              </div>
-              <div className="mt-4">
-                {user && !appliedEvents[notification.event_id] ? (
-                  <button onClick={() => handleApply(notification.event_id)} className="btn btn-primary">
-                    Apply
-                  </button>
-                ) : (
-                  <span className="text-green-600 inline-block">Applied</span>
-                )}
-              </div>
-            </div>
+            <MatchedEventCard
+              key={notification.event_id}
+              event={notification}
+              applied={appliedEvents[notification.event_id]}
+              onApply={handleApply}
+            />
           ))}
         </div>
       ) : (

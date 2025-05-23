@@ -93,7 +93,6 @@ export default function AddEvent() {
         event_type: data.eventType,
         poster_id: (user && typeof user === 'object' && 'id' in user) ? (user as { id: string }).id : '',
         status: 'pending',
-        event_id: '',
         created_at: new Date(),
       };
 

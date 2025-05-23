@@ -12,7 +12,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 // Mock events to seed
 const dummyPosts = [
   {
-    event_id: uuidv4(),
+    id: uuidv4(),
     poster_id: uuidv4(),
     postcode: 'GL1 1DG',
     geopoint: {
