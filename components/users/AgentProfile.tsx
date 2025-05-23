@@ -3,7 +3,6 @@ import React from 'react';
 import { useUserProfile } from '@components/UserProfileContext';
 import { getExperienceLevel } from '@utils/BadgeRules';
 import ReviewSection from '@components/ReviewSection';
-import { ExperienceBadge } from '@components/Profile/badges/ExperienceBadge';
 
 export default function AgentProfile() {
   const { profile, loading } = useUserProfile();
@@ -63,7 +62,7 @@ export default function AgentProfile() {
                 className="flex items-center justify-center transition-transform hover:scale-110 hover:shadow-xl rounded-md px-2 py-2"
                 title="Experience Level"
               >
-                <ExperienceBadge years_experience={profile.years_experience} size="xxl" />
+                {/* <ExperienceBadge years_experience={profile.years_experience} size="xxl" /> */}
               </div>
             </div>
           </div>

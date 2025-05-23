@@ -11,7 +11,7 @@ export async function insertProfileImageMetadata(userId: string, imageUrl: strin
     .from('profile_images')
     .insert([
       {
-        user_id: userId,
+        id: userId,
         image_url: imageUrl,
         // uploaded_at will default to now()
       },

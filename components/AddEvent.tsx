@@ -8,6 +8,7 @@ import { useAuth } from '../supabase/auth.js';
 import { createEvent } from '../supabase/events.js';
 import MiniMap from './maps/MiniMap';
 import { postcodeToGeoPoint } from '@utils/postcodeUtils';
+import PostcodeAutocomplete from '@utils/ValidatePostcode';
 
 
 interface AddEventFormValues {
