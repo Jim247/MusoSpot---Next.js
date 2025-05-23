@@ -15,8 +15,13 @@ interface DatabaseUser {
   region?: string;
   country?: string;
   geopoint?: any;
+  search_radius?: number;
   video?: string;
   instruments?: string[];
+  years_experience?: number;
+  transport?: boolean;
+  pa_system?: boolean;
+  lighting?: boolean;
   // Add other fields as needed
 }
 
