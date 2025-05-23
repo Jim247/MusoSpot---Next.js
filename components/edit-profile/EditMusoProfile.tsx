@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useUserProfile } from '@components/UserProfileContext';
 import { EditProfileHeader } from '@components/profile/EditProfileHeader';
@@ -21,12 +21,9 @@ export default function MusoEditProfile() {
   const [bioMessage, setBioMessage] = useState('');
   const [isEditingRadius, setIsEditingRadius] = useState(false);
   const [isEditingVideo, setIsEditingVideo] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const [photoMessage, setPhotoMessage] = useState('');
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [reviewLoading, setReviewLoading] = useState(true);
   const [reviewError, setReviewError] = useState('');
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [reviewLoading, setReviewLoading] = useState(false);
 
   const form = useForm<{ bio?: string }>({
     defaultValues: { bio: profile?.bio || '' },
@@ -42,32 +39,6 @@ export default function MusoEditProfile() {
     } catch (err) {
       setBioMessage('Failed to update bio');
       console.error(err);
-    }
-  };
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !authUser?.id) return;
-    try {
-      setIsUploading(true);
-      setPhotoMessage('');
-      if (!file.type.startsWith('image/')) {
-        setPhotoMessage('Please select an image file.');
-        return;
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        setPhotoMessage('Image must be less than 5MB.');
-        return;
-      }
-      await uploadProfileImage(authUser.id, file);
-      await refresh();
-      setPhotoMessage('Profile image updated successfully!');
-      setTimeout(() => setPhotoMessage(''), 3000);
-    } catch {
-      setPhotoMessage('Error uploading image. Please try again.');
-    } finally {
-      setIsUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -104,11 +75,7 @@ export default function MusoEditProfile() {
       )}
       <div className="max-w-7xl mx-auto p-6">
         <EditProfileHeader
-          username={profile.first_name}
           profile={profile}
-          isUploading={isUploading}
-          photoMessage={photoMessage}
-          handleImageUpload={handleImageUpload}
         />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="space-y-6">
@@ -136,13 +103,17 @@ export default function MusoEditProfile() {
             />
             <div className="bg-white rounded-lg p-6">
               <h2 className="text-xl font-semibold mb-2"></h2>
-              <ReviewSection
-                profileid={profile.id}
-                currentUser={authUser}
-                reviews={reviews}
-                loading={reviewLoading}
-                error={reviewError}
-              />
+              {reviewError ? (
+                <div className="text-red-500 text-sm mb-2">{reviewError}</div>
+              ) : !reviews ? (
+                <div className="text-gray-500 text-sm mb-2">No reviews found.</div>
+              ) : (
+                <ReviewSection
+                  profileid={profile.id}
+                  currentUser={authUser}
+                  reviews={reviews}
+                />
+              )}
             </div>
           </div>
           <div className="space-y-6">

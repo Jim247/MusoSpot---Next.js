@@ -1,23 +1,14 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import type { UserDashboard } from '../../constants/users';
-import Image from 'next/image'
+import { ImageUploader } from '../ImageUploader';
 
 interface EditProfileHeaderProps {
   profile: UserDashboard;
-  isUploading: boolean;
-  username: string;
-  photoMessage: string;
-  handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export const EditProfileHeader: React.FC<EditProfileHeaderProps> = ({
   profile,
-  isUploading,
-  photoMessage,
-  handleImageUpload,
 }) => {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
   return (
     <div className="bg-white rounded-lg p-6 mb-8">
      {profile.role == 'agent' && (
@@ -26,34 +17,12 @@ export const EditProfileHeader: React.FC<EditProfileHeaderProps> = ({
         </div>
       )}
       <div className="text-center">
-        <div className="relative inline-block cursor-pointer group">
-          <label className="cursor-pointer">
-            <Image
-              src={profile.avatar ? profile.avatar : '/default-avatar.svg'}
-              alt="Profile"
-              className="w-48 h-48 md:w-64 md:h-64 object-cover rounded-md border mx-auto"
-              width={256}
-              height={256}
-            />
-            <div className="absolute inset-0 bg-black bg-opacity-40 rounded-md opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              <span className="text-white text-sm">{profile.avatar ? 'Change Photo' : 'Add a Photo'}</span>
-            </div>
-            <input
-              type="file"
-              className="hidden"
-              onChange={handleImageUpload}
-              accept="image/*"
-              disabled={isUploading}
-              ref={fileInputRef}
-            />
-          </label>
-        </div>
-        {isUploading && <span className="mt-2 text-sm text-gray-500">Uploading...</span>}
-        {photoMessage && (
-          <p className={`mt-2 text-sm ${photoMessage.includes('Error') ? 'text-red-500' : 'text-green-600'}`}>
-            {photoMessage}
-          </p>
-        )}
+        <ImageUploader
+          userId={profile.id}
+          initialUrl={profile.avatar || '/default-avatar.svg'}
+          onImageChange={() => {}}
+          size={256}
+        />
       </div>
 
       <div className="mt-4 text-center">

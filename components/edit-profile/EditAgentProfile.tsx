@@ -38,7 +38,7 @@ export default function AgentEditProfile() {
     defaultValues: {
       bio: profile?.bio || '',
       video: profile?.video || '',
-      searchRadius: profile?.searchRadius || 100,
+      searchRadius: profile?.search_radius || 100,
     },
   });
 
@@ -47,7 +47,7 @@ export default function AgentEditProfile() {
       reset({
         bio: profile.bio || '',
         video: profile.video || '',
-        searchRadius: profile.searchRadius || 100,
+        searchRadius: profile.search_radius || 100,
       });
     }
   }, [profile, reset]);
@@ -82,7 +82,7 @@ export default function AgentEditProfile() {
       const updated_ata: Partial<UserDashboard> = {
         bio: data.bio,
         video: data.video,
-        searchRadius: data.searchRadius,
+        search_radius: data.searchRadius,
       };
 
       // Perform bio validation here if needed, or rely on RHF validation
@@ -193,11 +193,11 @@ export default function AgentEditProfile() {
                     <h3 className="text-gray-700 font-semibold w-1/3">Search Distance</h3>
                   </div>
                   <div className="">
-                    {profile.geoPoint ? (
+                    {profile.geopoint ? (
                       <SearchRadiusControl
                         // Use RHF state if possible, or keep local state for editing toggle
-                        initialRadius={profile.searchRadius || 100}
-                        center={profile.geoPoint}
+                        initialRadius={profile.search_radius || 100}
+                        center={profile.geopoint}
                         // Modify onSave to trigger the main form submission
                         onSave={async (radius) => {
                           setValue('searchRadius', radius, { shouldValidate: true });

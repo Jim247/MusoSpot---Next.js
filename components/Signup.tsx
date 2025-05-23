@@ -122,26 +122,26 @@ const BasicSignupForm = () => {
         <div className="form-success">{success}</div>
       )}
       {emailSent ? (
-        <div className="text-center">
-          <p className="form-success">{success}</p>
-          <p className="mb-4">
-            A verification email has been sent to <strong>{registeredEmail}</strong>.
-          </p>
-          <p className="mb-4">Please check your inbox and click the verification link to activate your account.</p>
+        <div className="flex flex-col items-center justify-center bg-white border border-slate-300 rounded-lg shadow-md p-6 mt-4 text-center transition-all duration-500">
+          <svg className="w-12 h-12 text-green-500 mb-2 mx-auto animate-bounce" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="white" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2l4-4" />
+          </svg>
+          <p className="text-lg font-semibold text-green-700 mb-2">Account created!</p>
+          <p className="text-black mb-2">A verification email has been sent to <strong>{registeredEmail}</strong>.</p>
+          <p className="text-black mb-4">Please check your inbox and click the verification link to activate your account.</p>
           <button
             onClick={handleResendEmail}
-            className="btn-primary"
+            className="btn-primary mb-2 mx-auto"
           >
             Resend Verification Email
           </button>
-          <div className="mt-2">
-            <button
-              onClick={() => (window.location.href = '/login')}
-              className="btn-secondary"
-            >
-              Login now
-            </button>
-          </div>
+          <button
+            onClick={() => (window.location.href = '/login')}
+            className="btn-secondary mx-auto"
+          >
+            Login now
+          </button>
         </div>
       ) : (
         <form ref={formRef} onSubmit={handleSubmit(onSubmit)} className="form-section">
@@ -186,13 +186,13 @@ const BasicSignupForm = () => {
             </p>
             {errors.password && <span className="form-error">{errors.password.message}</span>}
           </div>
-          <div className="form-group flex items-start space-x-3">
+          <div className="flex items-start space-x-3">
             <input
               type="checkbox"
               id="terms"
               checked={agreedToTerms}
               onChange={(e) => setAgreedToTerms(e.target.checked)}
-              className="form-checkbox"
+              className="form-checkbox mt-1"
             />
             <label htmlFor="terms" className="form-label">
               I agree to the{' '}

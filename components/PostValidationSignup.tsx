@@ -3,8 +3,8 @@ import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
 import { INSTRUMENTS } from '../constants/instruments';
 import { postcodeValidator } from 'postcode-validator';
-import PostcodeAutocomplete from '../lib/utils/ValidatePostcode';
-import { postcodeToGeoPoint } from '@utils/GeoPoints';
+import PostcodeAutocomplete from '@utils/ValidatePostcode';
+import { postcodeToGeoPoint } from '../utils/postcodeUtils'
 
 interface ProfileFields {
   first_name: string;
@@ -128,7 +128,7 @@ const PostValidationSignup: React.FC<{ initialProfile?: Partial<ProfileFields> }
         ...fields,
         instruments: fields.instruments ? [fields.instruments] : [], // Always an array, always called instruments
         username, // Add generated username
-        geopoint: geoPoint?.point,
+        geopoint: geoPoint?.geopoint || null, // Use the GeoJSON Point object
         ward: geoPoint?.ward,
         region: geoPoint?.region,
         country: geoPoint?.country,
@@ -146,7 +146,7 @@ const PostValidationSignup: React.FC<{ initialProfile?: Partial<ProfileFields> }
         setIsLoading(false);
         return;
       }
-      setSuccess('Profile completed!');
+      setSuccess('Profile completed, you will be redicrected shortly!');
       setTimeout(() => {
         window.location.href = '/edit-profile';
       }, 1500); // Show message for 1.5s, then redirect

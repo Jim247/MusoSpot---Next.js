@@ -3,12 +3,12 @@ import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { INSTRUMENTS } from '@constants/instruments';
 import { EVENT_TYPES } from '../constants/event';
-import PostcodeAutocomplete from '@utils/ValidatePostcode';
 import type { EventPost } from '@constants/event';;
 import { useAuth } from '../supabase/auth.js';
-import { postcodeToGeoPoint } from '../lib/utils/GeoPoints';
 import { createEvent } from '../supabase/events.js';
 import MiniMap from './maps/MiniMap';
+import { postcodeToGeoPoint } from '@utils/postcodeUtils';
+
 
 interface AddEventFormValues {
   postcode: string;
