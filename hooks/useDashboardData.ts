@@ -2,47 +2,46 @@
 import { useState, useEffect } from "react";
 import { useUserProfile } from "@components/UserProfileContext";
 import { supabase } from "../supabaseClient.js";
-import type { EventApplication, EventNotification, EventPost } from "@constants/event";
+import type { EventNotification, EventPost } from "@constants/event";
 
 export function useDashboardData() {
   const { profile, loading: profileLoading } = useUserProfile();
   const [events, setEvents] = useState<EventPost[]>([]);
   const [notifications, setNotifications] = useState<EventNotification[]>([]);
-  const [applications] = useState<{ [key: string]: EventApplication[] }>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchData() {
-      if (!profile?.id) { // Supabase uses 'id' not 'id'
+      if (!profile?.id) {
         setLoading(false);
         return;
       }
       try {
         setLoading(true);
 
-        // Fetch events for the user
-        const { data: userEvents, error: eventsError } = await supabase
-          .from('events')
-          .select('*')
-          .eq('poster_id', profile.id);
+        // Run both queries in parallel
+        const [eventsRes, notificationsRes] = await Promise.all([
+          supabase
+            .from('events')
+            .select('*')
+            .eq('poster_id', profile.id),
+          supabase
+            .from('notifications')
+            .select('*')
+            .eq('user_id', profile.id),
+        ]);
 
-        // Fetch notifications for the user
-        const { data: userNotifications, error: notifError } = await supabase
-          .from('notifications')
-          .select('*')
-          .eq('user_id', profile.id);
-
-        if (eventsError || notifError) {
-          throw eventsError || notifError;
+        if (eventsRes.error || notificationsRes.error) {
+          throw eventsRes.error || notificationsRes.error;
         }
 
-        setEvents(userEvents || []);
-        const mappedNotifications = (userNotifications as EventNotification[]).map((notif) => ({
+        setEvents(eventsRes.data || []);
+        const mappedNotifications = (notificationsRes.data as EventNotification[]).map((notif) => ({
           ...notif,
           id: notif.id || '',
           poster_id: notif.agent_id || '',
-          event_id: notif.event_id || notif.event_id || '',
+          event_id: notif.event_id || '',
           event_type: notif.event_type || '',
           postcode: notif.postcode || '',
           budget: notif.budget || 0,
@@ -69,8 +68,7 @@ export function useDashboardData() {
     profile,
     events,
     notifications,
-    applications,
-    loading: profileLoading || loading,
+    loading: loading || profileLoading,
     error,
   };
 }

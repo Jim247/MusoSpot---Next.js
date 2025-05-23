@@ -18,7 +18,7 @@ interface ProfileFields {
   transport: string;
   pa_system: string;
   lighting: string;
-  
+  search_radius: string;
 }
 
 // Utility to generate a username from first and last name
@@ -29,7 +29,7 @@ function generateUserName(first: string, last: string) {
 }
 
 const PostValidationSignup: React.FC<{ initialProfile?: Partial<ProfileFields> }> = () => {
-  // Always start with empty fields, no caching of previous fields
+
   const [fields, setFields] = useState<ProfileFields>({
     first_name: '',
     last_name: '',
@@ -42,7 +42,9 @@ const PostValidationSignup: React.FC<{ initialProfile?: Partial<ProfileFields> }
     transport: '',
     pa_system: '',
     lighting: '',
+    search_radius: '100', 
   });
+
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -122,18 +124,37 @@ const PostValidationSignup: React.FC<{ initialProfile?: Partial<ProfileFields> }
       const username = generateUserName(fields.first_name, fields.last_name);
       const formattedPostcode = fields.postcode.toUpperCase().replace(/\s+/g, '');
       const geoPoint = await postcodeToGeoPoint(formattedPostcode);
-      const userData = {
-        id: user.id,
-        email: user.email,
-        ...fields,
-        instruments: fields.instruments ? [fields.instruments] : [], // Always an array, always called instruments
-        username, // Add generated username
-        geopoint: geoPoint?.geopoint || null, // Use the GeoJSON Point object
-        ward: geoPoint?.ward,
-        region: geoPoint?.region,
-        country: geoPoint?.country,
-        profile_complete: true, // Set the complete flag on successful profile completion
-      };
+      const userData: any = {
+  id: user.id,
+  email: user.email,
+  ...fields,
+  instruments: fields.instruments ? [fields.instruments] : [],
+  username,
+  geopoint: geoPoint?.geopoint || null,
+  ward: geoPoint?.ward,
+  region: geoPoint?.region,
+  country: geoPoint?.country,
+  profile_complete: true,
+  search_radius: fields.search_radius ? Number(fields.search_radius) : 160934, // 100 miles in meters
+};
+
+// Role-specific fields
+if (fields.role === "musician") {
+  userData.instruments = fields.instruments ? [fields.instruments] : [];
+  userData.years_experience = fields.years_experience ? Number(fields.years_experience) : null;
+  userData.transport = fields.transport === "yes" ? true : fields.transport === "no" ? false : null;
+  userData.pa_system = fields.pa_system === "yes" ? true : fields.pa_system === "no" ? false : null;
+  userData.lighting = fields.lighting === "yes" ? true : fields.lighting === "no" ? false : null;
+  userData.agency_name = null; // Explicitly null for musicians
+
+} else if (fields.role === "agent") {
+  userData.agency_name = fields.agency_name || null;
+  userData.instruments = null;
+  userData.years_experience = null;
+  userData.transport = null;
+  userData.pa_system = null;
+  userData.lighting = null;
+}
       console.log('Upserting userData:', userData); // Debug log
       const { data, error: upsertError } = await supabase
         .from('users')

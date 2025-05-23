@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { sendPasswordReset } from '@supabase/auth'
 import { supabase } from '../supabaseClient';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 interface FormDataState {
   email: string;

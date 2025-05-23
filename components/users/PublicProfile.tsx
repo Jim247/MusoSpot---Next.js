@@ -1,23 +1,43 @@
 "use client"
 import { useEffect, useState } from 'react';
-import MusoProfile from './MusoProfile';
-import AgentProfile from './AgentProfile';
+import PublicMusoProfile from './PublicMusoProfile';
+import PublicAgentProfile from './PublicAgentProfile';
 import { getPublicProfileByUsername } from '@supabase/auth';
-import { UserProfile } from 'firebase/auth';
+import { PublicProfileProvider } from '@components/PublicProfileContext';
 
-const PublicProfile = ({ slug }: { slug: string }) => {
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+interface DatabaseUser {
+  id: string;
+  username: string;
+  role: 'musician' | 'agent';
+  first_name: string;
+  last_name: string;
+  email: string;
+  bio?: string;
+  avatar?: string;
+  agency_name?: string;
+  // Add other fields as needed
+}
+
+const PublicProfile = ({ username }: { username: string }) => {
+  const [profile, setProfile] = useState<DatabaseUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadProfile() {
+      console.log('Loading profile for username:', username);
       setLoading(true);
-      const user = await getPublicProfileByUsername(slug);
-      setProfile(user);
+      try {
+        const user = await getPublicProfileByUsername(username);
+        console.log('Profile loaded:', user);
+        setProfile(user);
+      } catch (error) {
+        console.error('Error loading profile:', error);
+        setProfile(null);
+      }
       setLoading(false);
     }
     loadProfile();
-  }, [slug]);
+  }, [username]);
 
     // Loading Screen for Dashboard
   if (loading) {
@@ -32,13 +52,12 @@ const PublicProfile = ({ slug }: { slug: string }) => {
   }
   if (!profile) return <div>Profile not found</div>;
 
-  
-
-if (profile.role === 'musician') {
-  return <MusoProfile profile={profile} />;
-} else if (profile.role === 'agent') {
-  return <AgentProfile profile={profile} />;
-}
+  return (
+    <PublicProfileProvider profile={profile} loading={loading}>
+      {profile.role === 'musician' && <PublicMusoProfile />}
+      {profile.role === 'agent' && <PublicAgentProfile />}
+    </PublicProfileProvider>
+  );
 };
 
 export default PublicProfile;

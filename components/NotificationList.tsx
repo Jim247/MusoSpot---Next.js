@@ -3,10 +3,11 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '@supabase/auth';
 import { supabase } from '../supabaseClient.js';
 import { MatchedEventCard } from './MatchedEventCard';
+import type { EventNotification } from '@constants/event';
 
 export const NotificationList: React.FC = () => {
   const { user } = useAuth();
-  const [notifications, setNotifications] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<EventNotification[]>([]);
   const [appliedEvents, setAppliedEvents] = useState<{ [key: string]: boolean }>({});
 
   useEffect(() => {
@@ -29,15 +30,17 @@ export const NotificationList: React.FC = () => {
       setNotifications(notifs);
 
       // Check which events the user has already applied to
+      const eventIds = notifs.map(n => n.event_id);
+      const { data: applications } = await supabase
+        .from('event_applications')
+        .select('event_id')
+        .in('event_id', eventIds)
+        .eq('user_id', user.id);
+
+      const appliedEventIds = new Set(applications?.map(app => app.event_id));
       const tracking: { [key: string]: boolean } = {};
       for (const notif of notifs) {
-        const { data: app } = await supabase
-          .from('event_applications')
-          .select('id')
-          .eq('event_id', notif.event_id)
-          .eq('user_id', user.id)
-          .maybeSingle();
-        tracking[notif.event_id] = !!app;
+        tracking[notif.event_id] = appliedEventIds.has(notif.event_id);
       }
       setAppliedEvents(tracking);
     })();
@@ -59,7 +62,7 @@ export const NotificationList: React.FC = () => {
   };
 
   return (
-    <div className="mt-8 mb-8 bg-white rounded-lg shadow-md p-2">
+    <div className="mt-8 mb-8 bg-white rounded-lg shadow-md p-6">
       <h2 className="text-xl font-bold pb-2">Events Matched to Me</h2>
       {notifications.length > 0 ? (
         <div className="space-y-4">

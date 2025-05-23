@@ -8,6 +8,8 @@ interface EventsListProps {
 }
 
 export const EventsList: React.FC<EventsListProps> = ({ events, applications }) => {
+  // Ensure applications is always an object
+  const safeApplications = applications || {};
   return (
     <div className="mt-8 bg-white rounded-lg p-6 col-2 shadow-md">
       <div>
@@ -21,7 +23,7 @@ export const EventsList: React.FC<EventsListProps> = ({ events, applications }) 
           <div className="space-y-4">
             {events.map((event) => {
               const eventKey = event.event_id || event.id;
-              const eventApplications = applications[String(eventKey)] || [];
+              const eventApplications = safeApplications[String(eventKey)] || [];
               return (
                 <div key={eventKey} className="border rounded-lg p-4">
                   <div className="grid grid-cols-2 gap-4">
